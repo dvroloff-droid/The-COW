@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Coach's Office</title>
+    <meta
+      name="description"
+      content="The rebuilt Coach's Office website with sections for articles, clips, fantasy football, spreadsheets, and coaching services."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <h1>The Coach's Office</h1>
+        <p class="subtitle">Home Page</p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="diagram" aria-labelledby="diagram-title">
+        <h2 id="diagram-title">Site Map Diagram</h2>
+        <img
+          src="assets/The%20Coach%27s%20Office%20Web%20Design.svg"
+          alt="The Coach's Office website structure diagram"
+          loading="lazy"
+        />
+      </section>
+
+      <section class="grid" aria-label="Site sections">
+        <article class="card" id="articles">
+          <h3>Articles</h3>
+          <p>Upload and organize article content from PDFs.</p>
+          <button type="button" data-action="placeholder">Open Articles</button>
+        </article>
+
+        <article class="card" id="tips-clips">
+          <h3>Coaching Tips & Clips</h3>
+          <p>Video clips and text resources curated from trusted sources.</p>
+          <button type="button" data-action="placeholder">Open Tips & Clips</button>
+        </article>
+
+        <article class="card" id="espn-fantasy">
+          <h3>ESPN Fantasy</h3>
+          <p>Quick access area for fantasy football resources and links.</p>
+          <a href="#" data-action="external-placeholder">Open ESPN Fantasy</a>
+        </article>
+
+        <article class="card" id="football-not-futbol">
+          <h3>Football (Not Futbol)</h3>
+          <p>Spreadsheet-driven section with room for multi-tab updates.</p>
+          <button type="button" data-action="placeholder">Open Football Data</button>
+        </article>
+
+        <article class="card" id="gffl">
+          <h3>The GFFL</h3>
+          <p>Upload and maintain a multi-tab Excel-based tracking section.</p>
+          <button type="button" data-action="placeholder">Open GFFL</button>
+        </article>
+
+        <article class="card" id="store">
+          <h3>Web Store</h3>
+          <p>Book coaching lessons and services.</p>
+          <button type="button" data-action="placeholder">Open Store</button>
+        </article>
+
+        <article class="card" id="milwaukee-angels">
+          <h3>Milwaukee Angels U-11</h3>
+          <p>External GameChanger access point.</p>
+          <a href="#" data-action="external-placeholder">Open GameChanger</a>
+        </article>
+
+        <article class="card" id="madison-college">
+          <h3>Madison College</h3>
+          <p>External GameChanger access point.</p>
+          <a href="#" data-action="external-placeholder">Open GameChanger</a>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> The Coach's Office</p>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
