@@ -8,7 +8,6 @@
       name="description"
       content="The rebuilt Coach's Office website with sections for articles, clips, fantasy football, spreadsheets, and coaching services."
     />
-    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="site-header">
@@ -22,7 +21,7 @@
       <section class="diagram" aria-labelledby="diagram-title">
         <h2 id="diagram-title">Site Map Diagram</h2>
         <img
-          src="assets/The%20Coach%27s%20Office%20Web%20Design.svg"
+          src="The%20Coach%27s%20Office%20Web%20Design.svg"
           alt="The Coach's Office website structure diagram"
           loading="lazy"
         />
@@ -85,6 +84,8 @@
       </div>
     </footer>
 
-    <script src="app.js"></script>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
   </body>
 </html>
