@@ -10,7 +10,7 @@ values (
   'coach-thoughts',
   true,
   20971520,
-  array['application/pdf']
+  null
 )
 on conflict (id) do update
 set
@@ -18,15 +18,17 @@ set
   file_size_limit = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
+drop policy if exists "Public can list Coach's Thoughts files" on storage.objects;
 drop policy if exists "Public can list Coach's Thoughts PDFs" on storage.objects;
-create policy "Public can list Coach's Thoughts PDFs"
+create policy "Public can list Coach's Thoughts files"
 on storage.objects
 for select
 to anon, authenticated
 using (bucket_id = 'coach-thoughts');
 
+drop policy if exists "Authorized users can upload Coach's Thoughts files" on storage.objects;
 drop policy if exists "Authorized users can upload Coach's Thoughts PDFs" on storage.objects;
-create policy "Authorized users can upload Coach's Thoughts PDFs"
+create policy "Authorized users can upload Coach's Thoughts files"
 on storage.objects
 for insert
 to authenticated

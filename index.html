@@ -131,7 +131,7 @@
             </header>
 
             <p class="thoughts-status" id="thoughts-status" role="status" aria-live="polite">
-              PDF uploads are not connected yet. Set up Supabase to enable this library.
+              File uploads are not connected yet. Set up Supabase to enable this library.
             </p>
 
             <form class="thoughts-login" id="thoughts-login" hidden>
@@ -144,18 +144,18 @@
 
             <div class="thoughts-uploader" id="thoughts-uploader" hidden>
               <form id="thoughts-upload">
-                <label for="thoughts-file">Choose a PDF</label>
-                <input id="thoughts-file" name="file" type="file" accept="application/pdf,.pdf" required />
-                <p>PDF only · Up to 20 MB</p>
-                <button type="submit">Upload PDF</button>
+                <label for="thoughts-file">Choose a file</label>
+                <input id="thoughts-file" name="file" type="file" required />
+                <p>Any file type · Up to 20 MB</p>
+                <button type="submit">Upload file</button>
               </form>
               <button class="thoughts-signout" id="thoughts-signout" type="button">Sign out</button>
             </div>
 
             <div class="thoughts-library">
-              <h3>Shared PDFs</h3>
+              <h3>Shared files</h3>
               <ul id="thoughts-list" aria-live="polite">
-                <li>Connect Supabase to load shared PDFs.</li>
+                <li>Connect Supabase to load shared files.</li>
               </ul>
             </div>
           </section>
