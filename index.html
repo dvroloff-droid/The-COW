@@ -140,6 +140,15 @@
               <label for="thoughts-password">Password</label>
               <input id="thoughts-password" name="password" type="password" autocomplete="current-password" required />
               <button type="submit">Sign in to upload</button>
+              <button id="thoughts-reset-request" type="button">Send password reset link</button>
+            </form>
+
+            <form class="thoughts-reset" id="thoughts-reset" hidden>
+              <label for="thoughts-new-password">New password</label>
+              <input id="thoughts-new-password" name="password" type="password" autocomplete="new-password" minlength="6" required />
+              <label for="thoughts-confirm-password">Confirm new password</label>
+              <input id="thoughts-confirm-password" name="confirmation" type="password" autocomplete="new-password" minlength="6" required />
+              <button type="submit">Update password</button>
             </form>
 
             <div class="thoughts-uploader" id="thoughts-uploader" hidden>

@@ -4,13 +4,17 @@
   const config = window.COACH_THOUGHTS_CONFIG;
   const status = document.querySelector("#thoughts-status");
   const loginForm = document.querySelector("#thoughts-login");
+  const resetRequestButton = document.querySelector("#thoughts-reset-request");
+  const resetForm = document.querySelector("#thoughts-reset");
   const uploadArea = document.querySelector("#thoughts-uploader");
   const uploadForm = document.querySelector("#thoughts-upload");
   const fileInput = document.querySelector("#thoughts-file");
   const signOutButton = document.querySelector("#thoughts-signout");
   const fileList = document.querySelector("#thoughts-list");
 
+  let statusRevision = 0;
   const setStatus = (message) => {
+    statusRevision++;
     status.textContent = message;
   };
 
@@ -41,6 +45,9 @@
       return;
     }
 
+    const hashParams = new URLSearchParams(window.location.hash.slice(1));
+    let recoveryMode = hashParams.get("type") === "recovery";
+    const recoveryError = hashParams.get("error_description");
     const client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
     const bucket = client.storage.from(bucketName);
 
@@ -54,10 +61,12 @@
 
     const showSession = (session) => {
       loginForm.hidden = Boolean(session);
-      uploadArea.hidden = !session;
+      resetForm.hidden = !session || !recoveryMode;
+      uploadArea.hidden = !session || recoveryMode;
     };
 
-    const loadFiles = async () => {
+    const loadFiles = async (preserveStatus = false) => {
+      const startingRevision = statusRevision;
       fileList.replaceChildren();
       try {
         const { data, error } = await bucket.list("", {
@@ -72,7 +81,7 @@
 
         const files = (data || []).filter((file) => file.id);
         if (files.length === 0) {
-          setStatus("No files have been shared yet.");
+          if (!preserveStatus && statusRevision === startingRevision) setStatus("No files have been shared yet.");
           const item = document.createElement("li");
           item.textContent = "Your shared files will appear here.";
           fileList.append(item);
@@ -90,7 +99,9 @@
           fileList.append(item);
         }
 
-        setStatus(`${files.length} shared file${files.length === 1 ? "" : "s"}.`);
+        if (!preserveStatus && statusRevision === startingRevision) {
+          setStatus(`${files.length} shared file${files.length === 1 ? "" : "s"}.`);
+        }
       } catch (error) {
         showError("Could not load shared files", error);
       }
@@ -117,6 +128,56 @@
         setStatus("Signed in. You can upload a file.");
       } catch (error) {
         showError("Could not sign in", error);
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+
+    resetRequestButton.addEventListener("click", async () => {
+      const emailInput = loginForm.querySelector('input[name="email"]');
+      if (!emailInput.reportValidity()) return;
+
+      resetRequestButton.disabled = true;
+      setStatus("Sending password reset link...");
+      try {
+        const redirectTo = `${window.location.origin}${window.location.pathname}`;
+        const { error } = await client.auth.resetPasswordForEmail(emailInput.value.trim(), { redirectTo });
+        if (error) {
+          showError("Could not send password reset link", error);
+          return;
+        }
+        setStatus("If this email has an account, check its inbox for a password reset link.");
+      } catch (error) {
+        showError("Could not send password reset link", error);
+      } finally {
+        resetRequestButton.disabled = false;
+      }
+    });
+
+    resetForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formData = new FormData(resetForm);
+      const password = formData.get("password");
+      if (password !== formData.get("confirmation")) {
+        setStatus("The new passwords do not match.");
+        return;
+      }
+
+      const submitButton = resetForm.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      setStatus("Updating password...");
+      try {
+        const { error } = await client.auth.updateUser({ password });
+        if (error) {
+          showError("Could not update password", error);
+          return;
+        }
+        recoveryMode = false;
+        resetForm.reset();
+        showSession(true);
+        setStatus("Password updated. You can now upload a file.");
+      } catch (error) {
+        showError("Could not update password", error);
       } finally {
         submitButton.disabled = false;
       }
@@ -179,7 +240,15 @@
       }
     });
 
-    client.auth.onAuthStateChange((_event, session) => showSession(session));
+    client.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        recoveryMode = true;
+        setStatus("Enter a new password below.");
+      }
+      if (event === "SIGNED_OUT") recoveryMode = false;
+      showSession(session);
+    });
+    const initialStatusRevision = statusRevision;
     client.auth
       .getSession()
       .then(({ data, error }) => {
@@ -188,7 +257,12 @@
           return;
         }
         showSession(data.session);
-        loadFiles();
+        if (recoveryError) {
+          setStatus(`Password reset link error: ${recoveryError}. Request a new link.`);
+        } else if (recoveryMode && data.session) {
+          setStatus("Enter a new password below.");
+        }
+        loadFiles(Boolean(recoveryError) || recoveryMode || statusRevision !== initialStatusRevision);
       })
       .catch((error) => showError("Could not check sign-in status", error));
   };

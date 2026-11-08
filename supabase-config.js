@@ -1,4 +1,4 @@
 window.COACH_THOUGHTS_CONFIG = {
-  supabaseUrl: "https://your-project-id.supabase.co",
-  supabaseAnonKey: "your-publishable-key",
+  supabaseUrl: "https://lxcbtctiakdmakhhvpac.supabase.co",
+  supabaseAnonKey: "sb_publishable__UewK7iysIeGVdwg6h_SKQ_rrxcHpaA",
 };

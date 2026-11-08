@@ -17,3 +17,18 @@ The bucket accepts any file type up to 20 MB.
    into `supabase-config.js`. Never put a `service_role` key in this website.
 5. Publish the site. Authorized uploaders can sign in to add files up to 20 MB;
    visitors can download shared files from the library.
+
+## Password recovery
+
+In Supabase Authentication URL Configuration, set the Site URL to
+`https://dvroloff-droid.github.io/The-COW/` and add the published page URLs
+`https://dvroloff-droid.github.io/The-COW/` and
+`https://dvroloff-droid.github.io/The-COW/index.html` to Redirect URLs. Add
+other deployment URLs only if they are trusted. If using a custom reset email
+template, ensure its link uses `{{ .ConfirmationURL }}` so Supabase verifies the
+reset before redirecting back to the site.
+
+On the published site, enter the authorized account's email and select
+**Send password reset link**. Open the latest link in the email and enter the
+new password on the site. Links expire and can be used only once; request a
+new one if needed.

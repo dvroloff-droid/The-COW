@@ -393,6 +393,7 @@ main,
 }
 
 .thoughts-login,
+.thoughts-reset,
 .thoughts-uploader form {
   display: grid;
   gap: 0.4rem;
@@ -400,11 +401,13 @@ main,
 }
 
 .thoughts-login label,
+.thoughts-reset label,
 .thoughts-uploader label {
   font: 700 0.68rem/1.3 var(--sans);
 }
 
 .thoughts-login input,
+.thoughts-reset input,
 .thoughts-uploader input {
   width: 100%;
   min-width: 0;
@@ -417,6 +420,7 @@ main,
 }
 
 .thoughts-login button,
+.thoughts-reset button,
 .thoughts-uploader button {
   justify-self: start;
   padding: 0.55rem 0.7rem;
@@ -428,6 +432,7 @@ main,
 }
 
 .thoughts-login button:hover,
+.thoughts-reset button:hover,
 .thoughts-uploader button:hover {
   background: var(--red);
 }
