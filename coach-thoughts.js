@@ -67,7 +67,7 @@
       uploadArea.hidden = !session || recoveryMode;
     };
 
-    const loadFiles = async (preserveStatus = false) => {
+    const loadFiles = async (preserveStatus = false, openStoryName = null) => {
       const startingRevision = statusRevision;
       fileList.replaceChildren();
       try {
@@ -152,6 +152,7 @@
                 loading = false;
               }
             });
+            details.open = file.name === openStoryName;
             item.append(details);
           } else {
             const link = document.createElement("a");
@@ -240,7 +241,7 @@
 
         storyForm.reset();
         setStatus("Story published successfully.");
-        await loadFiles(true);
+        await loadFiles(true, objectName);
       } catch (error) {
         showError("Could not publish story", error);
       } finally {
