@@ -292,51 +292,9 @@ main,
 
 .column-heading h1 {
   margin: 0.25rem 0 0;
-  font-size: clamp(1.85rem, 3.15vw, 2.8rem);
+  font-size: clamp(1.85rem, 3vw, 2.5rem);
   letter-spacing: -0.055em;
-  line-height: 0.99;
-}
-
-.column-copy {
-  padding: 0.75rem 0 0.6rem;
-}
-
-.column-copy h2 {
-  margin: 0.65rem 0 0.3rem;
-  font-size: 1.05rem;
-  letter-spacing: -0.02em;
-  line-height: 1.14;
-}
-
-.column-copy h2:first-child {
-  margin-top: 0;
-}
-
-.column-copy p {
-  margin: 0 0 0.55rem;
-  color: #39332b;
-  font-size: 0.84rem;
-  line-height: 1.5;
-}
-
-.column-copy a {
-  color: var(--red);
-  font-weight: 700;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-
-.column-scores {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.35rem 0.5rem;
-  margin: 0.45rem 0 0.6rem;
-  padding: 0.55rem 0;
-  border-top: 1px solid var(--rule-light);
-  border-bottom: 1px solid var(--rule-light);
-  list-style: none;
-  font-size: 0.72rem;
-  font-weight: 700;
+  line-height: 1.02;
 }
 
 .today-news {
@@ -422,8 +380,8 @@ main,
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  margin-top: 0.65rem;
-  padding: 0.65rem 0.5rem;
+  margin-top: 1rem;
+  padding: 1rem 0.7rem;
   border-top: 3px double var(--ink);
   border-bottom: 1px solid var(--ink);
   background: var(--paper-dark);
@@ -447,7 +405,7 @@ main,
 }
 
 .download-briefing strong {
-  font-size: 0.93rem;
+  font-size: 1rem;
 }
 
 .download-briefing small {
