@@ -14,6 +14,7 @@
   const storyEditor = document.querySelector("#thoughts-story-editor");
   const storyImageButton = document.querySelector("#thoughts-story-add-image");
   const storyImageInput = document.querySelector("#thoughts-story-image");
+  const storyAgainButton = document.querySelector("#thoughts-story-again");
   const signOutButton = document.querySelector("#thoughts-signout");
   const fileList = document.querySelector("#thoughts-list");
   const heroInner = document.querySelector(".hero-inner");
@@ -22,6 +23,11 @@
   const setStatus = (message) => {
     statusRevision++;
     status.textContent = message;
+    status.dataset.state = /could not|choose|enter|add a headline/i.test(message)
+      ? "error"
+      : /successfully|picture added|published/i.test(message)
+        ? "success"
+        : "info";
   };
 
   const appendSafeStoryNodes = (source, target, supabaseUrl, bucketName) => {
@@ -366,12 +372,24 @@
       }
     });
 
+    storyAgainButton.addEventListener("click", () => {
+      storyForm.hidden = false;
+      storyAgainButton.hidden = true;
+      storyTitleInput.focus();
+    });
+
     storyForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const storyTitle = storyTitleInput.value.trim();
       const storyHtml = storyEditor.innerHTML.trim();
-      if (!storyTitle || !storyEditor.textContent.trim() && !storyEditor.querySelector("img")) {
-        setStatus("Add a headline and story text or a picture before publishing.");
+      if (!storyTitle) {
+        setStatus("Enter a headline before publishing your article.");
+        storyTitleInput.focus();
+        return;
+      }
+      if (!storyEditor.textContent.trim() && !storyEditor.querySelector("img")) {
+        setStatus("Add article text or a picture before publishing.");
+        storyEditor.focus();
         return;
       }
 
@@ -386,7 +404,7 @@
 
       const publishButton = storyForm.querySelector('button[type="submit"]');
       publishButton.disabled = true;
-      setStatus("Publishing story...");
+      setStatus("Publishing your article...");
 
       try {
         const safeTitle = storyTitle
@@ -407,7 +425,9 @@
 
         storyForm.reset();
         storyEditor.replaceChildren();
-        setStatus("Story published successfully.");
+        storyForm.hidden = true;
+        storyAgainButton.hidden = false;
+        setStatus("Article published successfully.");
         await loadFiles(true, objectName);
       } catch (error) {
         showError("Could not publish story", error);

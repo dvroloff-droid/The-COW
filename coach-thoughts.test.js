@@ -10,12 +10,14 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
   for (const id of [
     "status", "login", "reset-request", "reset", "uploader", "upload", "file",
     "story", "story-title", "story-editor", "story-add-image", "story-image",
+    "story-again",
     "signout", "list",
   ]) {
     elements[id] = {
       hidden: true,
       disabled: false,
       value: "",
+      dataset: {},
       innerHTML: "",
       textContent: "",
       files: [],
@@ -35,7 +37,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
       replaceChildren(...children) { this.children = children; },
       append(...children) { this.children.push(...children); },
       contains() { return false; },
-      focus() {},
+      focus() { this.focused = true; },
       reset() { this.wasReset = true; },
     };
   }
@@ -169,7 +171,7 @@ test("expired recovery links show an actionable error", async () => {
   assert.match(elements.status.textContent, /Link expired.*Request a new link/);
 });
 
-test("publishes a full story as a shared plain-text file", async () => {
+test("publishes a full article as a formatted shared file", async () => {
   const { elements, calls } = setup();
   await new Promise(setImmediate);
   elements["story-title"].value = "A complete story";
@@ -188,9 +190,29 @@ test("publishes a full story as a shared plain-text file", async () => {
     html: "<p>with a second paragraph.</p>",
   });
   assert.equal(elements.story.wasReset, true);
-  assert.match(elements.status.textContent, /Story published successfully/);
+  assert.equal(elements.story.hidden, true);
+  assert.equal(elements["story-again"].hidden, false);
+  assert.match(elements.status.textContent, /Article published successfully/);
   const publishedStory = elements.list.children[0].children[0];
   assert.equal(publishedStory.open, true);
+
+  await elements["story-again"].listeners.click();
+  assert.equal(elements.story.hidden, false);
+  assert.equal(elements["story-again"].hidden, true);
+  assert.equal(elements["story-title"].focused, true);
+});
+
+test("shows clear validation when an article has no headline", async () => {
+  const { elements, calls } = setup();
+  await new Promise(setImmediate);
+  elements["story-editor"].textContent = "Article text";
+  elements["story-editor"].innerHTML = "<p>Article text</p>";
+
+  await elements.story.listeners.submit({ preventDefault() {} });
+
+  assert.match(elements.status.textContent, /Enter a headline/);
+  assert.equal(elements["story-title"].focused, true);
+  assert.equal(calls.upload, undefined);
 });
 
 test("loads published stories as plain text in the shared list", async () => {

@@ -18,8 +18,9 @@ type up to 20 MB.
    into `supabase-config.js`. Never put a `service_role` key in this website.
 5. Publish the site. Authorized uploaders can sign in to add files or publish
    newspaper columns with formatted text and inline pictures. Each picture may
-   be up to 20 MB. Published columns open in a multi-column newspaper layout;
-   older plain-text stories remain readable in the library.
+   be up to 20 MB. Published columns open in a multi-column newspaper layout,
+   with more room reserved for the article than either side column; older
+   plain-text stories remain readable in the library.
 
 ## Password recovery
 
