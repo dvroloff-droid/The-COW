@@ -17,7 +17,8 @@ type up to 20 MB.
 4. Copy the project's URL and its public publishable (or legacy `anon`) key
    into `supabase-config.js`. Never put a `service_role` key in this website.
 5. Publish the site. Authorized uploaders can sign in to add files or publish
-   plain-text stories up to 20 MB; visitors can download files and expand
+   plain-text stories up to 20 MB. Published stories open in newspaper format
+   with the first non-empty line as the headline; visitors can expand other
    stories in the library to read and copy their full text.
 
 ## Password recovery

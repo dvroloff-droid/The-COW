@@ -51,6 +51,7 @@ function setup(hash = "", sharedFiles = []) {
     list: async () => ({ data: sharedFiles, error: null }),
     upload: async (name, body, options) => {
       calls.upload = { name, body, options };
+      sharedFiles.unshift({ id: name, name });
       return { error: null };
     },
     download: async (name) => {
@@ -69,6 +70,7 @@ function setup(hash = "", sharedFiles = []) {
     addEventListener(event, callback) { this.listeners[event] = callback; },
     replaceChildren(...children) { this.children = children; },
     append(...children) { this.children.push(...children); },
+    open: false,
   });
   const context = {
     window: {
@@ -142,6 +144,7 @@ test("expired recovery links show an actionable error", async () => {
 
 test("publishes a full story as a shared plain-text file", async () => {
   const { elements, calls } = setup();
+  await new Promise(setImmediate);
   elements["story-text"].value = "\nA complete story\nwith a second paragraph.\n";
 
   await elements.story.listeners.submit({ preventDefault() {} });
@@ -157,6 +160,8 @@ test("publishes a full story as a shared plain-text file", async () => {
   );
   assert.equal(elements.story.wasReset, true);
   assert.match(elements.status.textContent, /Story published successfully/);
+  const publishedStory = elements.list.children[0].children[0];
+  assert.equal(publishedStory.open, true);
 });
 
 test("loads published stories as plain text in the shared list", async () => {
