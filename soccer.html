@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#eee6d4" />
+    <meta name="description" content="Browse archived soccer stories from The Coach's Office." />
+    <title>Soccer Archive — The Coach's Office</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="edition-bar" aria-label="Newspaper edition">
+        <span>VOL. I <b>◆</b> NO. 1</span>
+        <span>THE SPORTS ARCHIVE</span>
+        <span>SOCCER EDITION</span>
+      </div>
+      <div class="nameplate">
+        <a class="masthead-title" href="index.html" aria-label="The Coach's Office home">The Coach's Office</a>
+        <p>All the sports worth talking about</p>
+      </div>
+      <div class="nav-bar">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+          <span class="sr-only">Toggle navigation</span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <nav class="primary-nav" id="primary-nav" aria-label="Main navigation">
+          <a href="baseball.html">Baseball</a>
+          <a href="football.html">Football</a>
+          <a href="basketball.html">Basketball</a>
+          <a href="hockey.html">Hockey</a>
+          <a href="soccer.html" aria-current="page">Soccer</a>
+        </nav>
+      </div>
+    </header>
+    <main class="archive-main" id="main">
+      <article class="archive-page">
+        <header class="archive-heading">
+          <p class="eyebrow">THE COACH'S OFFICE · STORY ARCHIVE</p>
+          <h1>Soccer</h1>
+          <p>Stories, notes, and columns from the pitch.</p>
+        </header>
+        <section class="archive-empty" aria-labelledby="archive-status">
+          <h2 id="archive-status">The archive is just getting started</h2>
+          <p>No soccer stories have been archived yet. Check back for future articles and updates.</p>
+        </section>
+        <a class="archive-back" href="index.html">← Back to the front page</a>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <a class="footer-wordmark" href="index.html">The Coach's Office</a>
+        <p>For the love of the game.</p>
+        <span class="copyright">© <span id="year"></span> The Coach's Office</span>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>
