@@ -466,14 +466,15 @@ p {
 
 .room-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  max-width: 720px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
 }
 
 .room-card {
   position: relative;
   display: flex;
-  min-height: 270px;
+  min-height: 190px;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
@@ -483,8 +484,7 @@ p {
 }
 
 .room-card-large {
-  grid-column: span 2;
-  min-height: 300px;
+  min-height: 210px;
   background: #f0eee8;
 }
 
@@ -802,10 +802,6 @@ p {
     padding-bottom: 5rem;
   }
 
-  .room-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .teams-inner {
     gap: 3rem;
   }
@@ -959,12 +955,12 @@ p {
 
   .room-card,
   .room-card-large {
-    min-height: 238px;
+    min-height: 190px;
     grid-column: auto;
   }
 
   .room-card-large {
-    min-height: 260px;
+    min-height: 200px;
   }
 
   .teams-inner {
