@@ -122,24 +122,41 @@
             </div>
           </section>
 
-          <section class="daily-column" aria-labelledby="daily-column-title">
-            <header class="column-heading">
-              <p class="eyebrow">DOWNLOADABLE EDITION</p>
-              <h1 id="daily-column-title">Game-day column</h1>
+          <section class="thoughts-column" aria-labelledby="thoughts-title">
+            <header class="thoughts-heading">
+              <p class="eyebrow">THE COACH'S NOTEBOOK</p>
+              <h2 id="thoughts-title">Coach's Thoughts</h2>
+              <p>Practice notes, ideas, and shared reading.</p>
             </header>
 
-            <a
-              class="download-briefing"
-              href="assets/football-briefing-2026-11-08.pdf"
-              download
-            >
-              <span class="download-icon" aria-hidden="true">↓</span>
-              <span>
-                <strong>Download today's article</strong>
-                <small>Sunday, November 8 · PDF</small>
-              </span>
-              <span class="download-arrow" aria-hidden="true">↗</span>
-            </a>
+            <p class="thoughts-status" id="thoughts-status" role="status" aria-live="polite">
+              PDF uploads are not connected yet. Set up Supabase to enable this library.
+            </p>
+
+            <form class="thoughts-login" id="thoughts-login" hidden>
+              <label for="thoughts-email">Authorized email</label>
+              <input id="thoughts-email" name="email" type="email" autocomplete="username" required />
+              <label for="thoughts-password">Password</label>
+              <input id="thoughts-password" name="password" type="password" autocomplete="current-password" required />
+              <button type="submit">Sign in to upload</button>
+            </form>
+
+            <div class="thoughts-uploader" id="thoughts-uploader" hidden>
+              <form id="thoughts-upload">
+                <label for="thoughts-file">Choose a PDF</label>
+                <input id="thoughts-file" name="file" type="file" accept="application/pdf,.pdf" required />
+                <p>PDF only · Up to 20 MB</p>
+                <button type="submit">Upload PDF</button>
+              </form>
+              <button class="thoughts-signout" id="thoughts-signout" type="button">Sign out</button>
+            </div>
+
+            <div class="thoughts-library">
+              <h3>Shared PDFs</h3>
+              <ul id="thoughts-list" aria-live="polite">
+                <li>Connect Supabase to load shared PDFs.</li>
+              </ul>
+            </div>
           </section>
 
           <aside class="today-news" aria-labelledby="today-news-title">
@@ -187,6 +204,18 @@
               >NCAA Week 10 scoreboard <span aria-hidden="true">↗</span></a>
             </article>
 
+            <a
+              class="download-briefing"
+              href="assets/football-briefing-2026-11-08.pdf"
+              download
+            >
+              <span class="download-icon" aria-hidden="true">↓</span>
+              <span>
+                <strong>Download today's article</strong>
+                <small>Sunday, November 8 · Game-day briefing PDF</small>
+              </span>
+              <span class="download-arrow" aria-hidden="true">↗</span>
+            </a>
           </aside>
         </div>
         <div class="hero-foot">
@@ -223,5 +252,7 @@
     </footer>
 
     <script src="app.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="coach-thoughts.js"></script>
   </body>
 </html>

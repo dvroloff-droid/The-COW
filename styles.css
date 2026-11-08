@@ -144,12 +144,12 @@ main,
 .hero-inner {
   display: grid;
   flex: 1;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.86fr) minmax(0, 0.95fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.88fr) minmax(0, 0.95fr);
   gap: clamp(1.1rem, 2.2vw, 2.2rem);
 }
 
 .rooms,
-.daily-column,
+.thoughts-column,
 .today-news {
   min-width: 0;
 }
@@ -279,22 +279,125 @@ main,
   font-size: 0.7rem;
 }
 
-.daily-column {
-  padding-inline: clamp(1rem, 2.2vw, 2rem);
-  border-left: 1px solid var(--rule);
-  border-right: 1px solid var(--rule);
+.thoughts-column {
+  padding-inline: clamp(1rem, 2vw, 1.8rem);
+  border-inline: 1px solid var(--rule);
 }
 
-.column-heading {
-  padding: 0 0 0.65rem;
+.thoughts-heading {
+  padding-bottom: 0.65rem;
   border-bottom: 3px double var(--ink);
 }
 
-.column-heading h1 {
-  margin: 0.25rem 0 0;
-  font-size: clamp(1.85rem, 3vw, 2.5rem);
-  letter-spacing: -0.055em;
-  line-height: 1.02;
+.thoughts-heading h2 {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.55rem, 2.3vw, 2rem);
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.thoughts-heading > p:last-child {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+.thoughts-status {
+  margin: 0.7rem 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.thoughts-column [hidden] {
+  display: none !important;
+}
+
+.thoughts-login,
+.thoughts-uploader form {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.8rem 0;
+}
+
+.thoughts-login label,
+.thoughts-uploader label {
+  font: 700 0.68rem/1.3 var(--sans);
+}
+
+.thoughts-login input,
+.thoughts-uploader input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  background: #fffdf8;
+  color: var(--ink);
+  font: 0.8rem var(--sans);
+}
+
+.thoughts-login button,
+.thoughts-uploader button {
+  justify-self: start;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  font: 700 0.68rem/1.2 var(--sans);
+}
+
+.thoughts-login button:hover,
+.thoughts-uploader button:hover {
+  background: var(--red);
+}
+
+.thoughts-uploader form p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.thoughts-signout {
+  border-color: var(--rule) !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+}
+
+.thoughts-signout:hover {
+  color: var(--red) !important;
+}
+
+.thoughts-library {
+  margin-top: 1rem;
+  padding-top: 0.65rem;
+  border-top: 3px double var(--ink);
+}
+
+.thoughts-library h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.thoughts-library ul {
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.thoughts-library li {
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--rule-light);
+  font-size: 0.77rem;
+  overflow-wrap: anywhere;
+}
+
+.thoughts-library a {
+  color: var(--red);
+  font-weight: 700;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 
 .today-news {
@@ -523,17 +626,10 @@ main,
     gap: 1.5rem;
   }
 
-  .daily-column {
+  .thoughts-column {
     padding: 1.15rem 0;
-    border-top: 3px double var(--ink);
-    border-right: 0;
-    border-bottom: 3px double var(--ink);
-    border-left: 0;
-  }
-
-  .column-heading h1 {
-    max-width: 14ch;
-    font-size: clamp(2.25rem, 7vw, 3.2rem);
+    border-block: 3px double var(--ink);
+    border-inline: 0;
   }
 
   .today-news {
