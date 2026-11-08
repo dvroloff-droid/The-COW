@@ -540,7 +540,7 @@ main,
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 700px) {
   .hero-inner {
     grid-template-columns: 1fr;
     gap: 1.5rem;
