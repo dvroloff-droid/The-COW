@@ -55,7 +55,10 @@ function setup(hash = "", sharedFiles = []) {
     },
     download: async (name) => {
       calls.download = name;
-      return { data: new Blob(["<script>story text</script>"]), error: null };
+      return {
+        data: new Blob(["<script>story text</script>\n\nA second paragraph."]),
+        error: null,
+      };
     },
     getPublicUrl: (name) => ({ data: { publicUrl: `https://example.com/${name}` } }),
   };
@@ -64,6 +67,7 @@ function setup(hash = "", sharedFiles = []) {
     children: [],
     listeners: {},
     addEventListener(event, callback) { this.listeners[event] = callback; },
+    replaceChildren(...children) { this.children = children; },
     append(...children) { this.children.push(...children); },
   });
   const context = {
@@ -163,7 +167,8 @@ test("loads published stories as plain text in the shared list", async () => {
   await new Promise(setImmediate);
 
   const details = elements.list.children[0].children[0];
-  const storyContent = details.children[1];
+  const storyArticle = details.children[1];
+  const [storyHeader, storyBody] = storyArticle.children;
   details.open = true;
   await details.listeners.toggle();
 
@@ -172,5 +177,8 @@ test("loads published stories as plain text in the shared list", async () => {
     "story-00000000-0000-4000-8000-000000000001-A-complete-story.txt",
   );
   assert.equal(details.children[0].textContent, "A complete story");
-  assert.equal(storyContent.textContent, "<script>story text</script>");
+  assert.equal(storyHeader.children[0].textContent, "COACH'S NOTEBOOK");
+  assert.equal(storyHeader.children[1].textContent, "<script>story text</script>");
+  assert.equal(storyBody.children.length, 1);
+  assert.equal(storyBody.children[0].textContent, "A second paragraph.");
 });

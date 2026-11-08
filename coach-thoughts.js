@@ -97,33 +97,57 @@
           if (file.name.startsWith("story-")) {
             const details = document.createElement("details");
             const summary = document.createElement("summary");
-            const storyContent = document.createElement("pre");
+            const storyArticle = document.createElement("article");
+            const storyHeader = document.createElement("header");
+            const storyEyebrow = document.createElement("p");
+            const storyTitle = document.createElement("h3");
+            const storyBody = document.createElement("div");
             let loaded = false;
             let loading = false;
+            storyArticle.className = "shared-story-article";
+            storyEyebrow.className = "eyebrow";
+            storyEyebrow.textContent = "COACH'S NOTEBOOK";
+            storyHeader.className = "shared-story-header";
+            storyBody.className = "shared-story-body";
             summary.textContent = file.name
               .replace(/^story-[0-9a-f-]{36}-/i, "")
               .replace(/\.txt$/i, "")
               .replace(/-/g, " ") || "Read shared story";
-            details.append(summary, storyContent);
+            storyHeader.append(storyEyebrow, storyTitle);
+            storyArticle.append(storyHeader, storyBody);
+            details.append(summary, storyArticle);
             details.addEventListener("toggle", async () => {
               if (!details.open || loaded || loading) return;
               loading = true;
-              storyContent.textContent = "Loading story...";
+              storyBody.textContent = "Loading story...";
               try {
                 const { data, error } = await bucket.download(file.name);
                 if (error) {
                   showError("Could not load shared story", error);
-                  storyContent.textContent = "Could not load this story. Open it again to retry.";
+                  storyBody.textContent = "Could not load this story. Open it again to retry.";
                   return;
                 }
                 if (!data || typeof data.text !== "function") {
                   throw new Error("The shared story could not be read.");
                 }
-                storyContent.textContent = await data.text();
+                const lines = (await data.text()).split(/\r?\n/);
+                const titleIndex = lines.findIndex((line) => line.trim());
+                storyTitle.textContent = titleIndex < 0
+                  ? "Untitled story"
+                  : lines[titleIndex].trim();
+                const paragraphs = titleIndex < 0
+                  ? []
+                  : lines.slice(titleIndex + 1).join("\n").trim().split(/\n\s*\n/).filter(Boolean);
+                storyBody.replaceChildren();
+                for (const paragraph of paragraphs) {
+                  const paragraphElement = document.createElement("p");
+                  paragraphElement.textContent = paragraph.trim();
+                  storyBody.append(paragraphElement);
+                }
                 loaded = true;
               } catch (error) {
                 showError("Could not load shared story", error);
-                storyContent.textContent = "Could not load this story. Open it again to retry.";
+                storyBody.textContent = "Could not load this story. Open it again to retry.";
               } finally {
                 loading = false;
               }
