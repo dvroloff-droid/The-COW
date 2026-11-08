@@ -4,6 +4,13 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 
 const script = fs.readFileSync(`${__dirname}/coach-thoughts.js`, "utf8");
+const page = fs.readFileSync(`${__dirname}/index.html`, "utf8");
+
+test("places the story editor below the published article archive without generic uploads", () => {
+  assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
+  assert.doesNotMatch(page, /id="thoughts-upload"|id="thoughts-file"|Choose a file|Upload file/i);
+  assert.match(page, /coach-thoughts\.js\?v=20261108-6/);
+});
 
 function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []) {
   const elements = {};

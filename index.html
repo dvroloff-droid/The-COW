@@ -151,6 +151,13 @@
               <button type="submit">Update password</button>
             </form>
 
+            <div class="thoughts-library">
+              <h3>Published articles &amp; archive</h3>
+              <ul id="thoughts-list" aria-live="polite">
+                <li>Connect Supabase to load shared files.</li>
+              </ul>
+            </div>
+
             <div class="thoughts-uploader" id="thoughts-uploader" hidden>
               <form class="thoughts-story-form" id="thoughts-story">
                 <label for="thoughts-story-title">Column headline</label>
@@ -184,13 +191,6 @@
               <p class="thoughts-status" id="thoughts-story-status" role="status" aria-live="polite"></p>
               <button id="thoughts-story-again" type="button" hidden>Write another article</button>
               <button class="thoughts-signout" id="thoughts-signout" type="button">Sign out</button>
-            </div>
-
-            <div class="thoughts-library">
-              <h3>Shared files</h3>
-              <ul id="thoughts-list" aria-live="polite">
-                <li>Connect Supabase to load shared files.</li>
-              </ul>
             </div>
           </section>
 
@@ -288,6 +288,6 @@
 
     <script src="app.js"></script>
     <script src="supabase-config.js"></script>
-    <script src="coach-thoughts.js?v=20261108-5"></script>
+    <script src="coach-thoughts.js?v=20261108-6"></script>
   </body>
 </html>
