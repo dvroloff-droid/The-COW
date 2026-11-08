@@ -228,6 +228,14 @@ main,
   gap: clamp(1.1rem, 2.2vw, 2.2rem);
 }
 
+.today-news {
+  grid-column: 2 / -1;
+}
+
+.thoughts-column {
+  grid-column: 1 / -1;
+}
+
 .rooms,
 .thoughts-column,
 .today-news {
@@ -360,8 +368,8 @@ main,
 }
 
 .thoughts-column {
-  padding-inline: clamp(1rem, 2vw, 1.8rem);
-  border-inline: 1px solid var(--rule);
+  padding: 1.15rem 0;
+  border-block: 3px double var(--ink);
 }
 
 .thoughts-heading {
@@ -448,7 +456,7 @@ main,
   padding: 0.6rem;
   border: 1px solid var(--rule);
   background: #fffdf8;
-  font: 0.9rem/1.5 var(--serif);
+  font: 12pt/1.5 var(--serif);
 }
 
 .story-editor:focus {
@@ -479,7 +487,7 @@ main,
   columns: 2 24rem;
   column-gap: clamp(1.5rem, 4vw, 3.5rem);
   column-rule: 1px solid var(--rule-light);
-  font-size: 1rem;
+  font-size: 12pt;
   line-height: 1.65;
 }
 
@@ -623,7 +631,7 @@ main,
 
 .shared-story-body {
   padding-top: 0.45rem;
-  font-size: 0.83rem;
+  font-size: 12pt;
   line-height: 1.5;
 }
 
@@ -889,10 +897,13 @@ main,
     gap: 1.5rem;
   }
 
+  .today-news,
   .thoughts-column {
-    padding: 1.15rem 0;
-    border-block: 3px double var(--ink);
-    border-inline: 0;
+    grid-column: 1 / -1;
+  }
+
+  .thoughts-column {
+    padding-block: 1.15rem;
   }
 
   .today-news {
