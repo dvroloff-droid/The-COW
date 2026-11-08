@@ -159,6 +159,8 @@
         }
 
         const files = (data || []).filter((file) => file.id);
+        const storyToOpenName = openStoryName ||
+          files.find((file) => file.name.startsWith("story-"))?.name;
         if (files.length === 0) {
           if (!preserveStatus && statusRevision === startingRevision) {
             setStatus("No files or stories have been shared yet.");
@@ -255,7 +257,7 @@
                 loading = false;
               }
             });
-            details.open = file.name === openStoryName;
+            details.open = file.name === storyToOpenName;
             if (details.open) {
               heroInner.classList.add("newspaper-reading");
               openedStory = details;
@@ -275,7 +277,9 @@
         if (!preserveStatus && statusRevision === startingRevision) {
           setStatus(`${files.length} shared item${files.length === 1 ? "" : "s"}.`);
         }
-        if (openedStory) openedStory.scrollIntoView({ block: "start", behavior: "smooth" });
+        if (openStoryName && openedStory) {
+          openedStory.scrollIntoView({ block: "start", behavior: "smooth" });
+        }
         return !openStoryName || Boolean(openedStory);
       } catch (error) {
         showError("Could not load shared files", error);

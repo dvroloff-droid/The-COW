@@ -272,6 +272,33 @@ test("loads published stories as plain text in the shared list", async () => {
   assert.equal(storyBody.children[0].textContent, "A second paragraph.");
 });
 
+test("opens the newest published article inline instead of leaving it as a link", async () => {
+  const newestStory = {
+    id: "newest-story",
+    name: "story-00000000-0000-4000-8000-000000000002-Newest-story.json",
+  };
+  const olderStory = {
+    id: "older-story",
+    name: "story-00000000-0000-4000-8000-000000000001-Older-story.json",
+  };
+  const { elements, calls } = setup("", [newestStory, olderStory], JSON.stringify({
+    title: "Newest story",
+    html: "<p>Article body</p>",
+  }));
+  await new Promise(setImmediate);
+
+  const newestDetails = elements.list.children[0].children[0];
+  const olderDetails = elements.list.children[1].children[0];
+  assert.equal(newestDetails.tagName, "details");
+  assert.equal(newestDetails.open, true);
+  assert.equal(olderDetails.open, false);
+
+  await newestDetails.listeners.toggle();
+
+  assert.equal(calls.download, newestStory.name);
+  assert.equal(newestDetails.children[1].children[0].children[1].textContent, "Newest story");
+});
+
 test("uploads an image for a newspaper column", async () => {
   const { elements, calls } = setup();
   await new Promise(setImmediate);
