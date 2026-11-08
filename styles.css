@@ -409,7 +409,7 @@ main,
 .thoughts-login input,
 .thoughts-reset input,
 .thoughts-uploader input,
-.thoughts-story-form textarea {
+.thoughts-story-form input:not([type="file"]) {
   width: 100%;
   min-width: 0;
   padding: 0.5rem;
@@ -420,10 +420,107 @@ main,
   font: 0.8rem var(--sans);
 }
 
-.thoughts-story-form textarea {
+.story-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.thoughts-uploader .story-toolbar button {
+  padding: 0.4rem 0.5rem;
+  background: transparent;
+  color: var(--ink);
+}
+
+.story-editor {
   min-height: 22rem;
-  resize: vertical;
-  font: 0.88rem/1.5 var(--serif);
+  padding: 0.6rem;
+  border: 1px solid var(--rule);
+  background: #fffdf8;
+  font: 0.9rem/1.5 var(--serif);
+}
+
+.story-editor:focus {
+  outline: 2px solid var(--red);
+  outline-offset: 1px;
+}
+
+.story-editor:empty::before {
+  color: var(--muted);
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
+
+.story-editor img {
+  max-width: 100%;
+  height: auto;
+}
+
+.story-editor figure {
+  margin: 0.8rem 0;
+}
+
+.hero-inner.newspaper-reading {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.hero-inner.newspaper-reading > .rooms,
+.hero-inner.newspaper-reading > .today-news {
+  display: none;
+}
+
+.hero-inner.newspaper-reading > .thoughts-column {
+  padding-inline: clamp(1rem, 5vw, 4rem);
+  border-inline: 0;
+}
+
+.hero-inner.newspaper-reading .thoughts-library li {
+  font-size: 0.9rem;
+}
+
+.hero-inner.newspaper-reading .shared-story-body {
+  columns: 2 24rem;
+  column-gap: clamp(1.5rem, 4vw, 3.5rem);
+  column-rule: 1px solid var(--rule-light);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.hero-inner.newspaper-reading .shared-story-body > * {
+  break-inside: avoid;
+}
+
+.hero-inner.newspaper-reading .shared-story-body figure {
+  margin: 0.8rem 0;
+  break-inside: avoid;
+}
+
+.hero-inner.newspaper-reading .shared-story-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.hero-inner.newspaper-reading .shared-story-body figcaption {
+  margin-top: 0.3rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+.hero-inner.newspaper-reading .shared-story-header h3 {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+}
+
+.hero-inner.newspaper-reading .thoughts-library details > summary {
+  font-size: 1rem;
+}
+
+@media (max-width: 700px) {
+  .hero-inner.newspaper-reading .shared-story-body {
+    columns: 1;
+    column-rule: 0;
+  }
 }
 
 .thoughts-login button,
@@ -450,7 +547,7 @@ main,
   font-size: 0.68rem;
 }
 
-.thoughts-story-form p {
+.thoughts-story-form > p {
   margin: 0;
   color: var(--muted);
   font-size: 0.68rem;
@@ -537,6 +634,20 @@ main,
   font-size: 2.35rem;
   font-weight: 700;
   line-height: 0.85;
+}
+
+.shared-story-body h2,
+.shared-story-body h3 {
+  margin: 0.8rem 0 0.3rem;
+  break-after: avoid;
+}
+
+.shared-story-body blockquote {
+  margin: 0.8rem 0;
+  padding-left: 0.8rem;
+  border-left: 3px solid var(--red);
+  color: var(--muted);
+  font-style: italic;
 }
 
 .thoughts-library a {

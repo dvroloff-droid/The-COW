@@ -5,29 +5,43 @@ const vm = require("node:vm");
 
 const script = fs.readFileSync(`${__dirname}/coach-thoughts.js`, "utf8");
 
-function setup(hash = "", sharedFiles = []) {
+function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []) {
   const elements = {};
   for (const id of [
     "status", "login", "reset-request", "reset", "uploader", "upload", "file",
-    "story", "story-text", "signout", "list",
+    "story", "story-title", "story-editor", "story-add-image", "story-image",
+    "signout", "list",
   ]) {
     elements[id] = {
       hidden: true,
       disabled: false,
       value: "",
+      innerHTML: "",
+      textContent: "",
+      files: [],
       listeners: {},
       addEventListener(event, callback) { this.listeners[event] = callback; },
+      querySelectorAll() { return []; },
       querySelector(selector) {
-        return selector.includes("email") ? emailInput : this.button;
+        if (selector.includes("email")) return emailInput;
+        if (selector === 'details[open]') {
+          return this.children.flatMap((item) => item.children)
+            .find((child) => child.tagName === "details" && child.open) || null;
+        }
+        return this.button;
       },
       button: { disabled: false },
       children: [],
       replaceChildren(...children) { this.children = children; },
       append(...children) { this.children.push(...children); },
+      contains() { return false; },
+      focus() {},
       reset() { this.wasReset = true; },
     };
   }
   elements.file.files = [];
+  elements["story-editor"].querySelector = () => null;
+  const heroInner = { classList: { add() {}, remove() {} } };
   const emailInput = { value: "coach@example.com", reportValidity: () => true };
   const calls = {};
   let onAuthStateChange;
@@ -57,19 +71,23 @@ function setup(hash = "", sharedFiles = []) {
     download: async (name) => {
       calls.download = name;
       return {
-        data: new Blob(["<script>story text</script>\n\nA second paragraph."]),
+        data: new Blob([downloadText || "<script>story text</script>\n\nA second paragraph."]),
         error: null,
       };
     },
-    getPublicUrl: (name) => ({ data: { publicUrl: `https://example.com/${name}` } }),
+    getPublicUrl: (name) => ({
+      data: { publicUrl: `https://example.supabase.co/storage/v1/object/public/coach-thoughts/${name}` },
+    }),
   };
   const createElement = (tagName) => ({
     tagName,
     children: [],
     listeners: {},
+    attributes: {},
     addEventListener(event, callback) { this.listeners[event] = callback; },
     replaceChildren(...children) { this.children = children; },
     append(...children) { this.children.push(...children); },
+    getAttribute(name) { return this.attributes[name] || null; },
     open: false,
   });
   const context = {
@@ -77,13 +95,22 @@ function setup(hash = "", sharedFiles = []) {
       location: { origin: "https://example.com", pathname: "/The-COW/", hash },
       COACH_THOUGHTS_CONFIG: { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "public-key" },
       supabase: { createClient: () => ({ auth, storage: { from: () => bucket } }) },
+      getSelection: () => null,
     },
     document: {
-      querySelector: (selector) => elements[selector.replace("#thoughts-", "")],
+      querySelector: (selector) => selector === ".hero-inner"
+        ? heroInner
+        : elements[selector.replace("#thoughts-", "")],
       createElement,
+      createTextNode: (textContent) => ({ nodeType: 3, textContent }),
+      execCommand() {},
     },
     URLSearchParams,
+    URL,
     Blob,
+    DOMParser: class {
+      parseFromString() { return { body: { childNodes: storyNodes } }; }
+    },
     crypto: { randomUUID: () => "00000000-0000-4000-8000-000000000001" },
     FormData: class {
       constructor(form) { this.values = form.values; }
@@ -145,19 +172,21 @@ test("expired recovery links show an actionable error", async () => {
 test("publishes a full story as a shared plain-text file", async () => {
   const { elements, calls } = setup();
   await new Promise(setImmediate);
-  elements["story-text"].value = "\nA complete story\nwith a second paragraph.\n";
+  elements["story-title"].value = "A complete story";
+  elements["story-editor"].textContent = "with a second paragraph.";
+  elements["story-editor"].innerHTML = "<p>with a second paragraph.</p>";
 
   await elements.story.listeners.submit({ preventDefault() {} });
 
   assert.equal(
     calls.upload.name,
-    "story-00000000-0000-4000-8000-000000000001-A-complete-story.txt",
+    "story-00000000-0000-4000-8000-000000000001-A-complete-story.json",
   );
-  assert.equal(calls.upload.options.contentType, "text/plain;charset=utf-8");
-  assert.equal(
-    await calls.upload.body.text(),
-    "\nA complete story\nwith a second paragraph.\n",
-  );
+  assert.equal(calls.upload.options.contentType, "application/json;charset=utf-8");
+  assert.deepEqual(JSON.parse(await calls.upload.body.text()), {
+    title: "A complete story",
+    html: "<p>with a second paragraph.</p>",
+  });
   assert.equal(elements.story.wasReset, true);
   assert.match(elements.status.textContent, /Story published successfully/);
   const publishedStory = elements.list.children[0].children[0];
@@ -186,4 +215,60 @@ test("loads published stories as plain text in the shared list", async () => {
   assert.equal(storyHeader.children[1].textContent, "<script>story text</script>");
   assert.equal(storyBody.children.length, 1);
   assert.equal(storyBody.children[0].textContent, "A second paragraph.");
+});
+
+test("uploads an image for a newspaper column", async () => {
+  const { elements, calls } = setup();
+  await new Promise(setImmediate);
+  const image = new Blob(["picture"], { type: "image/png" });
+  image.name = "team-photo.png";
+  elements["story-image"].files = [image];
+
+  await elements["story-image"].listeners.change();
+
+  assert.equal(calls.upload.name, "story-images/00000000-0000-4000-8000-000000000001-team-photo.png");
+  assert.equal(calls.upload.options.contentType, "image/png");
+  const figure = elements["story-editor"].children[0];
+  assert.equal(figure.children[0].tagName, "img");
+  assert.match(figure.children[0].src, /story-images\/00000000-0000-4000-8000-000000000001-team-photo\.png$/);
+});
+
+test("renders only safe column formatting and site-hosted pictures", async () => {
+  const nodes = [
+    { nodeType: 1, tagName: "P", childNodes: [{ nodeType: 3, textContent: "Column text" }] },
+    {
+      nodeType: 1,
+      tagName: "IMG",
+      attributes: {
+        src: "https://example.supabase.co/storage/v1/object/public/coach-thoughts/story-images/photo.png",
+        alt: "Team photo",
+      },
+      getAttribute(name) { return this.attributes[name] || null; },
+    },
+    { nodeType: 1, tagName: "SCRIPT", childNodes: [{ nodeType: 3, textContent: "unsafe()" }] },
+    {
+      nodeType: 1,
+      tagName: "IMG",
+      attributes: { src: "https://attacker.example/photo.png", alt: "External" },
+      getAttribute(name) { return this.attributes[name] || null; },
+    },
+  ];
+  const { elements } = setup("", [{
+    id: "story-id",
+    name: "story-00000000-0000-4000-8000-000000000001-A-column.json",
+  }], JSON.stringify({ title: "Game-day column", html: "<p>content</p>" }), nodes);
+  await new Promise(setImmediate);
+
+  const details = elements.list.children[0].children[0];
+  details.open = true;
+  await details.listeners.toggle();
+
+  const storyArticle = details.children[1];
+  assert.equal(storyArticle.children[0].children[1].textContent, "Game-day column");
+  assert.equal(storyArticle.children[1].children.length, 2);
+  assert.equal(storyArticle.children[1].children[0].children[0].textContent, "Column text");
+  assert.equal(
+    storyArticle.children[1].children[1].src,
+    "https://example.supabase.co/storage/v1/object/public/coach-thoughts/story-images/photo.png",
+  );
 });
