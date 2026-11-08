@@ -228,12 +228,19 @@ main,
   gap: clamp(1.1rem, 2.2vw, 2.2rem);
 }
 
+.rooms {
+  grid-column: 1;
+  grid-row: 1;
+}
+
 .today-news {
   grid-column: 3;
+  grid-row: 1;
 }
 
 .thoughts-column {
   grid-column: 2;
+  grid-row: 1;
 }
 
 .rooms,
@@ -897,9 +904,11 @@ main,
     gap: 1.5rem;
   }
 
+  .rooms,
   .today-news,
   .thoughts-column {
     grid-column: 1 / -1;
+    grid-row: auto;
   }
 
   .thoughts-column {
