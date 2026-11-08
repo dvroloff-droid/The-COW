@@ -1,12 +1,12 @@
 :root {
   color-scheme: light;
-  --paper: #e9dfcb;
-  --paper-dark: #d9cbb1;
-  --ink: #2b241c;
-  --muted: #665a49;
-  --rule: #84745d;
-  --rule-light: #c1b196;
-  --red: #762c25;
+  --paper: #ded0b5;
+  --paper-dark: #cbbb9d;
+  --ink: #30271d;
+  --muted: #665744;
+  --rule: #806b50;
+  --rule-light: #baa688;
+  --red: #702b23;
   --serif: Georgia, "Times New Roman", serif;
   --sans: Arial, Helvetica, sans-serif;
 }
@@ -22,9 +22,9 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(ellipse at 12% 18%, #e8dcc5 0, transparent 34rem),
-    radial-gradient(ellipse at 88% 76%, #a99a80 0, transparent 42rem),
-    #bcb09a;
+    radial-gradient(ellipse at 8% 12%, #e1d3b9 0, transparent 30rem),
+    radial-gradient(ellipse at 90% 78%, #93836b 0, transparent 40rem),
+    #a99a81;
   color: var(--ink);
   font-family: var(--serif);
   line-height: 1.45;
@@ -55,10 +55,15 @@ main,
   margin-inline: auto;
   background-color: var(--paper);
   background-image:
-    radial-gradient(ellipse at 8% 12%, rgb(116 78 39 / 8%), transparent 25%),
-    radial-gradient(ellipse at 91% 67%, rgb(116 78 39 / 6%), transparent 30%),
-    repeating-linear-gradient(3deg, rgb(73 54 32 / 2%) 0 1px, transparent 1px 5px);
-  box-shadow: inset 0 0 3.5rem rgb(89 66 38 / 8%);
+    radial-gradient(ellipse at 4% 28%, rgb(112 70 32 / 14%), transparent 22%),
+    radial-gradient(ellipse at 94% 72%, rgb(112 70 32 / 12%), transparent 25%),
+    radial-gradient(ellipse at 53% 4%, rgb(255 249 225 / 30%), transparent 36%),
+    radial-gradient(ellipse at 38% 91%, rgb(112 70 32 / 8%), transparent 32%),
+    repeating-linear-gradient(2deg, transparent 0 4px, rgb(73 54 32 / 4%) 4.2px 4.7px),
+    repeating-linear-gradient(97deg, transparent 0 9px, rgb(73 54 32 / 3%) 9.2px 9.6px);
+  box-shadow:
+    inset 0 0 1.2rem rgb(83 55 27 / 17%),
+    inset 0 0 5rem rgb(89 66 38 / 13%);
 }
 
 .site-header {
@@ -93,7 +98,10 @@ main,
   font-weight: 900;
   letter-spacing: -0.075em;
   line-height: 1.04;
-  text-shadow: 0.6px 0 currentColor, -0.35px 0 rgb(43 36 28 / 45%);
+  text-shadow:
+    0.6px 0 currentColor,
+    -0.35px 0 rgb(43 36 28 / 45%),
+    0 1px 1px rgb(83 55 27 / 25%);
   text-decoration: none;
 }
 
