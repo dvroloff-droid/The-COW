@@ -288,6 +288,28 @@ test("uploads an image for a newspaper column", async () => {
   assert.match(figure.children[0].src, /story-images\/00000000-0000-4000-8000-000000000001-team-photo\.png$/);
 });
 
+test("uploads pasted pictures into shared storage for a newspaper column", async () => {
+  const { elements, calls } = setup();
+  await new Promise(setImmediate);
+  const image = new Blob(["picture"], { type: "image/png" });
+  image.name = "pasted-picture.png";
+  let prevented = false;
+
+  await elements["story-editor"].listeners.paste({
+    clipboardData: {
+      items: [{ type: "image/png", getAsFile: () => image }],
+    },
+    preventDefault() { prevented = true; },
+  });
+
+  assert.equal(prevented, true);
+  assert.equal(calls.upload.name, "story-images/00000000-0000-4000-8000-000000000001-pasted-picture.png");
+  assert.equal(calls.upload.options.contentType, "image/png");
+  const figure = elements["story-editor"].children[0];
+  assert.equal(figure.children[0].tagName, "img");
+  assert.match(figure.children[0].src, /story-images\/00000000-0000-4000-8000-000000000001-pasted-picture\.png$/);
+});
+
 test("renders only safe column formatting and site-hosted pictures", async () => {
   const nodes = [
     { nodeType: 1, tagName: "P", childNodes: [{ nodeType: 3, textContent: "Column text" }] },

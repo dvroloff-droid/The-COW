@@ -470,20 +470,6 @@ main,
   margin: 0.8rem 0;
 }
 
-.hero-inner.newspaper-reading {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.hero-inner.newspaper-reading > .rooms,
-.hero-inner.newspaper-reading > .today-news {
-  display: none;
-}
-
-.hero-inner.newspaper-reading > .thoughts-column {
-  padding-inline: clamp(1rem, 5vw, 4rem);
-  border-inline: 0;
-}
-
 .hero-inner.newspaper-reading .thoughts-library li {
   font-size: 0.9rem;
 }

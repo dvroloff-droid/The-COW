@@ -326,10 +326,7 @@
       storyImageInput.click();
     });
 
-    storyImageInput.addEventListener("change", async () => {
-      const image = storyImageInput.files?.[0];
-      storyImageInput.value = "";
-      if (!image) return;
+    const uploadStoryImage = async (image, selectionRange = savedStorySelection) => {
       if (!image.type.startsWith("image/")) {
         setStoryStatus("Choose an image file.");
         return;
@@ -365,17 +362,22 @@
         storyEditor.focus();
         const selection = window.getSelection();
         if (
-          savedStorySelection &&
-          storyEditor.contains(savedStorySelection.commonAncestorContainer) &&
+          selectionRange &&
+          storyEditor.contains(selectionRange.commonAncestorContainer) &&
           selection
         ) {
           selection.removeAllRanges();
-          selection.addRange(savedStorySelection);
-          savedStorySelection.deleteContents();
-          savedStorySelection.insertNode(figure);
-          savedStorySelection = null;
+          selection.addRange(selectionRange);
+          selectionRange.deleteContents();
+          selectionRange.insertNode(figure);
+          selectionRange.setStartAfter(figure);
+          selectionRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(selectionRange);
+          savedStorySelection = selectionRange.cloneRange();
         } else {
           storyEditor.append(figure);
+          savedStorySelection = null;
         }
         setStoryStatus("Picture added to your column.");
       } catch (error) {
@@ -383,6 +385,30 @@
       } finally {
         storyImageButton.disabled = false;
       }
+    };
+
+    storyEditor.addEventListener("paste", async (event) => {
+      const images = Array.from(event.clipboardData?.items || [])
+        .filter((item) => item.type.startsWith("image/"))
+        .map((item) => item.getAsFile())
+        .filter(Boolean);
+      if (!images.length) return;
+      event.preventDefault();
+      const selection = window.getSelection();
+      savedStorySelection = selection?.rangeCount &&
+        storyEditor.contains(selection.anchorNode)
+        ? selection.getRangeAt(0).cloneRange()
+        : null;
+      for (const image of images) {
+        await uploadStoryImage(image);
+      }
+    });
+
+    storyImageInput.addEventListener("change", async () => {
+      const image = storyImageInput.files?.[0];
+      storyImageInput.value = "";
+      if (!image) return;
+      await uploadStoryImage(image);
     });
 
     storyAgainButton.addEventListener("click", () => {
