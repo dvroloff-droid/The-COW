@@ -500,11 +500,43 @@ main,
   font-weight: 700;
 }
 
-.thoughts-library pre {
-  margin: 0.5rem 0 0;
+.shared-story-article {
+  margin-top: 0.65rem;
+  padding: 0.7rem 0;
+  border-top: 3px double var(--ink);
+}
+
+.shared-story-header {
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.shared-story-header h3 {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.shared-story-body {
+  padding-top: 0.45rem;
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.shared-story-body p {
+  margin: 0.45rem 0 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font: 0.8rem/1.5 var(--serif);
+}
+
+.shared-story-body p:first-child::first-letter {
+  float: left;
+  padding: 0.03rem 0.22rem 0 0;
+  color: var(--red);
+  font-size: 2.35rem;
+  font-weight: 700;
+  line-height: 0.85;
 }
 
 .thoughts-library a {
