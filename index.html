@@ -42,163 +42,117 @@
     <main id="main">
       <section class="hero" id="home" aria-labelledby="hero-title">
         <div class="hero-inner">
-          <div class="hero-copy">
-            <p class="eyebrow"><span></span> A home for the love of the game</p>
-            <h1 id="hero-title">Football,<br /><em>well played.</em></h1>
-            <p class="hero-intro">
-              A place to learn the game, sharpen your instincts, and stay
-              connected to the teams and people who make it special.
-            </p>
-            <div class="hero-actions">
-              <a class="button button-primary" href="#playbook">
-                Explore the office <span aria-hidden="true">↗</span>
-              </a>
-              <a class="text-link" href="#milwaukee-angels">Meet our teams</a>
+          <section class="rooms hero-rooms" id="playbook" aria-labelledby="playbook-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">THE COACH'S OFFICE</p>
+                <h2 id="playbook-title">Around the office</h2>
+              </div>
+              <p>Explore the playbook.</p>
             </div>
-          </div>
 
-          <aside class="hero-note" aria-label="The Coach's Office approach">
-            <div class="note-topline">
-              <span class="note-label">THE COACH'S NOTEBOOK</span>
-              <span class="note-dot" aria-hidden="true"></span>
+            <div class="room-grid" role="list" aria-label="The Coach's Office categories">
+              <article class="room-card room-card-featured" role="listitem">
+                <div class="card-top"><span class="card-number">01</span><span class="card-tag">THE PLAYBOOK</span></div>
+                <div class="card-content">
+                  <h3>Articles</h3>
+                  <p>Ideas, lessons, and football reading for curious minds.</p>
+                  <span class="availability">Articles coming soon</span>
+                </div>
+              </article>
+              <article class="room-card room-card-light" role="listitem">
+                <div class="card-top"><span class="card-number">02</span><span class="card-tag">LEARN &amp; WATCH</span></div>
+                <div class="card-content">
+                  <h3>Coaching tips &amp; clips</h3>
+                  <p>Useful teaching points and video for your next practice.</p>
+                  <span class="availability">Library coming soon</span>
+                </div>
+              </article>
+              <article class="room-card room-card-cream" id="game-day" role="listitem">
+                <div class="card-top"><span class="card-number">03</span><span class="card-tag">FANTASY &amp; LEAGUE DATA</span></div>
+                <div class="card-content">
+                  <h3>ESPN Fantasy</h3>
+                  <p>Fantasy football, league tracking, and spreadsheet resources.</p>
+                  <a class="card-link" href="https://fantasy.espn.com/football/" target="_blank" rel="noopener noreferrer">
+                    Go to ESPN Fantasy <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+                <div class="card-children" role="list" aria-label="ESPN Fantasy subcategories">
+                  <article class="subcard" role="listitem">
+                    <h4>Football, not Futbol</h4>
+                    <p>Football spreadsheets and data, organized for easy updates.</p>
+                    <span class="availability">Resources coming soon</span>
+                  </article>
+                  <article class="subcard" role="listitem">
+                    <h4>The GFFL</h4>
+                    <p>League information and season tracking for GFFL members.</p>
+                    <span class="availability">League hub coming soon</span>
+                  </article>
+                </div>
+              </article>
+              <article class="room-card room-card-cream" id="coaching" role="listitem">
+                <div class="card-top"><span class="card-number">04</span><span class="card-tag">WEB STORE</span></div>
+                <div class="card-content">
+                  <h3>Coaching lessons</h3>
+                  <p>Explore coaching lessons and find ways to grow your game.</p>
+                  <span class="availability">Booking details coming soon</span>
+                </div>
+              </article>
+              <article class="room-card room-card-light" id="milwaukee-angels" role="listitem">
+                <div class="card-top"><span class="card-number">05</span><span class="card-tag">GAMECHANGER</span></div>
+                <div class="card-content">
+                  <h3>Milwaukee Angels U-11</h3>
+                  <p>Follow team schedules, scores, and updates on GameChanger.</p>
+                  <a class="card-link" href="https://web.gc.com/" target="_blank" rel="noopener noreferrer">Find the team <span aria-hidden="true">↗</span></a>
+                </div>
+              </article>
+              <article class="room-card room-card-light" id="madison-college" role="listitem">
+                <div class="card-top"><span class="card-number">06</span><span class="card-tag">GAMECHANGER</span></div>
+                <div class="card-content">
+                  <h3>Madison College</h3>
+                  <p>Follow team schedules, scores, and updates on GameChanger.</p>
+                  <a class="card-link" href="https://web.gc.com/" target="_blank" rel="noopener noreferrer">Find the team <span aria-hidden="true">↗</span></a>
+                </div>
+              </article>
             </div>
-            <p class="note-quote">“The details make<br />the difference.”</p>
-            <div class="note-rule"></div>
-            <div class="note-list">
-              <div><span>01</span><p>Learn something new</p></div>
-              <div><span>02</span><p>Put it into practice</p></div>
-              <div><span>03</span><p>Enjoy every snap</p></div>
+          </section>
+
+          <div class="hero-aside">
+            <div class="hero-copy">
+              <p class="eyebrow"><span></span> A home for the love of the game</p>
+              <h1 id="hero-title">Football,<br /><em>well played.</em></h1>
+              <p class="hero-intro">
+                A place to learn the game, sharpen your instincts, and stay
+                connected to the teams and people who make it special.
+              </p>
+              <div class="hero-actions">
+                <a class="button button-primary" href="#playbook">
+                  Explore the office <span aria-hidden="true">↗</span>
+                </a>
+                <a class="text-link" href="#milwaukee-angels">Meet our teams</a>
+              </div>
             </div>
-            <span class="note-watermark" aria-hidden="true">CO</span>
-          </aside>
+
+            <aside class="hero-note" aria-label="The Coach's Office approach">
+              <div class="note-topline">
+                <span class="note-label">THE COACH'S NOTEBOOK</span>
+                <span class="note-dot" aria-hidden="true"></span>
+              </div>
+              <p class="note-quote">“The details make<br />the difference.”</p>
+              <div class="note-rule"></div>
+              <div class="note-list">
+                <div><span>01</span><p>Learn something new</p></div>
+                <div><span>02</span><p>Put it into practice</p></div>
+                <div><span>03</span><p>Enjoy every snap</p></div>
+              </div>
+              <span class="note-watermark" aria-hidden="true">CO</span>
+            </aside>
+          </div>
         </div>
         <div class="hero-foot">
           <span>GOOD FOOTBALL STARTS HERE</span>
           <a href="#playbook" aria-label="Scroll to the playbook">↓</a>
           <span>EST. FOR THE LOVE OF THE GAME</span>
-        </div>
-      </section>
-
-      <section class="welcome section-wrap" aria-labelledby="welcome-title">
-        <div>
-          <p class="eyebrow eyebrow-dark">STEP INSIDE</p>
-          <h2 id="welcome-title">A little bit of everything.<br /><em>All about football.</em></h2>
-        </div>
-        <p class="welcome-copy">
-          From coaching ideas and football resources to fantasy and team
-          updates, this is your starting point for what happens on and off the
-          field.
-        </p>
-      </section>
-
-      <section class="rooms section-wrap" id="playbook" aria-labelledby="playbook-title">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow eyebrow-dark">MAKE YOURSELF AT HOME</p>
-            <h2 id="playbook-title">Around the office</h2>
-          </div>
-          <p>Pick a room and stay awhile.</p>
-        </div>
-
-        <div class="room-grid" role="list" aria-label="The Coach's Office categories">
-          <article class="room-card room-card-featured" role="listitem">
-            <div class="card-top">
-              <span class="card-number">01</span>
-              <span class="card-tag">THE PLAYBOOK</span>
-            </div>
-            <div class="card-content">
-              <h3>Articles</h3>
-              <p>Ideas, lessons, and football reading for curious minds.</p>
-              <span class="availability">Articles coming soon</span>
-            </div>
-            <span class="card-mark" aria-hidden="true">A</span>
-          </article>
-
-          <article class="room-card room-card-light" role="listitem">
-            <div class="card-top">
-              <span class="card-number">02</span>
-              <span class="card-tag">LEARN &amp; WATCH</span>
-            </div>
-            <div class="card-content">
-              <h3>Coaching tips &amp; clips</h3>
-              <p>Useful teaching points and video for your next practice.</p>
-              <span class="availability">Library coming soon</span>
-            </div>
-            <span class="card-mark" aria-hidden="true">▶</span>
-          </article>
-
-          <article class="room-card room-card-cream" id="game-day" role="listitem">
-            <div class="card-top">
-              <span class="card-number">03</span>
-              <span class="card-tag">FANTASY &amp; LEAGUE DATA</span>
-            </div>
-            <div class="card-content">
-              <h3>ESPN Fantasy</h3>
-              <p>Fantasy football, league tracking, and spreadsheet resources.</p>
-              <a
-                class="card-link"
-                href="https://fantasy.espn.com/football/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >Go to ESPN Fantasy <span aria-hidden="true">↗</span></a>
-            </div>
-            <div class="card-children" role="list" aria-label="ESPN Fantasy subcategories">
-              <article class="subcard" role="listitem">
-                <h4>Football, not Futbol</h4>
-                <p>Football spreadsheets and data, organized for easy updates.</p>
-                <span class="availability">Resources coming soon</span>
-              </article>
-              <article class="subcard" role="listitem">
-                <h4>The GFFL</h4>
-                <p>League information and season tracking for GFFL members.</p>
-                <span class="availability">League hub coming soon</span>
-              </article>
-            </div>
-            <span class="card-mark" aria-hidden="true">F</span>
-          </article>
-
-          <article class="room-card room-card-cream" id="coaching" role="listitem">
-            <div class="card-top">
-              <span class="card-number">04</span>
-              <span class="card-tag">WEB STORE</span>
-            </div>
-            <div class="card-content">
-              <h3>Coaching lessons</h3>
-              <p>Explore coaching lessons and find ways to grow your game.</p>
-              <span class="availability">Booking details coming soon</span>
-            </div>
-            <span class="card-mark" aria-hidden="true">↗</span>
-          </article>
-
-          <article class="room-card room-card-light" id="milwaukee-angels" role="listitem">
-            <div class="card-top">
-              <span class="card-number">05</span>
-              <span class="card-tag">GAMECHANGER</span>
-            </div>
-            <div class="card-content">
-              <h3>Milwaukee Angels U-11</h3>
-              <p>Follow team schedules, scores, and updates on GameChanger.</p>
-              <a class="card-link" href="https://web.gc.com/" target="_blank" rel="noopener noreferrer">
-                Find the team <span aria-hidden="true">↗</span>
-              </a>
-            </div>
-            <span class="card-mark" aria-hidden="true">M</span>
-          </article>
-
-          <article class="room-card room-card-light" id="madison-college" role="listitem">
-            <div class="card-top">
-              <span class="card-number">06</span>
-              <span class="card-tag">GAMECHANGER</span>
-            </div>
-            <div class="card-content">
-              <h3>Madison College</h3>
-              <p>Follow team schedules, scores, and updates on GameChanger.</p>
-              <a class="card-link" href="https://web.gc.com/" target="_blank" rel="noopener noreferrer">
-                Find the team <span aria-hidden="true">↗</span>
-              </a>
-            </div>
-            <span class="card-mark" aria-hidden="true">MC</span>
-          </article>
         </div>
       </section>
 
