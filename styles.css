@@ -144,11 +144,12 @@ main,
 .hero-inner {
   display: grid;
   flex: 1;
-  grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
-  gap: clamp(1.5rem, 3.2vw, 3.2rem);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.86fr) minmax(0, 0.95fr);
+  gap: clamp(1.1rem, 2.2vw, 2.2rem);
 }
 
 .rooms,
+.daily-column,
 .today-news {
   min-width: 0;
 }
@@ -278,9 +279,50 @@ main,
   font-size: 0.7rem;
 }
 
-.today-news {
-  padding-left: clamp(1.5rem, 3.2vw, 3.2rem);
+.daily-column {
+  padding-inline: clamp(1rem, 2.2vw, 2rem);
   border-left: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+}
+
+.column-heading {
+  padding: 0 0 0.65rem;
+  border-bottom: 3px double var(--ink);
+}
+
+.column-heading h1 {
+  margin: 0.25rem 0 0;
+  font-size: clamp(1.85rem, 3.15vw, 2.8rem);
+  letter-spacing: -0.055em;
+  line-height: 0.99;
+}
+
+.column-copy {
+  padding: 0.75rem 0 0.6rem;
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.column-copy h2 {
+  margin: 0 0 0.3rem;
+  color: var(--red);
+  font: 700 0.62rem/1.3 var(--sans);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.column-copy p {
+  margin: 0 0 0.55rem;
+  color: #39332b;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.column-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.today-news {
+  min-width: 0;
 }
 
 .news-heading {
@@ -292,10 +334,10 @@ main,
   margin-bottom: 0.45rem;
 }
 
-.news-heading h1 {
+.news-heading h2 {
   max-width: 16ch;
   margin: 0;
-  font-size: clamp(2rem, 3.9vw, 3.35rem);
+  font-size: clamp(1.8rem, 3vw, 2.65rem);
   letter-spacing: -0.055em;
   line-height: 0.98;
 }
@@ -498,6 +540,31 @@ main,
   }
 }
 
+@media (max-width: 900px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .daily-column {
+    padding: 1.15rem 0;
+    border-top: 3px double var(--ink);
+    border-right: 0;
+    border-bottom: 3px double var(--ink);
+    border-left: 0;
+  }
+
+  .column-heading h1 {
+    max-width: 14ch;
+    font-size: clamp(2.25rem, 7vw, 3.2rem);
+  }
+
+  .today-news {
+    padding-top: 1.15rem;
+    border-top: 3px double var(--ink);
+  }
+}
+
 @media (max-width: 760px) {
   .site-header {
     padding-inline: 5%;
@@ -567,18 +634,7 @@ main,
     padding: 1.4rem 5% 0;
   }
 
-  .hero-inner {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .today-news {
-    padding: 1.15rem 0 0;
-    border-top: 3px double var(--ink);
-    border-left: 0;
-  }
-
-  .news-heading h1 {
+  .news-heading h2 {
     font-size: clamp(2.25rem, 9vw, 3.2rem);
   }
 
