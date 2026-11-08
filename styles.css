@@ -408,7 +408,8 @@ main,
 
 .thoughts-login input,
 .thoughts-reset input,
-.thoughts-uploader input {
+.thoughts-uploader input,
+.thoughts-story-form textarea {
   width: 100%;
   min-width: 0;
   padding: 0.5rem;
@@ -417,6 +418,12 @@ main,
   background: #fffdf8;
   color: var(--ink);
   font: 0.8rem var(--sans);
+}
+
+.thoughts-story-form textarea {
+  min-height: 22rem;
+  resize: vertical;
+  font: 0.88rem/1.5 var(--serif);
 }
 
 .thoughts-login button,
@@ -438,6 +445,12 @@ main,
 }
 
 .thoughts-uploader form p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.thoughts-story-form p {
   margin: 0;
   color: var(--muted);
   font-size: 0.68rem;
@@ -475,6 +488,23 @@ main,
   border-bottom: 1px solid var(--rule-light);
   font-size: 0.77rem;
   overflow-wrap: anywhere;
+}
+
+.thoughts-library details {
+  white-space: normal;
+}
+
+.thoughts-library summary {
+  color: var(--red);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.thoughts-library pre {
+  margin: 0.5rem 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 0.8rem/1.5 var(--serif);
 }
 
 .thoughts-library a {

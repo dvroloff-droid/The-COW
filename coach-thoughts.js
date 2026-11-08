@@ -9,6 +9,8 @@
   const uploadArea = document.querySelector("#thoughts-uploader");
   const uploadForm = document.querySelector("#thoughts-upload");
   const fileInput = document.querySelector("#thoughts-file");
+  const storyForm = document.querySelector("#thoughts-story");
+  const storyInput = document.querySelector("#thoughts-story-text");
   const signOutButton = document.querySelector("#thoughts-signout");
   const fileList = document.querySelector("#thoughts-list");
 
@@ -81,26 +83,65 @@
 
         const files = (data || []).filter((file) => file.id);
         if (files.length === 0) {
-          if (!preserveStatus && statusRevision === startingRevision) setStatus("No files have been shared yet.");
+          if (!preserveStatus && statusRevision === startingRevision) {
+            setStatus("No files or stories have been shared yet.");
+          }
           const item = document.createElement("li");
-          item.textContent = "Your shared files will appear here.";
+          item.textContent = "Your shared files and stories will appear here.";
           fileList.append(item);
           return;
         }
 
         for (const file of files) {
           const item = document.createElement("li");
-          const link = document.createElement("a");
-          link.href = bucket.getPublicUrl(file.name, { download: true }).data.publicUrl;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          link.textContent = file.name.replace(/^[0-9a-f-]{36}-/i, "");
-          item.append(link);
+          if (file.name.startsWith("story-")) {
+            const details = document.createElement("details");
+            const summary = document.createElement("summary");
+            const storyContent = document.createElement("pre");
+            let loaded = false;
+            let loading = false;
+            summary.textContent = file.name
+              .replace(/^story-[0-9a-f-]{36}-/i, "")
+              .replace(/\.txt$/i, "")
+              .replace(/-/g, " ") || "Read shared story";
+            details.append(summary, storyContent);
+            details.addEventListener("toggle", async () => {
+              if (!details.open || loaded || loading) return;
+              loading = true;
+              storyContent.textContent = "Loading story...";
+              try {
+                const { data, error } = await bucket.download(file.name);
+                if (error) {
+                  showError("Could not load shared story", error);
+                  storyContent.textContent = "Could not load this story. Open it again to retry.";
+                  return;
+                }
+                if (!data || typeof data.text !== "function") {
+                  throw new Error("The shared story could not be read.");
+                }
+                storyContent.textContent = await data.text();
+                loaded = true;
+              } catch (error) {
+                showError("Could not load shared story", error);
+                storyContent.textContent = "Could not load this story. Open it again to retry.";
+              } finally {
+                loading = false;
+              }
+            });
+            item.append(details);
+          } else {
+            const link = document.createElement("a");
+            link.href = bucket.getPublicUrl(file.name, { download: true }).data.publicUrl;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = file.name.replace(/^[0-9a-f-]{36}-/i, "");
+            item.append(link);
+          }
           fileList.append(item);
         }
 
         if (!preserveStatus && statusRevision === startingRevision) {
-          setStatus(`${files.length} shared file${files.length === 1 ? "" : "s"}.`);
+          setStatus(`${files.length} shared item${files.length === 1 ? "" : "s"}.`);
         }
       } catch (error) {
         showError("Could not load shared files", error);
@@ -125,11 +166,61 @@
           return;
         }
 
-        setStatus("Signed in. You can upload a file.");
+        setStatus("Signed in. You can share files and stories.");
       } catch (error) {
         showError("Could not sign in", error);
       } finally {
         submitButton.disabled = false;
+      }
+    });
+
+    storyForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const story = storyInput.value;
+      if (!story.trim()) {
+        setStatus("Write or paste a story before publishing.");
+        return;
+      }
+
+      const storyFile = new Blob([story], { type: "text/plain;charset=utf-8" });
+      if (storyFile.size > maxFileSize) {
+        setStatus("Choose a story no larger than 20 MB.");
+        return;
+      }
+
+      const publishButton = storyForm.querySelector('button[type="submit"]');
+      publishButton.disabled = true;
+      setStatus("Publishing story...");
+
+      try {
+        const storyTitle = story
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .find(Boolean)
+          ?.slice(0, 80);
+        const safeTitle = storyTitle
+          ?.normalize("NFKC")
+          .replace(/[^\w.-]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+        const objectName = `story-${crypto.randomUUID()}-${safeTitle || "untitled"}.txt`;
+        const { error } = await bucket.upload(objectName, storyFile, {
+          cacheControl: "3600",
+          contentType: "text/plain;charset=utf-8",
+          upsert: false,
+        });
+
+        if (error) {
+          showError("Could not publish story", error);
+          return;
+        }
+
+        storyForm.reset();
+        setStatus("Story published successfully.");
+        await loadFiles(true);
+      } catch (error) {
+        showError("Could not publish story", error);
+      } finally {
+        publishButton.disabled = false;
       }
     });
 
@@ -175,7 +266,7 @@
         recoveryMode = false;
         resetForm.reset();
         showSession(true);
-        setStatus("Password updated. You can now upload a file.");
+        setStatus("Password updated. You can now share files and stories.");
       } catch (error) {
         showError("Could not update password", error);
       } finally {
