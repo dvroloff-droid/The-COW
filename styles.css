@@ -1,12 +1,12 @@
 :root {
   color-scheme: light;
-  --paper: #f3eddf;
-  --paper-dark: #e7decb;
-  --ink: #211d18;
-  --muted: #625a4e;
-  --rule: #817766;
-  --rule-light: #c9beaa;
-  --red: #812c24;
+  --paper: #e9dfcb;
+  --paper-dark: #d9cbb1;
+  --ink: #2b241c;
+  --muted: #665a49;
+  --rule: #84745d;
+  --rule-light: #c1b196;
+  --red: #762c25;
   --serif: Georgia, "Times New Roman", serif;
   --sans: Arial, Helvetica, sans-serif;
 }
@@ -21,7 +21,10 @@ html {
 
 body {
   margin: 0;
-  background: #d8cfbd;
+  background:
+    radial-gradient(ellipse at 12% 18%, #e8dcc5 0, transparent 34rem),
+    radial-gradient(ellipse at 88% 76%, #a99a80 0, transparent 42rem),
+    #bcb09a;
   color: var(--ink);
   font-family: var(--serif);
   line-height: 1.45;
@@ -50,7 +53,12 @@ main,
 .site-footer {
   width: min(100%, 1380px);
   margin-inline: auto;
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 8% 12%, rgb(116 78 39 / 8%), transparent 25%),
+    radial-gradient(ellipse at 91% 67%, rgb(116 78 39 / 6%), transparent 30%),
+    repeating-linear-gradient(3deg, rgb(73 54 32 / 2%) 0 1px, transparent 1px 5px);
+  box-shadow: inset 0 0 3.5rem rgb(89 66 38 / 8%);
 }
 
 .site-header {
@@ -85,6 +93,7 @@ main,
   font-weight: 900;
   letter-spacing: -0.075em;
   line-height: 1.04;
+  text-shadow: 0.6px 0 currentColor, -0.35px 0 rgb(43 36 28 / 45%);
   text-decoration: none;
 }
 
