@@ -7,8 +7,6 @@
   const resetRequestButton = document.querySelector("#thoughts-reset-request");
   const resetForm = document.querySelector("#thoughts-reset");
   const uploadArea = document.querySelector("#thoughts-uploader");
-  const uploadForm = document.querySelector("#thoughts-upload");
-  const fileInput = document.querySelector("#thoughts-file");
   const storyForm = document.querySelector("#thoughts-story");
   const storyTitleInput = document.querySelector("#thoughts-story-title");
   const storyEditor = document.querySelector("#thoughts-story-editor");
@@ -530,50 +528,6 @@
         showError("Could not update password", error);
       } finally {
         submitButton.disabled = false;
-      }
-    });
-
-    uploadForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const file = fileInput.files?.[0];
-      if (!file) {
-        setStatus("Choose a file before uploading.");
-        return;
-      }
-      if (file.size > maxFileSize) {
-        setStatus("Choose a file no larger than 20 MB.");
-        return;
-      }
-
-      const uploadButton = uploadForm.querySelector('button[type="submit"]');
-      uploadButton.disabled = true;
-      setStatus("Preparing file...");
-
-      try {
-        const safeName = file.name
-          .normalize("NFKC")
-          .replace(/[^\w.-]+/g, "-")
-          .replace(/^-+|-+$/g, "");
-        const objectName = `${crypto.randomUUID()}-${safeName || "upload"}`;
-        setStatus("Uploading file...");
-        const { error } = await bucket.upload(objectName, file, {
-          cacheControl: "3600",
-          contentType: file.type || "application/octet-stream",
-          upsert: false,
-        });
-
-        if (error) {
-          showError("Could not upload file", error);
-          return;
-        }
-
-        uploadForm.reset();
-        setStatus("File uploaded successfully.");
-        await loadFiles();
-      } catch (error) {
-        showError("Could not upload file", error);
-      } finally {
-        uploadButton.disabled = false;
       }
     });
 
