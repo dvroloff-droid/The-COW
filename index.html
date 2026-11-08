@@ -3,85 +3,237 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Coach's Office</title>
+    <meta name="theme-color" content="#101b2c" />
     <meta
       name="description"
-      content="The rebuilt Coach's Office website with sections for articles, clips, fantasy football, spreadsheets, and coaching services."
+      content="The Coach's Office: a home for football coaching, resources, fantasy, and community."
     />
+    <title>The Coach's Office — Football, well played</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
     <header class="site-header">
-      <div class="container">
-        <h1>The Coach's Office</h1>
-        <p class="subtitle">Home Page</p>
+      <div class="header-inner">
+        <a class="wordmark" href="#home" aria-label="The Coach's Office home">
+          <span class="wordmark-mark" aria-hidden="true">CO</span>
+          <span>The Coach's <strong>Office</strong></span>
+        </a>
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="primary-nav"
+        >
+          <span class="sr-only">Toggle navigation</span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <nav class="primary-nav" id="primary-nav" aria-label="Main navigation">
+          <a href="#playbook">Playbook</a>
+          <a href="#game-day">Game day</a>
+          <a href="#teams">Our teams</a>
+          <a class="nav-cta" href="#coaching">Coaching</a>
+        </nav>
       </div>
     </header>
 
-    <main class="container">
-      <section class="diagram" aria-labelledby="diagram-title">
-        <h2 id="diagram-title">Site Map Diagram</h2>
-        <img
-          src="assets/The%20Coach%27s%20Office%20Web%20Design.svg"
-          alt="The Coach's Office website structure diagram"
-          loading="lazy"
-        />
+    <main id="main">
+      <section class="hero" id="home" aria-labelledby="hero-title">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="eyebrow"><span></span> A home for the love of the game</p>
+            <h1 id="hero-title">Football,<br /><em>well played.</em></h1>
+            <p class="hero-intro">
+              A place to learn the game, sharpen your instincts, and stay
+              connected to the teams and people who make it special.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#playbook">
+                Explore the office <span aria-hidden="true">↗</span>
+              </a>
+              <a class="text-link" href="#teams">Meet our teams</a>
+            </div>
+          </div>
+
+          <aside class="hero-note" aria-label="The Coach's Office approach">
+            <div class="note-topline">
+              <span class="note-label">THE COACH'S NOTEBOOK</span>
+              <span class="note-dot" aria-hidden="true"></span>
+            </div>
+            <p class="note-quote">“The details make<br />the difference.”</p>
+            <div class="note-rule"></div>
+            <div class="note-list">
+              <div><span>01</span><p>Learn something new</p></div>
+              <div><span>02</span><p>Put it into practice</p></div>
+              <div><span>03</span><p>Enjoy every snap</p></div>
+            </div>
+            <span class="note-watermark" aria-hidden="true">CO</span>
+          </aside>
+        </div>
+        <div class="hero-foot">
+          <span>GOOD FOOTBALL STARTS HERE</span>
+          <a href="#playbook" aria-label="Scroll to the playbook">↓</a>
+          <span>EST. FOR THE LOVE OF THE GAME</span>
+        </div>
       </section>
 
-      <section class="grid" aria-label="Site sections">
-        <article class="card" id="articles">
-          <h3>Articles</h3>
-          <p>Upload and organize article content from PDFs.</p>
-          <button type="button" data-action="placeholder">Open Articles</button>
-        </article>
+      <section class="welcome section-wrap" aria-labelledby="welcome-title">
+        <div>
+          <p class="eyebrow eyebrow-dark">STEP INSIDE</p>
+          <h2 id="welcome-title">A little bit of everything.<br /><em>All about football.</em></h2>
+        </div>
+        <p class="welcome-copy">
+          From coaching ideas and football resources to fantasy and team
+          updates, this is your starting point for what happens on and off the
+          field.
+        </p>
+      </section>
 
-        <article class="card" id="tips-clips">
-          <h3>Coaching Tips & Clips</h3>
-          <p>Video clips and text resources curated from trusted sources.</p>
-          <button type="button" data-action="placeholder">Open Tips & Clips</button>
-        </article>
+      <section class="rooms section-wrap" id="playbook" aria-labelledby="playbook-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow eyebrow-dark">MAKE YOURSELF AT HOME</p>
+            <h2 id="playbook-title">Around the office</h2>
+          </div>
+          <p>Pick a room and stay awhile.</p>
+        </div>
 
-        <article class="card" id="espn-fantasy">
-          <h3>ESPN Fantasy</h3>
-          <p>Quick access area for fantasy football resources and links.</p>
-          <a href="#" data-action="external-placeholder">Open ESPN Fantasy</a>
-        </article>
+        <div class="room-grid">
+          <article class="room-card room-card-large">
+            <div class="card-top">
+              <span class="card-number">01</span>
+              <span class="card-tag">THE PLAYBOOK</span>
+            </div>
+            <div class="card-content">
+              <h3>Articles</h3>
+              <p>Ideas, lessons, and football reading for curious minds.</p>
+              <span class="availability">Articles coming soon</span>
+            </div>
+            <span class="card-mark" aria-hidden="true">A</span>
+          </article>
 
-        <article class="card" id="football-not-futbol">
-          <h3>Football (Not Futbol)</h3>
-          <p>Spreadsheet-driven section with room for multi-tab updates.</p>
-          <button type="button" data-action="placeholder">Open Football Data</button>
-        </article>
+          <article class="room-card room-card-light">
+            <div class="card-top">
+              <span class="card-number">02</span>
+              <span class="card-tag">LEARN &amp; WATCH</span>
+            </div>
+            <div class="card-content">
+              <h3>Coaching tips &amp; clips</h3>
+              <p>Useful teaching points and video for your next practice.</p>
+              <span class="availability">Library coming soon</span>
+            </div>
+            <span class="card-mark" aria-hidden="true">▶</span>
+          </article>
 
-        <article class="card" id="gffl">
-          <h3>The GFFL</h3>
-          <p>Upload and maintain a multi-tab Excel-based tracking section.</p>
-          <button type="button" data-action="placeholder">Open GFFL</button>
-        </article>
+          <article class="room-card room-card-cream" id="game-day">
+            <div class="card-top">
+              <span class="card-number">03</span>
+              <span class="card-tag">FANTASY FOOTBALL</span>
+            </div>
+            <div class="card-content">
+              <h3>ESPN Fantasy</h3>
+              <p>Head to ESPN to manage your league and make your next move.</p>
+              <a
+                class="card-link"
+                href="https://fantasy.espn.com/football/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >Go to ESPN Fantasy <span aria-hidden="true">↗</span></a>
+            </div>
+            <span class="card-mark" aria-hidden="true">F</span>
+          </article>
 
-        <article class="card" id="store">
-          <h3>Web Store</h3>
-          <p>Book coaching lessons and services.</p>
-          <button type="button" data-action="placeholder">Open Store</button>
-        </article>
+          <article class="room-card room-card-light">
+            <div class="card-top">
+              <span class="card-number">04</span>
+              <span class="card-tag">THE NUMBERS GAME</span>
+            </div>
+            <div class="card-content">
+              <h3>Football, not futbol</h3>
+              <p>Football data and spreadsheet resources, all in one place.</p>
+              <span class="availability">Resources coming soon</span>
+            </div>
+            <span class="card-mark" aria-hidden="true">#</span>
+          </article>
 
-        <article class="card" id="milwaukee-angels">
-          <h3>Milwaukee Angels U-11</h3>
-          <p>External GameChanger access point.</p>
-          <a href="#" data-action="external-placeholder">Open GameChanger</a>
-        </article>
+          <article class="room-card room-card-dark" id="gffl">
+            <div class="card-top">
+              <span class="card-number">05</span>
+              <span class="card-tag">LEAGUE CENTRAL</span>
+            </div>
+            <div class="card-content">
+              <h3>The GFFL</h3>
+              <p>League information and season tracking for GFFL members.</p>
+              <span class="availability">League hub coming soon</span>
+            </div>
+            <span class="card-mark" aria-hidden="true">G</span>
+          </article>
 
-        <article class="card" id="madison-college">
-          <h3>Madison College</h3>
-          <p>External GameChanger access point.</p>
-          <a href="#" data-action="external-placeholder">Open GameChanger</a>
-        </article>
+          <article class="room-card room-card-cream" id="coaching">
+            <div class="card-top">
+              <span class="card-number">06</span>
+              <span class="card-tag">GET BETTER</span>
+            </div>
+            <div class="card-content">
+              <h3>Coaching &amp; lessons</h3>
+              <p>One-on-one coaching and ways to grow your game.</p>
+              <span class="availability">Booking details coming soon</span>
+            </div>
+            <span class="card-mark" aria-hidden="true">✳</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="teams-section" id="teams" aria-labelledby="teams-title">
+        <div class="section-wrap teams-inner">
+          <div class="teams-copy">
+            <p class="eyebrow">MORE THAN A GAME</p>
+            <h2 id="teams-title">Rooted in<br /><em>our community.</em></h2>
+            <p>
+              Follow the teams and programs that bring us together. Team
+              schedules and updates are hosted by GameChanger.
+            </p>
+          </div>
+          <div class="team-links">
+            <a href="https://web.gc.com/" target="_blank" rel="noopener noreferrer">
+              <span class="team-icon" aria-hidden="true">M</span>
+              <span><strong>Milwaukee Angels U-11</strong><small>Find the team on GameChanger</small></span>
+              <span class="team-arrow" aria-hidden="true">↗</span>
+            </a>
+            <a href="https://web.gc.com/" target="_blank" rel="noopener noreferrer">
+              <span class="team-icon team-icon-alt" aria-hidden="true">MC</span>
+              <span><strong>Madison College</strong><small>Find the team on GameChanger</small></span>
+              <span class="team-arrow" aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="blueprint section-wrap">
+        <details>
+          <summary>View the original website blueprint</summary>
+          <figure>
+            <img
+              src="The%20Coach%27s%20Office%20Web%20Design.svg"
+              alt="Original site map for The Coach's Office, showing articles, coaching tips, fantasy football, league resources, coaching lessons, and team links."
+              loading="lazy"
+            />
+            <figcaption>The original site map that inspired this website.</figcaption>
+          </figure>
+        </details>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div class="container">
-        <p>© <span id="year"></span> The Coach's Office</p>
+      <div class="footer-inner">
+        <a class="wordmark footer-wordmark" href="#home">
+          <span class="wordmark-mark" aria-hidden="true">CO</span>
+          <span>The Coach's <strong>Office</strong></span>
+        </a>
+        <p>For the love of the game.</p>
+        <span class="copyright">© <span id="year"></span> The Coach's Office</span>
       </div>
     </footer>
 
