@@ -237,8 +237,7 @@ p {
 }
 
 .hero h1 em,
-.welcome h2 em,
-.teams-copy h2 em {
+.welcome h2 em {
   color: var(--orange-light);
   font-style: normal;
 }
@@ -417,8 +416,7 @@ p {
 }
 
 .welcome h2,
-.section-heading h2,
-.teams-copy h2 {
+.section-heading h2 {
   margin-bottom: 0;
   font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 3.2rem);
@@ -465,25 +463,44 @@ p {
 }
 
 .room-grid {
+  position: relative;
   display: grid;
   max-width: 720px;
   grid-template-columns: minmax(0, 1fr);
   gap: 12px;
+  padding-left: 28px;
+}
+
+.room-grid::before {
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  left: 9px;
+  width: 1px;
+  background: var(--line);
+  content: "";
 }
 
 .room-card {
   position: relative;
-  display: flex;
   min-height: 190px;
-  flex-direction: column;
-  justify-content: space-between;
   overflow: hidden;
   padding: 1.5rem;
   border: 1px solid var(--line);
   background: var(--white);
 }
 
-.room-card-large {
+.room-card::before {
+  position: absolute;
+  top: 27px;
+  left: -19px;
+  width: 18px;
+  height: 1px;
+  background: var(--line);
+  content: "";
+}
+
+.room-card-featured {
   min-height: 210px;
   background: #f0eee8;
 }
@@ -494,12 +511,6 @@ p {
 
 .room-card-cream {
   background: #eeeae1;
-}
-
-.room-card-dark {
-  border-color: var(--navy);
-  background: var(--navy);
-  color: var(--white);
 }
 
 .card-top {
@@ -514,23 +525,15 @@ p {
   color: #90979c;
 }
 
-.room-card-dark .card-number {
-  color: rgb(255 255 255 / 48%);
-}
-
 .card-tag {
   color: #777f87;
   font-size: 0.56rem;
 }
 
-.room-card-dark .card-tag {
-  color: rgb(255 255 255 / 55%);
-}
-
 .card-content {
   position: relative;
   z-index: 1;
-  max-width: 310px;
+  max-width: 560px;
   padding-top: 2rem;
 }
 
@@ -542,19 +545,11 @@ p {
   letter-spacing: -0.055em;
 }
 
-.room-card-large .card-content h3 {
-  font-size: 1.7rem;
-}
-
 .card-content p {
   margin-bottom: 1.1rem;
   color: var(--ink-soft);
   font-size: 0.82rem;
   line-height: 1.7;
-}
-
-.room-card-dark .card-content p {
-  color: rgb(255 255 255 / 66%);
 }
 
 .availability {
@@ -574,10 +569,6 @@ p {
   content: "";
 }
 
-.room-card-dark .availability {
-  color: rgb(255 255 255 / 69%);
-}
-
 .card-link {
   display: inline-flex;
   align-items: center;
@@ -593,6 +584,47 @@ p {
   text-underline-offset: 4px;
 }
 
+.card-children {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.8rem;
+  margin: 1.5rem 0 0 0.25rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--line);
+}
+
+.subcard {
+  position: relative;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  background: rgb(255 255 255 / 62%);
+}
+
+.subcard::before {
+  position: absolute;
+  top: 1.2rem;
+  left: -1rem;
+  width: 1rem;
+  height: 1px;
+  background: var(--line);
+  content: "";
+}
+
+.subcard h4 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: -0.035em;
+}
+
+.subcard p {
+  margin: 0 0 0.65rem;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+
 .card-mark {
   position: absolute;
   right: 0.7rem;
@@ -604,105 +636,6 @@ p {
   letter-spacing: -0.1em;
   line-height: 1;
   pointer-events: none;
-}
-
-.room-card-dark .card-mark {
-  color: rgb(255 255 255 / 4%);
-}
-
-.teams-section {
-  overflow: hidden;
-  background: var(--navy);
-  color: var(--white);
-}
-
-.teams-inner {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  align-items: center;
-  gap: clamp(3rem, 9vw, 9rem);
-  padding-top: 6.5rem;
-  padding-bottom: 6.5rem;
-}
-
-.teams-copy .eyebrow {
-  margin-bottom: 1rem;
-}
-
-.teams-copy h2 {
-  margin-bottom: 1.2rem;
-}
-
-.teams-copy > p:last-child {
-  max-width: 385px;
-  margin-bottom: 0;
-  color: rgb(255 255 255 / 63%);
-  font-size: 0.88rem;
-  line-height: 1.8;
-}
-
-.team-links {
-  border-top: 1px solid rgb(255 255 255 / 16%);
-}
-
-.team-links a {
-  display: grid;
-  min-height: 91px;
-  grid-template-columns: 44px 1fr auto;
-  align-items: center;
-  gap: 1rem;
-  border-bottom: 1px solid rgb(255 255 255 / 16%);
-  color: var(--white);
-  text-decoration: none;
-  transition: padding 160ms ease, background 160ms ease;
-}
-
-.team-links a:hover {
-  padding-right: 0.5rem;
-  padding-left: 0.5rem;
-  background: rgb(255 255 255 / 3%);
-}
-
-.team-icon {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border: 1px solid rgb(247 170 123 / 42%);
-  border-radius: 50%;
-  color: var(--orange-light);
-  font-family: var(--font-display);
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-.team-icon-alt {
-  border-color: rgb(255 255 255 / 24%);
-  color: var(--white);
-  font-size: 0.64rem;
-}
-
-.team-links strong,
-.team-links small {
-  display: block;
-}
-
-.team-links strong {
-  font-family: var(--font-display);
-  font-size: 0.91rem;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-}
-
-.team-links small {
-  margin-top: 0.22rem;
-  color: rgb(255 255 255 / 52%);
-  font-size: 0.7rem;
-}
-
-.team-arrow {
-  color: var(--orange-light);
-  font-size: 1.1rem;
 }
 
 .blueprint {
@@ -802,9 +735,6 @@ p {
     padding-bottom: 5rem;
   }
 
-  .teams-inner {
-    gap: 3rem;
-  }
 }
 
 @media (max-width: 620px) {
@@ -931,8 +861,7 @@ p {
     padding-bottom: 4.5rem;
   }
 
-  .welcome h2,
-  .teams-copy h2 {
+  .welcome h2 {
     font-size: 2.4rem;
   }
 
@@ -953,21 +882,9 @@ p {
     gap: 10px;
   }
 
-  .room-card,
-  .room-card-large {
+  .room-card {
     min-height: 190px;
     grid-column: auto;
-  }
-
-  .room-card-large {
-    min-height: 200px;
-  }
-
-  .teams-inner {
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-    padding-top: 5rem;
-    padding-bottom: 5rem;
   }
 
   .footer-inner {
