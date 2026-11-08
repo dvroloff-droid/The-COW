@@ -15,20 +15,25 @@
   const storyImageButton = document.querySelector("#thoughts-story-add-image");
   const storyImageInput = document.querySelector("#thoughts-story-image");
   const storyAgainButton = document.querySelector("#thoughts-story-again");
+  const storyStatus = document.querySelector("#thoughts-story-status");
   const signOutButton = document.querySelector("#thoughts-signout");
   const fileList = document.querySelector("#thoughts-list");
   const heroInner = document.querySelector(".hero-inner");
 
   let statusRevision = 0;
-  const setStatus = (message) => {
-    statusRevision++;
-    status.textContent = message;
-    status.dataset.state = /could not|choose|enter|add a headline/i.test(message)
+  const updateStatus = (element, message) => {
+    element.textContent = message;
+    element.dataset.state = /could not|choose|enter|add article|add a headline|couldn't/i.test(message)
       ? "error"
       : /successfully|picture added|published/i.test(message)
         ? "success"
         : "info";
   };
+  const setStatus = (message) => {
+    statusRevision++;
+    updateStatus(status, message);
+  };
+  const setStoryStatus = (message) => updateStatus(storyStatus, message);
 
   const appendSafeStoryNodes = (source, target, supabaseUrl, bucketName) => {
     const allowedTags = new Set([
@@ -124,12 +129,12 @@
     const bucket = client.storage.from(bucketName);
     let savedStorySelection = null;
 
-    const showError = (action, error) => {
+    const showError = (action, error, report = setStatus) => {
       const details =
         error && typeof error.message === "string"
           ? error.message
           : "An unexpected error occurred.";
-      setStatus(`${action}: ${details}`);
+      report(`${action}: ${details}`);
     };
 
     const showSession = (session) => {
@@ -150,7 +155,7 @@
 
         if (error) {
           showError("Could not load shared files", error);
-          return;
+          return false;
         }
 
         const files = (data || []).filter((file) => file.id);
@@ -161,9 +166,10 @@
           const item = document.createElement("li");
           item.textContent = "Your shared files and stories will appear here.";
           fileList.append(item);
-          return;
+          return !openStoryName;
         }
 
+        let openedStory = null;
         for (const file of files) {
           const item = document.createElement("li");
           if (file.name.startsWith("story-")) {
@@ -223,6 +229,7 @@
                   storyTitle.textContent = article.title;
                   summary.textContent = article.title;
                   const parsed = new DOMParser().parseFromString(article.html, "text/html");
+                  storyBody.replaceChildren();
                   appendSafeStoryNodes(parsed.body, storyBody, config.supabaseUrl, bucketName);
                 } else {
                   const lines = text.split(/\r?\n/);
@@ -249,7 +256,10 @@
               }
             });
             details.open = file.name === openStoryName;
-            if (details.open) heroInner.classList.add("newspaper-reading");
+            if (details.open) {
+              heroInner.classList.add("newspaper-reading");
+              openedStory = details;
+            }
             item.append(details);
           } else {
             const link = document.createElement("a");
@@ -265,8 +275,11 @@
         if (!preserveStatus && statusRevision === startingRevision) {
           setStatus(`${files.length} shared item${files.length === 1 ? "" : "s"}.`);
         }
+        if (openedStory) openedStory.scrollIntoView({ block: "start", behavior: "smooth" });
+        return !openStoryName || Boolean(openedStory);
       } catch (error) {
         showError("Could not load shared files", error);
+        return false;
       }
     };
 
@@ -318,16 +331,16 @@
       storyImageInput.value = "";
       if (!image) return;
       if (!image.type.startsWith("image/")) {
-        setStatus("Choose an image file.");
+        setStoryStatus("Choose an image file.");
         return;
       }
       if (image.size > maxFileSize) {
-        setStatus("Choose an image no larger than 20 MB.");
+        setStoryStatus("Choose an image no larger than 20 MB.");
         return;
       }
 
       storyImageButton.disabled = true;
-      setStatus("Uploading picture...");
+      setStoryStatus("Uploading picture...");
       try {
         const safeName = image.name
           .normalize("NFKC")
@@ -340,7 +353,7 @@
           upsert: false,
         });
         if (error) {
-          showError("Could not upload picture", error);
+          showError("Could not upload picture", error, setStoryStatus);
           return;
         }
 
@@ -364,9 +377,9 @@
         } else {
           storyEditor.append(figure);
         }
-        setStatus("Picture added to your column.");
+        setStoryStatus("Picture added to your column.");
       } catch (error) {
-        showError("Could not upload picture", error);
+        showError("Could not upload picture", error, setStoryStatus);
       } finally {
         storyImageButton.disabled = false;
       }
@@ -375,6 +388,7 @@
     storyAgainButton.addEventListener("click", () => {
       storyForm.hidden = false;
       storyAgainButton.hidden = true;
+      setStoryStatus("");
       storyTitleInput.focus();
     });
 
@@ -383,12 +397,12 @@
       const storyTitle = storyTitleInput.value.trim();
       const storyHtml = storyEditor.innerHTML.trim();
       if (!storyTitle) {
-        setStatus("Enter a headline before publishing your article.");
+        setStoryStatus("Enter a headline before publishing your article.");
         storyTitleInput.focus();
         return;
       }
       if (!storyEditor.textContent.trim() && !storyEditor.querySelector("img")) {
-        setStatus("Add article text or a picture before publishing.");
+        setStoryStatus("Add article text or a picture before publishing.");
         storyEditor.focus();
         return;
       }
@@ -398,13 +412,13 @@
         { type: "application/json;charset=utf-8" },
       );
       if (storyFile.size > maxFileSize) {
-        setStatus("Choose a story no larger than 20 MB.");
+        setStoryStatus("Choose a story no larger than 20 MB.");
         return;
       }
 
       const publishButton = storyForm.querySelector('button[type="submit"]');
       publishButton.disabled = true;
-      setStatus("Publishing your article...");
+      setStoryStatus("Publishing your article...");
 
       try {
         const safeTitle = storyTitle
@@ -419,7 +433,7 @@
         });
 
         if (error) {
-          showError("Could not publish story", error);
+          showError("Could not publish story", error, setStoryStatus);
           return;
         }
 
@@ -427,10 +441,13 @@
         storyEditor.replaceChildren();
         storyForm.hidden = true;
         storyAgainButton.hidden = false;
-        setStatus("Article published successfully.");
-        await loadFiles(true, objectName);
+        setStoryStatus("Article published successfully. Opening your article...");
+        const refreshed = await loadFiles(true, objectName);
+        setStoryStatus(refreshed
+          ? "Article published successfully."
+          : "Article published, but it couldn't be opened in the shared list. Reload the page to find it.");
       } catch (error) {
-        showError("Could not publish story", error);
+        showError("Could not publish story", error, setStoryStatus);
       } finally {
         publishButton.disabled = false;
       }

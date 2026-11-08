@@ -10,7 +10,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
   for (const id of [
     "status", "login", "reset-request", "reset", "uploader", "upload", "file",
     "story", "story-title", "story-editor", "story-add-image", "story-image",
-    "story-again",
+    "story-again", "story-status",
     "signout", "list",
   ]) {
     elements[id] = {
@@ -90,6 +90,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     replaceChildren(...children) { this.children = children; },
     append(...children) { this.children.push(...children); },
     getAttribute(name) { return this.attributes[name] || null; },
+    scrollIntoView() { this.scrolledIntoView = true; },
     open: false,
   });
   const context = {
@@ -192,9 +193,10 @@ test("publishes a full article as a formatted shared file", async () => {
   assert.equal(elements.story.wasReset, true);
   assert.equal(elements.story.hidden, true);
   assert.equal(elements["story-again"].hidden, false);
-  assert.match(elements.status.textContent, /Article published successfully/);
+  assert.match(elements["story-status"].textContent, /Article published successfully/);
   const publishedStory = elements.list.children[0].children[0];
   assert.equal(publishedStory.open, true);
+  assert.equal(publishedStory.scrolledIntoView, true);
 
   await elements["story-again"].listeners.click();
   assert.equal(elements.story.hidden, false);
@@ -210,9 +212,40 @@ test("shows clear validation when an article has no headline", async () => {
 
   await elements.story.listeners.submit({ preventDefault() {} });
 
-  assert.match(elements.status.textContent, /Enter a headline/);
+  assert.match(elements["story-status"].textContent, /Enter a headline/);
   assert.equal(elements["story-title"].focused, true);
   assert.equal(calls.upload, undefined);
+});
+
+test("shows publishing errors beside the editor and preserves the draft", async () => {
+  const { elements, bucket } = setup();
+  await new Promise(setImmediate);
+  elements["story-title"].value = "A headline";
+  elements["story-editor"].textContent = "Article text";
+  elements["story-editor"].innerHTML = "<p>Article text</p>";
+  bucket.upload = async () => ({ error: { message: "Permission denied" } });
+
+  await elements.story.listeners.submit({ preventDefault() {} });
+
+  assert.match(elements["story-status"].textContent, /Could not publish story: Permission denied/);
+  assert.equal(elements["story-status"].dataset.state, "error");
+  assert.equal(elements.story.wasReset, undefined);
+  assert.equal(elements.story.button.disabled, false);
+});
+
+test("distinguishes a successful upload from a failed list refresh", async () => {
+  const { elements, bucket } = setup();
+  await new Promise(setImmediate);
+  elements["story-title"].value = "A headline";
+  elements["story-editor"].textContent = "Article text";
+  elements["story-editor"].innerHTML = "<p>Article text</p>";
+  bucket.list = async () => ({ data: null, error: { message: "List unavailable" } });
+
+  await elements.story.listeners.submit({ preventDefault() {} });
+
+  assert.match(elements["story-status"].textContent, /Article published, but it couldn't be opened/);
+  assert.match(elements.status.textContent, /List unavailable/);
+  assert.equal(elements.story.wasReset, true);
 });
 
 test("loads published stories as plain text in the shared list", async () => {
