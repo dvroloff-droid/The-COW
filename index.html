@@ -160,7 +160,12 @@
               </form>
               <form class="thoughts-story-form" id="thoughts-story">
                 <label for="thoughts-story-title">Column headline</label>
-                <input id="thoughts-story-title" name="title" maxlength="160" required />
+                <input
+                  id="thoughts-story-title"
+                  name="title"
+                  maxlength="160"
+                  placeholder="Give your article a headline"
+                />
                 <label for="thoughts-story-editor">Write or paste your column</label>
                 <div class="story-toolbar" role="toolbar" aria-label="Story formatting">
                   <button type="button" data-command="bold" aria-label="Bold">Bold</button>
@@ -179,9 +184,10 @@
                   data-placeholder="Write or paste your full column here..."
                 ></div>
                 <input id="thoughts-story-image" type="file" accept="image/*" hidden />
-                <p>Format your column and add pictures · Images up to 20 MB each</p>
+                <p>Add a headline and article text, then insert pictures where they belong. Images up to 20 MB each.</p>
                 <button type="submit">Publish story</button>
               </form>
+              <button id="thoughts-story-again" type="button" hidden>Write another article</button>
               <button class="thoughts-signout" id="thoughts-signout" type="button">Sign out</button>
             </div>
 
