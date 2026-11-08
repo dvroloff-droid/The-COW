@@ -9,7 +9,7 @@
       content="The Coach's Office: a home for football coaching, resources, fantasy, and community."
     />
     <title>The Coach's Office — Football, well played</title>
-    <link rel="stylesheet" href="styles.css?v=20261108-2" />
+    <link rel="stylesheet" href="styles.css?v=20261108-3" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -159,15 +159,27 @@
                 <button type="submit">Upload file</button>
               </form>
               <form class="thoughts-story-form" id="thoughts-story">
-                <label for="thoughts-story-text">Write or paste a full story</label>
-                <textarea
-                  id="thoughts-story-text"
-                  name="story"
-                  rows="18"
-                  required
-                  placeholder="Paste or write your story here..."
-                ></textarea>
-                <p>Plain text · Up to 20 MB</p>
+                <label for="thoughts-story-title">Column headline</label>
+                <input id="thoughts-story-title" name="title" maxlength="160" required />
+                <label for="thoughts-story-editor">Write or paste your column</label>
+                <div class="story-toolbar" role="toolbar" aria-label="Story formatting">
+                  <button type="button" data-command="bold" aria-label="Bold">Bold</button>
+                  <button type="button" data-command="italic" aria-label="Italic">Italic</button>
+                  <button type="button" data-command="formatBlock" data-value="h2">Subheading</button>
+                  <button type="button" data-command="formatBlock" data-value="blockquote">Quote</button>
+                  <button id="thoughts-story-add-image" type="button">Add picture</button>
+                </div>
+                <div
+                  class="story-editor"
+                  id="thoughts-story-editor"
+                  contenteditable="true"
+                  role="textbox"
+                  aria-label="Column text"
+                  aria-multiline="true"
+                  data-placeholder="Write or paste your full column here..."
+                ></div>
+                <input id="thoughts-story-image" type="file" accept="image/*" hidden />
+                <p>Format your column and add pictures · Images up to 20 MB each</p>
                 <button type="submit">Publish story</button>
               </form>
               <button class="thoughts-signout" id="thoughts-signout" type="button">Sign out</button>
@@ -275,6 +287,6 @@
 
     <script src="app.js"></script>
     <script src="supabase-config.js"></script>
-    <script src="coach-thoughts.js?v=20261108-2"></script>
+    <script src="coach-thoughts.js?v=20261108-3"></script>
   </body>
 </html>
