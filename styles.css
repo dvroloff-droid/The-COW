@@ -16,7 +16,7 @@
 }
 
 html {
-  font-size: 12pt;
+  font-size: 10pt;
   scroll-behavior: smooth;
 }
 
@@ -657,7 +657,7 @@ main,
 
 .shared-story-body {
   padding-top: 0.45rem;
-  font-size: 12pt;
+  font-size: 10pt;
   line-height: 1.5;
 }
 

@@ -12,7 +12,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261109-2/);
+  assert.match(page, /styles\.css\?v=20261109-3/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /coach-thoughts\.js\?v=20261109-5/);
 });
@@ -20,6 +20,11 @@ test("places article and spreadsheet uploads below the published article archive
 test("styles the spreadsheet uploader consistently with the article editor", () => {
   assert.match(styles, /\.thoughts-uploader form\s*\{[^}]*display:\s*grid;/);
   assert.match(styles, /\.thoughts-uploader input,/);
+});
+
+test("uses smaller text for published article bodies and supports pictures", () => {
+  assert.equal((styles.match(/font-size: 10pt;/g) || []).length, 2);
+  assert.match(page, /id="thoughts-story-add-image"[^>]*>Add picture<\/button>/);
 });
 
 test("keeps shared storage publicly readable but upload-only for authorized accounts", () => {
