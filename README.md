@@ -23,9 +23,9 @@ type up to 20 MB.
    plain-text stories remain readable in the library.
    Authorized uploaders can also share `.xlsx`, `.xls`, and `.xlsm`
    workbooks up to 20 MB. Workbooks are stored unchanged, preserving every
-   worksheet, and appear as public download links. Visitors can download a
-   copy but cannot modify the shared original; only authorized accounts can
-   upload files.
+   worksheet, and appear as public download links under The GFFL section.
+   Visitors can download a copy but cannot modify the shared original; only
+   authorized accounts can upload files.
 
 ## Password recovery
 

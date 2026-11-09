@@ -19,6 +19,7 @@
   const storyStatus = document.querySelector("#thoughts-story-status");
   const signOutButton = document.querySelector("#thoughts-signout");
   const fileList = document.querySelector("#thoughts-list");
+  const gfflWorkbooks = document.querySelector("#gffl-workbooks");
   const heroInner = document.querySelector(".hero-inner");
 
   let statusRevision = 0;
@@ -36,6 +37,11 @@
   };
   const setSpreadsheetStatus = (message) => updateStatus(spreadsheetStatus, message);
   const setStoryStatus = (message) => updateStatus(storyStatus, message);
+  const setWorkbookMessage = (message) => {
+    const item = document.createElement("li");
+    item.textContent = message;
+    gfflWorkbooks.replaceChildren(item);
+  };
 
   const appendSafeStoryNodes = (source, target, supabaseUrl, bucketName) => {
     const allowedTags = new Set([
@@ -99,6 +105,7 @@
 
   const showSetupInstructions = () => {
     setStatus("Connect a Supabase project to enable file uploads. See the setup instructions.");
+    setWorkbookMessage("Connect Supabase to load GFFL workbooks.");
     fileList.replaceChildren();
     const item = document.createElement("li");
     const link = document.createElement("a");
@@ -121,6 +128,7 @@
   const initializeUploader = () => {
     if (!window.supabase?.createClient) {
       setStatus("The Supabase client could not be loaded. Check your connection and refresh.");
+      setWorkbookMessage("Could not load GFFL workbooks. Check your connection and refresh.");
       return;
     }
 
@@ -149,6 +157,7 @@
       const startingRevision = statusRevision;
       heroInner.classList.remove("newspaper-reading");
       fileList.replaceChildren();
+      gfflWorkbooks.replaceChildren();
       try {
         const { data, error } = await bucket.list("", {
           limit: 100,
@@ -157,6 +166,7 @@
 
         if (error) {
           showError("Could not load shared files", error);
+          setWorkbookMessage("Could not load GFFL workbooks. Refresh the page to retry.");
           return false;
         }
 
@@ -170,10 +180,15 @@
           const item = document.createElement("li");
           item.textContent = "Your shared files and stories will appear here.";
           fileList.append(item);
+          const workbookItem = document.createElement("li");
+          workbookItem.textContent = "GFFL workbooks will appear here.";
+          gfflWorkbooks.append(workbookItem);
           return !openStoryName;
         }
 
         let openedStory = null;
+        let archiveItemCount = 0;
+        let workbookCount = 0;
         for (const file of files) {
           const item = document.createElement("li");
           if (file.name.startsWith("story-")) {
@@ -273,7 +288,23 @@
             link.textContent = file.name.replace(/^[0-9a-f-]{36}-/i, "");
             item.append(link);
           }
+          if (/\.(xlsx|xls|xlsm)$/i.test(file.name)) {
+            gfflWorkbooks.append(item);
+            workbookCount++;
+          } else {
+            fileList.append(item);
+            archiveItemCount++;
+          }
+        }
+        if (archiveItemCount === 0) {
+          const item = document.createElement("li");
+          item.textContent = "No articles or other shared files have been published.";
           fileList.append(item);
+        }
+        if (workbookCount === 0) {
+          const item = document.createElement("li");
+          item.textContent = "GFFL workbooks will appear here.";
+          gfflWorkbooks.append(item);
         }
 
         if (!preserveStatus && statusRevision === startingRevision) {
@@ -285,6 +316,7 @@
         return !openStoryName || Boolean(openedStory);
       } catch (error) {
         showError("Could not load shared files", error);
+        setWorkbookMessage("Could not load GFFL workbooks. Refresh the page to retry.");
         return false;
       }
     };
@@ -368,8 +400,8 @@
         spreadsheetForm.reset();
         const refreshed = await loadFiles(true);
         setSpreadsheetStatus(refreshed
-          ? "Workbook shared successfully. Its public download link is in the shared list."
-          : "Workbook uploaded, but the shared list couldn't refresh. Reload the page to find it.");
+          ? "Workbook shared successfully. Its public download link is under The GFFL."
+          : "Workbook uploaded, but The GFFL list couldn't refresh. Reload the page to find it.");
       } catch (error) {
         showError("Could not share workbook", error, setSpreadsheetStatus);
       } finally {

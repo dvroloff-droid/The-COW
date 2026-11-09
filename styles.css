@@ -374,6 +374,25 @@ main,
   font-size: 0.7rem;
 }
 
+.gffl-workbooks {
+  margin: 0.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gffl-workbooks li {
+  margin-top: 0.15rem;
+  font-size: 0.68rem;
+  overflow-wrap: anywhere;
+}
+
+.gffl-workbooks a {
+  color: var(--red);
+  font-weight: 700;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
 .thoughts-column {
   padding: 1.15rem 0;
   border-block: 3px double var(--ink);
