@@ -521,7 +521,7 @@ main,
 }
 
 .hero-inner.newspaper-reading .shared-story-header h3 {
-  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
 }
 
 .hero-inner.newspaper-reading .thoughts-library details > summary {
@@ -632,6 +632,7 @@ main,
 .shared-story-header h3 {
   margin: 0.2rem 0 0;
   font-size: clamp(1.2rem, 2vw, 1.65rem);
+  font-weight: 400;
   letter-spacing: -0.035em;
   line-height: 1.08;
 }
