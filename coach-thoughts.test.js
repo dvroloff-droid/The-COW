@@ -381,6 +381,7 @@ test("edits a published article in place and preserves its file name", async () 
 
   assert.equal(elements.story.hidden, false);
   assert.equal(elements["story-title"].value, "The GFFL Update");
+  assert.equal(elements.story.button.textContent, "Save changes");
   elements["story-editor"].textContent = "Updated with a picture.";
   elements["story-editor"].innerHTML = "<p>Updated with a picture.</p><figure><img src=\"https://example.supabase.co/image.png\"></figure>";
   await elements.story.listeners.submit({ preventDefault() {} });
@@ -392,6 +393,7 @@ test("edits a published article in place and preserves its file name", async () 
     html: "<p>Updated with a picture.</p><figure><img src=\"https://example.supabase.co/image.png\"></figure>",
   });
   assert.match(elements["story-status"].textContent, /Article updated successfully/);
+  assert.equal(elements.story.button.textContent, "Publish story");
 });
 
 test("shows clear validation when an article has no headline", async () => {

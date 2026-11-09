@@ -11,6 +11,7 @@
   const spreadsheetInput = document.querySelector("#thoughts-spreadsheet-file");
   const spreadsheetStatus = document.querySelector("#thoughts-spreadsheet-status");
   const storyForm = document.querySelector("#thoughts-story");
+  const storySubmitButton = storyForm.querySelector('button[type="submit"]');
   const storyTitleInput = document.querySelector("#thoughts-story-title");
   const storyEditor = document.querySelector("#thoughts-story-editor");
   const storyImageButton = document.querySelector("#thoughts-story-add-image");
@@ -338,6 +339,7 @@
                   storyForm.hidden = false;
                   storyAgainButton.hidden = false;
                   storyAgainButton.textContent = "Cancel editing";
+                  storySubmitButton.textContent = "Save changes";
                   setStoryStatus("Edit the article, add pictures, and save your changes.");
                 } catch (error) {
                   showError("Could not edit article", error, setStoryStatus);
@@ -591,6 +593,7 @@
         editingStoryName = null;
         storyForm.reset();
         storyEditor.replaceChildren();
+        storySubmitButton.textContent = "Publish story";
       }
       storyForm.hidden = false;
       storyAgainButton.hidden = true;
@@ -623,7 +626,7 @@
         return;
       }
 
-      const publishButton = storyForm.querySelector('button[type="submit"]');
+      const publishButton = storySubmitButton;
       publishButton.disabled = true;
       setStoryStatus("Publishing your article...");
 
@@ -652,6 +655,7 @@
 
         storyForm.reset();
         storyEditor.replaceChildren();
+        storySubmitButton.textContent = "Publish story";
         editingStoryName = null;
         storyForm.hidden = true;
         storyAgainButton.hidden = false;
