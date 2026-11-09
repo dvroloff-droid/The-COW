@@ -8,6 +8,7 @@ const page = fs.readFileSync(`${__dirname}/index.html`, "utf8");
 
 test("places the story editor below the published article archive without generic uploads", () => {
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
+  assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.doesNotMatch(page, /id="thoughts-upload"|id="thoughts-file"|Choose a file|Upload file/i);
   assert.match(page, /coach-thoughts\.js\?v=20261108-6/);
 });
