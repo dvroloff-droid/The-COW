@@ -37,6 +37,12 @@
   };
   const setSpreadsheetStatus = (message) => updateStatus(spreadsheetStatus, message);
   const setStoryStatus = (message) => updateStatus(storyStatus, message);
+  const workbookKey = (name) => name
+    .replace(/^[0-9a-f-]{36}-/i, "")
+    .normalize("NFKC")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
   const setWorkbookMessage = (message) => {
     const item = document.createElement("li");
     item.textContent = message;
@@ -174,11 +180,14 @@
         const latestWorkbooks = new Map();
         for (const file of files) {
           if (!/\.(xlsx|xls|xlsm)$/i.test(file.name)) continue;
-          const workbookName = file.name.replace(/^[0-9a-f-]{36}-/i, "").toLowerCase();
+          const workbookName = workbookKey(file.name);
           const current = latestWorkbooks.get(workbookName);
+          const fileCreatedAt = Date.parse(file.created_at || "");
+          const currentCreatedAt = Date.parse(current?.created_at || "");
           if (
             !current ||
-            Date.parse(file.created_at || "") > Date.parse(current.created_at || "")
+            (Number.isFinite(fileCreatedAt) &&
+              (!Number.isFinite(currentCreatedAt) || fileCreatedAt > currentCreatedAt))
           ) {
             latestWorkbooks.set(workbookName, file);
           }
@@ -301,7 +310,7 @@
             item.append(link);
           }
           if (/\.(xlsx|xls|xlsm)$/i.test(file.name)) {
-            const workbookName = file.name.replace(/^[0-9a-f-]{36}-/i, "").toLowerCase();
+            const workbookName = workbookKey(file.name);
             if (latestWorkbooks.get(workbookName) === file) {
               gfflWorkbooks.append(item);
               workbookCount++;

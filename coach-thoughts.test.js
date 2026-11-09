@@ -14,7 +14,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.match(page, /id="gffl-workbooks"/);
   assert.match(page, /styles\.css\?v=20261109-2/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
-  assert.match(page, /coach-thoughts\.js\?v=20261109-4/);
+  assert.match(page, /coach-thoughts\.js\?v=20261109-5/);
 });
 
 test("styles the spreadsheet uploader consistently with the article editor", () => {
@@ -227,7 +227,7 @@ test("lists only the latest upload for each workbook filename", async () => {
     },
     {
       id: "newer-workbook",
-      name: "00000000-0000-4000-8000-000000000002-League-Standings.xlsx",
+      name: "00000000-0000-4000-8000-000000000002-league-standings.xlsx",
       created_at: "2026-11-09T12:00:00Z",
     },
     {
@@ -239,10 +239,10 @@ test("lists only the latest upload for each workbook filename", async () => {
   await new Promise(setImmediate);
 
   assert.equal(elements["gffl-workbooks"].children.length, 2);
-  assert.equal(elements["gffl-workbooks"].children[0].children[0].textContent, "League-Standings.xlsx");
+  assert.equal(elements["gffl-workbooks"].children[0].children[0].textContent, "league-standings.xlsx");
   assert.match(
     elements["gffl-workbooks"].children[0].children[0].href,
-    /00000000-0000-4000-8000-000000000002-League-Standings\.xlsx\?download$/,
+    /00000000-0000-4000-8000-000000000002-league-standings\.xlsx\?download$/,
   );
   assert.equal(elements["gffl-workbooks"].children[1].children[0].textContent, "Playoff-Bracket.xlsx");
 });
