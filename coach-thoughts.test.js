@@ -11,6 +11,8 @@ const storagePolicies = fs.readFileSync(`${__dirname}/supabase-setup.sql`, "utf8
 test("places article and spreadsheet uploads below the published article archive", () => {
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
+  assert.match(page, /id="gffl-workbooks"/);
+  assert.match(page, /styles\.css\?v=20261109-2/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /coach-thoughts\.js\?v=20261109-2/);
 });
@@ -31,7 +33,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
   const elements = {};
   for (const id of [
     "status", "login", "reset-request", "reset", "uploader", "upload", "file",
-    "spreadsheet", "spreadsheet-file", "spreadsheet-status",
+    "spreadsheet", "spreadsheet-file", "spreadsheet-status", "gffl-workbooks",
     "story", "story-title", "story-editor", "story-add-image", "story-image",
     "story-again", "story-status",
     "signout", "list",
@@ -128,7 +130,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     document: {
       querySelector: (selector) => selector === ".hero-inner"
         ? heroInner
-        : elements[selector.replace("#thoughts-", "")],
+        : elements[selector.replace(/^#(?:thoughts-)?/, "")],
       createElement,
       createTextNode: (textContent) => ({ nodeType: 3, textContent }),
       execCommand() {},
@@ -194,10 +196,26 @@ test("shares Excel workbooks unchanged through public read-only download links",
     assert.equal(calls.upload.options.upsert, false);
     assert.equal(elements.spreadsheet.wasReset, true);
     assert.match(elements["spreadsheet-status"].textContent, /public download link/);
-    const sharedWorkbookLink = elements.list.children[0].children[0];
+    const sharedWorkbookLink = elements["gffl-workbooks"].children[0].children[0];
     assert.equal(sharedWorkbookLink.textContent, filename);
     assert.match(sharedWorkbookLink.href, /\?download$/);
+    assert.equal(elements.list.children[0].textContent, "No articles or other shared files have been published.");
   }
+});
+
+test("keeps GFFL workbooks under GFFL while articles stay in the published archive", async () => {
+  const { elements } = setup("", [
+    { id: "workbook-id", name: "00000000-0000-4000-8000-000000000001-League-Standings.xlsx" },
+    { id: "story-id", name: "story-00000000-0000-4000-8000-000000000002-League-update.json" },
+    { id: "pdf-id", name: "00000000-0000-4000-8000-000000000003-rules.pdf" },
+  ]);
+  await new Promise(setImmediate);
+
+  assert.equal(elements["gffl-workbooks"].children.length, 1);
+  assert.equal(elements["gffl-workbooks"].children[0].children[0].textContent, "League-Standings.xlsx");
+  assert.equal(elements.list.children.length, 2);
+  assert.equal(elements.list.children[0].children[0].tagName, "details");
+  assert.equal(elements.list.children[1].children[0].textContent, "rules.pdf");
 });
 
 test("rejects unsupported and oversized files before uploading", async () => {

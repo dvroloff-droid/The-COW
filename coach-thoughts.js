@@ -19,6 +19,7 @@
   const storyStatus = document.querySelector("#thoughts-story-status");
   const signOutButton = document.querySelector("#thoughts-signout");
   const fileList = document.querySelector("#thoughts-list");
+  const gfflWorkbooks = document.querySelector("#gffl-workbooks");
   const heroInner = document.querySelector(".hero-inner");
 
   let statusRevision = 0;
@@ -149,6 +150,7 @@
       const startingRevision = statusRevision;
       heroInner.classList.remove("newspaper-reading");
       fileList.replaceChildren();
+      gfflWorkbooks.replaceChildren();
       try {
         const { data, error } = await bucket.list("", {
           limit: 100,
@@ -170,10 +172,15 @@
           const item = document.createElement("li");
           item.textContent = "Your shared files and stories will appear here.";
           fileList.append(item);
+          const workbookItem = document.createElement("li");
+          workbookItem.textContent = "GFFL workbooks will appear here.";
+          gfflWorkbooks.append(workbookItem);
           return !openStoryName;
         }
 
         let openedStory = null;
+        let archiveItemCount = 0;
+        let workbookCount = 0;
         for (const file of files) {
           const item = document.createElement("li");
           if (file.name.startsWith("story-")) {
@@ -273,7 +280,23 @@
             link.textContent = file.name.replace(/^[0-9a-f-]{36}-/i, "");
             item.append(link);
           }
+          if (/\.(xlsx|xls|xlsm)$/i.test(file.name)) {
+            gfflWorkbooks.append(item);
+            workbookCount++;
+          } else {
+            fileList.append(item);
+            archiveItemCount++;
+          }
+        }
+        if (archiveItemCount === 0) {
+          const item = document.createElement("li");
+          item.textContent = "No articles or other shared files have been published.";
           fileList.append(item);
+        }
+        if (workbookCount === 0) {
+          const item = document.createElement("li");
+          item.textContent = "GFFL workbooks will appear here.";
+          gfflWorkbooks.append(item);
         }
 
         if (!preserveStatus && statusRevision === startingRevision) {
