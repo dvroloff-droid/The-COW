@@ -37,6 +37,11 @@
   };
   const setSpreadsheetStatus = (message) => updateStatus(spreadsheetStatus, message);
   const setStoryStatus = (message) => updateStatus(storyStatus, message);
+  const setWorkbookMessage = (message) => {
+    const item = document.createElement("li");
+    item.textContent = message;
+    gfflWorkbooks.replaceChildren(item);
+  };
 
   const appendSafeStoryNodes = (source, target, supabaseUrl, bucketName) => {
     const allowedTags = new Set([
@@ -100,6 +105,7 @@
 
   const showSetupInstructions = () => {
     setStatus("Connect a Supabase project to enable file uploads. See the setup instructions.");
+    setWorkbookMessage("Connect Supabase to load GFFL workbooks.");
     fileList.replaceChildren();
     const item = document.createElement("li");
     const link = document.createElement("a");
@@ -122,6 +128,7 @@
   const initializeUploader = () => {
     if (!window.supabase?.createClient) {
       setStatus("The Supabase client could not be loaded. Check your connection and refresh.");
+      setWorkbookMessage("Could not load GFFL workbooks. Check your connection and refresh.");
       return;
     }
 
@@ -159,6 +166,7 @@
 
         if (error) {
           showError("Could not load shared files", error);
+          setWorkbookMessage("Could not load GFFL workbooks. Refresh the page to retry.");
           return false;
         }
 
@@ -308,6 +316,7 @@
         return !openStoryName || Boolean(openedStory);
       } catch (error) {
         showError("Could not load shared files", error);
+        setWorkbookMessage("Could not load GFFL workbooks. Refresh the page to retry.");
         return false;
       }
     };
@@ -391,8 +400,8 @@
         spreadsheetForm.reset();
         const refreshed = await loadFiles(true);
         setSpreadsheetStatus(refreshed
-          ? "Workbook shared successfully. Its public download link is in the shared list."
-          : "Workbook uploaded, but the shared list couldn't refresh. Reload the page to find it.");
+          ? "Workbook shared successfully. Its public download link is under The GFFL."
+          : "Workbook uploaded, but The GFFL list couldn't refresh. Reload the page to find it.");
       } catch (error) {
         showError("Could not share workbook", error, setSpreadsheetStatus);
       } finally {
