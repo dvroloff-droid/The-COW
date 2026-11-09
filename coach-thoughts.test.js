@@ -5,18 +5,33 @@ const vm = require("node:vm");
 
 const script = fs.readFileSync(`${__dirname}/coach-thoughts.js`, "utf8");
 const page = fs.readFileSync(`${__dirname}/index.html`, "utf8");
+const styles = fs.readFileSync(`${__dirname}/styles.css`, "utf8");
+const storagePolicies = fs.readFileSync(`${__dirname}/supabase-setup.sql`, "utf8");
 
-test("places the story editor below the published article archive without generic uploads", () => {
+test("places article and spreadsheet uploads below the published article archive", () => {
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
-  assert.doesNotMatch(page, /id="thoughts-upload"|id="thoughts-file"|Choose a file|Upload file/i);
-  assert.match(page, /coach-thoughts\.js\?v=20261108-6/);
+  assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
+  assert.match(page, /coach-thoughts\.js\?v=20261109-2/);
+});
+
+test("styles the spreadsheet uploader consistently with the article editor", () => {
+  assert.match(styles, /\.thoughts-uploader form\s*\{[^}]*display:\s*grid;/);
+  assert.match(styles, /\.thoughts-uploader input,/);
+});
+
+test("keeps shared storage publicly readable but upload-only for authorized accounts", () => {
+  assert.match(storagePolicies, /'coach-thoughts'\s*,\s*'coach-thoughts'\s*,\s*true\s*,\s*20971520/i);
+  assert.match(storagePolicies, /for select\s+to anon, authenticated/i);
+  assert.match(storagePolicies, /for insert\s+to authenticated/i);
+  assert.doesNotMatch(storagePolicies, /for (?:update|delete)/i);
 });
 
 function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []) {
   const elements = {};
   for (const id of [
     "status", "login", "reset-request", "reset", "uploader", "upload", "file",
+    "spreadsheet", "spreadsheet-file", "spreadsheet-status",
     "story", "story-title", "story-editor", "story-add-image", "story-image",
     "story-again", "story-status",
     "signout", "list",
@@ -85,8 +100,10 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
         error: null,
       };
     },
-    getPublicUrl: (name) => ({
-      data: { publicUrl: `https://example.supabase.co/storage/v1/object/public/coach-thoughts/${name}` },
+    getPublicUrl: (name, options) => ({
+      data: {
+        publicUrl: `https://example.supabase.co/storage/v1/object/public/coach-thoughts/${name}${options?.download ? "?download" : ""}`,
+      },
     }),
   };
   const createElement = (tagName) => ({
@@ -155,6 +172,69 @@ test("existing password sign-in continues to work", async () => {
   authEvent("SIGNED_IN", { user: {} });
   assert.equal(elements.login.hidden, true);
   assert.equal(elements.uploader.hidden, false);
+});
+
+test("shares Excel workbooks unchanged through public read-only download links", async () => {
+  for (const [filename, contentType] of [
+    ["league.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+    ["league.xls", "application/vnd.ms-excel"],
+    ["league.xlsm", "application/vnd.ms-excel.sheet.macroEnabled.12"],
+  ]) {
+    const { elements, calls } = setup();
+    await new Promise(setImmediate);
+    const workbook = new Blob(["complete workbook"], { type: contentType });
+    workbook.name = filename;
+    elements["spreadsheet-file"].files = [workbook];
+
+    await elements.spreadsheet.listeners.submit({ preventDefault() {} });
+
+    assert.match(calls.upload.name, new RegExp(`-${filename}$`));
+    assert.equal(calls.upload.body, workbook);
+    assert.equal(calls.upload.options.contentType, contentType);
+    assert.equal(calls.upload.options.upsert, false);
+    assert.equal(elements.spreadsheet.wasReset, true);
+    assert.match(elements["spreadsheet-status"].textContent, /public download link/);
+    const sharedWorkbookLink = elements.list.children[0].children[0];
+    assert.equal(sharedWorkbookLink.textContent, filename);
+    assert.match(sharedWorkbookLink.href, /\?download$/);
+  }
+});
+
+test("rejects unsupported and oversized files before uploading", async () => {
+  const { elements, calls } = setup();
+  await new Promise(setImmediate);
+  const unsupportedFile = new Blob(["not a workbook"]);
+  unsupportedFile.name = "notes.pdf";
+  elements["spreadsheet-file"].files = [unsupportedFile];
+
+  await elements.spreadsheet.listeners.submit({ preventDefault() {} });
+
+  assert.match(elements["spreadsheet-status"].textContent, /Choose an \.xlsx, \.xls, or \.xlsm/);
+  assert.equal(calls.upload, undefined);
+  const oversizedFile = new Blob([new Uint8Array(20 * 1024 * 1024 + 1)]);
+  oversizedFile.name = "league.xlsx";
+  elements["spreadsheet-file"].files = [oversizedFile];
+
+  await elements.spreadsheet.listeners.submit({ preventDefault() {} });
+
+  assert.match(elements["spreadsheet-status"].textContent, /no larger than 20 MB/);
+  assert.equal(calls.upload, undefined);
+});
+
+test("reports spreadsheet upload errors without discarding the selected workbook", async () => {
+  const { elements, bucket } = setup();
+  await new Promise(setImmediate);
+  const workbook = new Blob(["complete workbook"]);
+  workbook.name = "league.xlsx";
+  elements["spreadsheet-file"].files = [workbook];
+  bucket.upload = async () => ({ error: { message: "Permission denied" } });
+
+  await elements.spreadsheet.listeners.submit({ preventDefault() {} });
+
+  assert.match(elements["spreadsheet-status"].textContent, /Could not share workbook: Permission denied/);
+  assert.equal(elements["spreadsheet-status"].dataset.state, "error");
+  assert.equal(elements.spreadsheet.wasReset, undefined);
+  assert.equal(elements.spreadsheet.button.disabled, false);
 });
 
 test("recovery requires matching passwords and updates the account", async () => {

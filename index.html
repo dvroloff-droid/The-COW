@@ -195,7 +195,7 @@
             </form>
 
             <div class="thoughts-library">
-              <h3>Published articles &amp; archive</h3>
+              <h3>Published articles &amp; shared files</h3>
               <ul id="thoughts-list" aria-live="polite">
                 <li>Connect Supabase to load shared files.</li>
               </ul>
@@ -205,6 +205,18 @@
             </div>
 
             <div class="thoughts-uploader" id="thoughts-uploader" hidden>
+              <form class="thoughts-spreadsheet-form" id="thoughts-spreadsheet">
+                <h3>Share an Excel workbook</h3>
+                <p>
+                  Upload an .xlsx, .xls, or .xlsm file. The workbook and all its
+                  tabs are preserved. Anyone can download a read-only copy; only
+                  authorized uploaders can add files. Maximum size: 20 MB.
+                </p>
+                <label for="thoughts-spreadsheet-file">Excel workbook</label>
+                <input id="thoughts-spreadsheet-file" type="file" accept=".xlsx,.xls,.xlsm" required />
+                <button type="submit">Share workbook</button>
+              </form>
+              <p class="thoughts-status" id="thoughts-spreadsheet-status" role="status" aria-live="polite"></p>
               <form class="thoughts-story-form" id="thoughts-story">
                 <label for="thoughts-story-title">Column headline</label>
                 <input
@@ -275,6 +287,6 @@
 
     <script src="app.js"></script>
     <script src="supabase-config.js"></script>
-    <script src="coach-thoughts.js?v=20261108-6"></script>
+    <script src="coach-thoughts.js?v=20261109-2"></script>
   </body>
 </html>

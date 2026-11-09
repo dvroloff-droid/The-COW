@@ -21,6 +21,11 @@ type up to 20 MB.
    be up to 20 MB. Published columns open in a multi-column newspaper layout,
    with more room reserved for the article than either side column; older
    plain-text stories remain readable in the library.
+   Authorized uploaders can also share `.xlsx`, `.xls`, and `.xlsm`
+   workbooks up to 20 MB. Workbooks are stored unchanged, preserving every
+   worksheet, and appear as public download links. Visitors can download a
+   copy but cannot modify the shared original; only authorized accounts can
+   upload files.
 
 ## Password recovery
 
