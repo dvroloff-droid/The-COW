@@ -7,6 +7,9 @@
   const resetRequestButton = document.querySelector("#thoughts-reset-request");
   const resetForm = document.querySelector("#thoughts-reset");
   const uploadArea = document.querySelector("#thoughts-uploader");
+  const spreadsheetForm = document.querySelector("#thoughts-spreadsheet");
+  const spreadsheetInput = document.querySelector("#thoughts-spreadsheet-file");
+  const spreadsheetStatus = document.querySelector("#thoughts-spreadsheet-status");
   const storyForm = document.querySelector("#thoughts-story");
   const storyTitleInput = document.querySelector("#thoughts-story-title");
   const storyEditor = document.querySelector("#thoughts-story-editor");
@@ -31,6 +34,7 @@
     statusRevision++;
     updateStatus(status, message);
   };
+  const setSpreadsheetStatus = (message) => updateStatus(spreadsheetStatus, message);
   const setStoryStatus = (message) => updateStatus(storyStatus, message);
 
   const appendSafeStoryNodes = (source, target, supabaseUrl, bucketName) => {
@@ -306,6 +310,68 @@
         setStatus("Signed in. You can share files and stories.");
       } catch (error) {
         showError("Could not sign in", error);
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+
+    spreadsheetForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const workbook = spreadsheetInput.files?.[0];
+      if (!workbook) {
+        setSpreadsheetStatus("Choose an Excel workbook to share.");
+        spreadsheetInput.focus();
+        return;
+      }
+
+      const extension = workbook.name.match(/\.(xlsx|xls|xlsm)$/i)?.[1].toLowerCase();
+      if (!extension) {
+        setSpreadsheetStatus("Choose an .xlsx, .xls, or .xlsm workbook.");
+        spreadsheetInput.focus();
+        return;
+      }
+      if (!workbook.size) {
+        setSpreadsheetStatus("Choose a non-empty Excel workbook.");
+        spreadsheetInput.focus();
+        return;
+      }
+      if (workbook.size > maxFileSize) {
+        setSpreadsheetStatus("Choose a workbook no larger than 20 MB.");
+        return;
+      }
+
+      const contentTypes = {
+        xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        xls: "application/vnd.ms-excel",
+        xlsm: "application/vnd.ms-excel.sheet.macroEnabled.12",
+      };
+      const safeName = workbook.name
+        .normalize("NFKC")
+        .replace(/[^\w.-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      const objectName = `${crypto.randomUUID()}-${safeName || `workbook.${extension}`}`;
+      const submitButton = spreadsheetForm.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      setSpreadsheetStatus("Uploading workbook...");
+
+      try {
+        const { error } = await bucket.upload(objectName, workbook, {
+          cacheControl: "3600",
+          contentType: contentTypes[extension],
+          upsert: false,
+        });
+        if (error) {
+          showError("Could not share workbook", error, setSpreadsheetStatus);
+          return;
+        }
+
+        spreadsheetForm.reset();
+        const refreshed = await loadFiles(true);
+        setSpreadsheetStatus(refreshed
+          ? "Workbook shared successfully. Its public download link is in the shared list."
+          : "Workbook uploaded, but the shared list couldn't refresh. Reload the page to find it.");
+      } catch (error) {
+        showError("Could not share workbook", error, setSpreadsheetStatus);
       } finally {
         submitButton.disabled = false;
       }
