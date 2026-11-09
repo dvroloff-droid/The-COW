@@ -14,7 +14,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.match(page, /id="gffl-workbooks"/);
   assert.match(page, /styles\.css\?v=20261109-2/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
-  assert.match(page, /coach-thoughts\.js\?v=20261109-3/);
+  assert.match(page, /coach-thoughts\.js\?v=20261109-4/);
 });
 
 test("styles the spreadsheet uploader consistently with the article editor", () => {
@@ -216,6 +216,35 @@ test("keeps GFFL workbooks under GFFL while articles stay in the published archi
   assert.equal(elements.list.children.length, 2);
   assert.equal(elements.list.children[0].children[0].tagName, "details");
   assert.equal(elements.list.children[1].children[0].textContent, "rules.pdf");
+});
+
+test("lists only the latest upload for each workbook filename", async () => {
+  const { elements } = setup("", [
+    {
+      id: "older-workbook",
+      name: "00000000-0000-4000-8000-000000000001-League-Standings.xlsx",
+      created_at: "2026-11-08T12:00:00Z",
+    },
+    {
+      id: "newer-workbook",
+      name: "00000000-0000-4000-8000-000000000002-League-Standings.xlsx",
+      created_at: "2026-11-09T12:00:00Z",
+    },
+    {
+      id: "other-workbook",
+      name: "00000000-0000-4000-8000-000000000003-Playoff-Bracket.xlsx",
+      created_at: "2026-11-09T13:00:00Z",
+    },
+  ]);
+  await new Promise(setImmediate);
+
+  assert.equal(elements["gffl-workbooks"].children.length, 2);
+  assert.equal(elements["gffl-workbooks"].children[0].children[0].textContent, "League-Standings.xlsx");
+  assert.match(
+    elements["gffl-workbooks"].children[0].children[0].href,
+    /00000000-0000-4000-8000-000000000002-League-Standings\.xlsx\?download$/,
+  );
+  assert.equal(elements["gffl-workbooks"].children[1].children[0].textContent, "Playoff-Bracket.xlsx");
 });
 
 test("rejects unsupported and oversized files before uploading", async () => {

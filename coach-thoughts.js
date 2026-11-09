@@ -171,6 +171,18 @@
         }
 
         const files = (data || []).filter((file) => file.id);
+        const latestWorkbooks = new Map();
+        for (const file of files) {
+          if (!/\.(xlsx|xls|xlsm)$/i.test(file.name)) continue;
+          const workbookName = file.name.replace(/^[0-9a-f-]{36}-/i, "").toLowerCase();
+          const current = latestWorkbooks.get(workbookName);
+          if (
+            !current ||
+            Date.parse(file.created_at || "") > Date.parse(current.created_at || "")
+          ) {
+            latestWorkbooks.set(workbookName, file);
+          }
+        }
         const storyToOpenName = openStoryName ||
           files.find((file) => file.name.startsWith("story-"))?.name;
         if (files.length === 0) {
@@ -289,8 +301,11 @@
             item.append(link);
           }
           if (/\.(xlsx|xls|xlsm)$/i.test(file.name)) {
-            gfflWorkbooks.append(item);
-            workbookCount++;
+            const workbookName = file.name.replace(/^[0-9a-f-]{36}-/i, "").toLowerCase();
+            if (latestWorkbooks.get(workbookName) === file) {
+              gfflWorkbooks.append(item);
+              workbookCount++;
+            }
           } else {
             fileList.append(item);
             archiveItemCount++;
