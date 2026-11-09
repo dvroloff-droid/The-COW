@@ -637,6 +637,20 @@ main,
   font-weight: 700;
 }
 
+.story-edit-button {
+  margin-top: 0.55rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: 700 0.68rem/1.2 var(--sans);
+}
+
+.story-edit-button:hover {
+  color: var(--red);
+}
+
 .shared-story-article {
   margin-top: 0.65rem;
   padding: 0.7rem 0;

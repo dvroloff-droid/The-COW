@@ -33,3 +33,11 @@ on storage.objects
 for insert
 to authenticated
 with check (bucket_id = 'coach-thoughts');
+
+drop policy if exists "Authorized users can update Coach's Thoughts stories" on storage.objects;
+create policy "Authorized users can update Coach's Thoughts stories"
+on storage.objects
+for update
+to authenticated
+using (bucket_id = 'coach-thoughts' and name like 'story-%')
+with check (bucket_id = 'coach-thoughts' and name like 'story-%');

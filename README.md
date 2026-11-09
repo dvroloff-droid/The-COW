@@ -11,7 +11,9 @@ type up to 20 MB.
 
 1. Create a Supabase project.
 2. In the Supabase SQL Editor, run `supabase-setup.sql` to create or update the
-   public bucket and its read/upload policies.
+   public bucket and its read/upload policies. The script also allows
+   authorized accounts to update published story files, so rerun it to enable
+   the article editor on an existing project.
 3. In Supabase Authentication settings, disable public sign-ups and create
    email/password accounts for the people authorized to upload.
 4. Copy the project's URL and its public publishable (or legacy `anon`) key

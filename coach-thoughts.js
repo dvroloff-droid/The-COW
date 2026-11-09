@@ -37,6 +37,9 @@
   };
   const setSpreadsheetStatus = (message) => updateStatus(spreadsheetStatus, message);
   const setStoryStatus = (message) => updateStatus(storyStatus, message);
+  const storyEditButtons = new Set();
+  let editingStoryName = null;
+  let activeSession = null;
   const workbookKey = (name) => name
     .replace(/^[0-9a-f-]{36}-/i, "")
     .normalize("NFKC")
@@ -154,9 +157,11 @@
     };
 
     const showSession = (session) => {
+      activeSession = session;
       loginForm.hidden = Boolean(session);
       resetForm.hidden = !session || !recoveryMode;
       uploadArea.hidden = !session || recoveryMode;
+      for (const button of storyEditButtons) button.hidden = !session || recoveryMode;
     };
 
     const loadFiles = async (preserveStatus = false, openStoryName = null) => {
@@ -220,6 +225,7 @@
             const storyEyebrow = document.createElement("p");
             const storyTitle = document.createElement("h3");
             const storyBody = document.createElement("div");
+            const storyEditButton = document.createElement("button");
             let loaded = false;
             let loading = false;
             storyArticle.className = "shared-story-article";
@@ -227,11 +233,19 @@
             storyEyebrow.textContent = "COACH'S NOTEBOOK";
             storyHeader.className = "shared-story-header";
             storyBody.className = "shared-story-body";
+            if (file.name.endsWith(".json")) {
+              storyEditButton.className = "story-edit-button";
+              storyEditButton.type = "button";
+              storyEditButton.textContent = "Edit article";
+              storyEditButton.hidden = !activeSession || recoveryMode;
+              storyEditButtons.add(storyEditButton);
+            }
             summary.textContent = file.name
               .replace(/^story-[0-9a-f-]{36}-/i, "")
               .replace(/\.(txt|json)$/i, "")
               .replace(/-/g, " ") || "Read shared story";
             storyHeader.append(storyEyebrow, storyTitle);
+            if (file.name.endsWith(".json")) storyHeader.append(storyEditButton);
             storyArticle.append(storyHeader, storyBody);
             details.append(summary, storyArticle);
             details.addEventListener("toggle", async () => {
@@ -295,6 +309,43 @@
                 loading = false;
               }
             });
+            if (file.name.endsWith(".json")) {
+              storyEditButton.addEventListener("click", async () => {
+                storyEditButton.disabled = true;
+                setStoryStatus("Loading article for editing...");
+                try {
+                  const { data, error } = await bucket.download(file.name);
+                  if (error) {
+                    showError("Could not edit article", error, setStoryStatus);
+                    return;
+                  }
+                  if (!data || typeof data.text !== "function") {
+                    throw new Error("The shared story could not be read.");
+                  }
+                  const article = JSON.parse(await data.text());
+                  if (
+                    !article ||
+                    typeof article.title !== "string" ||
+                    typeof article.html !== "string"
+                  ) {
+                    throw new Error("The published column has an invalid format.");
+                  }
+                  storyTitleInput.value = article.title;
+                  storyEditor.replaceChildren();
+                  const parsed = new DOMParser().parseFromString(article.html, "text/html");
+                  appendSafeStoryNodes(parsed.body, storyEditor, config.supabaseUrl, bucketName);
+                  editingStoryName = file.name;
+                  storyForm.hidden = false;
+                  storyAgainButton.hidden = false;
+                  storyAgainButton.textContent = "Cancel editing";
+                  setStoryStatus("Edit the article, add pictures, and save your changes.");
+                } catch (error) {
+                  showError("Could not edit article", error, setStoryStatus);
+                } finally {
+                  storyEditButton.disabled = false;
+                }
+              });
+            }
             details.open = file.name === storyToOpenName;
             if (details.open) {
               heroInner.classList.add("newspaper-reading");
@@ -536,8 +587,14 @@
     });
 
     storyAgainButton.addEventListener("click", () => {
+      if (editingStoryName) {
+        editingStoryName = null;
+        storyForm.reset();
+        storyEditor.replaceChildren();
+      }
       storyForm.hidden = false;
       storyAgainButton.hidden = true;
+      storyAgainButton.textContent = "Write another article";
       setStoryStatus("");
       storyTitleInput.focus();
     });
@@ -575,29 +632,45 @@
           ?.normalize("NFKC")
           .replace(/[^\w.-]+/g, "-")
           .replace(/^-+|-+$/g, "");
-        const objectName = `story-${crypto.randomUUID()}-${safeTitle || "untitled"}.json`;
+        const objectName = editingStoryName ||
+          `story-${crypto.randomUUID()}-${safeTitle || "untitled"}.json`;
+        const wasEditing = Boolean(editingStoryName);
         const { error } = await bucket.upload(objectName, storyFile, {
           cacheControl: "3600",
           contentType: "application/json;charset=utf-8",
-          upsert: false,
+          upsert: wasEditing,
         });
 
         if (error) {
-          showError("Could not publish story", error, setStoryStatus);
+          showError(
+            wasEditing ? "Could not update article" : "Could not publish story",
+            error,
+            setStoryStatus,
+          );
           return;
         }
 
         storyForm.reset();
         storyEditor.replaceChildren();
+        editingStoryName = null;
         storyForm.hidden = true;
         storyAgainButton.hidden = false;
-        setStoryStatus("Article published successfully. Opening your article...");
+        storyAgainButton.textContent = "Write another article";
+        setStoryStatus(wasEditing
+          ? "Saving article changes. Opening the updated article..."
+          : "Article published successfully. Opening your article...");
         const refreshed = await loadFiles(true, objectName);
         setStoryStatus(refreshed
-          ? "Article published successfully."
-          : "Article published, but it couldn't be opened in the shared list. Reload the page to find it.");
+          ? wasEditing ? "Article updated successfully." : "Article published successfully."
+          : wasEditing
+            ? "Article saved, but it couldn't be opened in the shared list. Reload the page to find it."
+            : "Article published, but it couldn't be opened in the shared list. Reload the page to find it.");
       } catch (error) {
-        showError("Could not publish story", error, setStoryStatus);
+        showError(
+          editingStoryName ? "Could not update article" : "Could not publish story",
+          error,
+          setStoryStatus,
+        );
       } finally {
         publishButton.disabled = false;
       }

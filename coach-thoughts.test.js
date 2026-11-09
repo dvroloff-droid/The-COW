@@ -12,9 +12,9 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261109-3/);
+  assert.match(page, /styles\.css\?v=20261109-4/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
-  assert.match(page, /coach-thoughts\.js\?v=20261109-5/);
+  assert.match(page, /coach-thoughts\.js\?v=20261109-6/);
 });
 
 test("styles the spreadsheet uploader consistently with the article editor", () => {
@@ -27,11 +27,12 @@ test("uses smaller text for published article bodies and supports pictures", () 
   assert.match(page, /id="thoughts-story-add-image"[^>]*>Add picture<\/button>/);
 });
 
-test("keeps shared storage publicly readable but upload-only for authorized accounts", () => {
+test("keeps shared storage publicly readable and limits authorized updates to stories", () => {
   assert.match(storagePolicies, /'coach-thoughts'\s*,\s*'coach-thoughts'\s*,\s*true\s*,\s*20971520/i);
   assert.match(storagePolicies, /for select\s+to anon, authenticated/i);
   assert.match(storagePolicies, /for insert\s+to authenticated/i);
-  assert.doesNotMatch(storagePolicies, /for (?:update|delete)/i);
+  assert.match(storagePolicies, /for update\s+to authenticated\s+using\s*\(bucket_id = 'coach-thoughts' and name like 'story-%'\)/i);
+  assert.doesNotMatch(storagePolicies, /for delete/i);
 });
 
 function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []) {
@@ -97,7 +98,13 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     list: async () => ({ data: sharedFiles, error: null }),
     upload: async (name, body, options) => {
       calls.upload = { name, body, options };
-      sharedFiles.unshift({ id: name, name });
+      if (options?.upsert) {
+        const existing = sharedFiles.find((file) => file.name === name);
+        if (existing) existing.updated = true;
+        else sharedFiles.unshift({ id: name, name });
+      } else {
+        sharedFiles.unshift({ id: name, name });
+      }
       return { error: null };
     },
     download: async (name) => {
@@ -357,6 +364,34 @@ test("publishes a full article as a formatted shared file", async () => {
   assert.equal(elements.story.hidden, false);
   assert.equal(elements["story-again"].hidden, true);
   assert.equal(elements["story-title"].focused, true);
+});
+
+test("edits a published article in place and preserves its file name", async () => {
+  const storyName = "story-00000000-0000-4000-8000-000000000001-GFFL-Update.json";
+  const { elements, calls, authEvent } = setup("", [
+    { id: "story-id", name: storyName },
+  ], JSON.stringify({ title: "The GFFL Update", html: "<p>Existing article.</p>" }));
+  await new Promise(setImmediate);
+  authEvent("SIGNED_IN", { user: {} });
+
+  const editButton = elements.list.children[0].children[0].children[1].children[0].children[2];
+  assert.equal(editButton.textContent, "Edit article");
+  assert.equal(editButton.hidden, false);
+  await editButton.listeners.click();
+
+  assert.equal(elements.story.hidden, false);
+  assert.equal(elements["story-title"].value, "The GFFL Update");
+  elements["story-editor"].textContent = "Updated with a picture.";
+  elements["story-editor"].innerHTML = "<p>Updated with a picture.</p><figure><img src=\"https://example.supabase.co/image.png\"></figure>";
+  await elements.story.listeners.submit({ preventDefault() {} });
+
+  assert.equal(calls.upload.name, storyName);
+  assert.equal(calls.upload.options.upsert, true);
+  assert.deepEqual(JSON.parse(await calls.upload.body.text()), {
+    title: "The GFFL Update",
+    html: "<p>Updated with a picture.</p><figure><img src=\"https://example.supabase.co/image.png\"></figure>",
+  });
+  assert.match(elements["story-status"].textContent, /Article updated successfully/);
 });
 
 test("shows clear validation when an article has no headline", async () => {
