@@ -5,12 +5,18 @@ const vm = require("node:vm");
 
 const script = fs.readFileSync(`${__dirname}/coach-thoughts.js`, "utf8");
 const page = fs.readFileSync(`${__dirname}/index.html`, "utf8");
+const styles = fs.readFileSync(`${__dirname}/styles.css`, "utf8");
 
 test("places the story editor below the published article archive without generic uploads", () => {
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.doesNotMatch(page, /id="thoughts-upload"|id="thoughts-file"|Choose a file|Upload file/i);
   assert.match(page, /coach-thoughts\.js\?v=20261108-6/);
+});
+
+test("keeps Coach's Thoughts article headlines modest and regular-weight", () => {
+  assert.match(styles, /\.shared-story-header h3\s*\{[^}]*font-weight:\s*400;/);
+  assert.match(styles, /\.hero-inner\.newspaper-reading \.shared-story-header h3\s*\{[^}]*font-size:\s*clamp\(1\.5rem,\s*3vw,\s*2\.25rem\);/);
 });
 
 function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []) {
