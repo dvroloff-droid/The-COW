@@ -12,7 +12,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261110-1/);
+  assert.match(page, /styles\.css\?v=20261110-2/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /coach-thoughts\.js\?v=20261110-2/);
 });
