@@ -684,7 +684,10 @@ main,
 .shared-story-body p {
   margin: 0.45rem 0 0;
   white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  text-align: justify;
+  text-align-last: start;
+  hyphens: auto;
 }
 
 .shared-story-body p:first-child::first-letter {
