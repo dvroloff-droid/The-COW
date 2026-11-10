@@ -14,7 +14,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.match(page, /id="gffl-workbooks"/);
   assert.match(page, /styles\.css\?v=20261110-1/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
-  assert.match(page, /coach-thoughts\.js\?v=20261110-1/);
+  assert.match(page, /coach-thoughts\.js\?v=20261110-2/);
 });
 
 test("styles the spreadsheet uploader consistently with the article editor", () => {
@@ -78,6 +78,8 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
   const heroInner = { classList: { add() {}, remove() {} } };
   const emailInput = { value: "coach@example.com", reportValidity: () => true };
   const calls = {};
+  const uploadedStories = new Map();
+  let readOverride = null;
   let onAuthStateChange;
   const auth = {
     onAuthStateChange(callback) { onAuthStateChange = callback; },
@@ -99,6 +101,9 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     list: async () => ({ data: sharedFiles, error: null }),
     upload: async (name, body, options) => {
       calls.upload = { name, body, options };
+      if (name.startsWith("story-") && !name.startsWith("story-images/")) {
+        uploadedStories.set(name, await body.text());
+      }
       if (options?.upsert) {
         const existing = sharedFiles.find((file) => file.name === name);
         if (existing) existing.updated = true;
@@ -107,13 +112,6 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
         sharedFiles.unshift({ id: name, name });
       }
       return { error: null };
-    },
-    download: async (name) => {
-      calls.download = name;
-      return {
-        data: new Blob([downloadText || "<script>story text</script>\n\nA second paragraph."]),
-        error: null,
-      };
     },
     getPublicUrl: (name, options) => ({
       data: {
@@ -151,6 +149,15 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     URLSearchParams,
     URL,
     Blob,
+    fetch: async (url, options) => {
+      const parsed = new URL(url);
+      const name = decodeURIComponent(parsed.pathname.split("/").pop());
+      calls.download = name;
+      calls.read = { url: parsed, options };
+      const text = readOverride ?? uploadedStories.get(name) ??
+        downloadText ?? "<script>story text</script>\n\nA second paragraph.";
+      return { ok: true, text: async () => text };
+    },
     DOMParser: class {
       parseFromString() { return { body: { childNodes: storyNodes } }; }
     },
@@ -165,6 +172,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     elements,
     calls,
     bucket,
+    setReadOverride: (text) => { readOverride = text; },
     authEvent: (event, session) => onAuthStateChange(event, session),
   };
 }
@@ -389,12 +397,85 @@ test("edits a published article in place and preserves its file name", async () 
 
   assert.equal(calls.upload.name, storyName);
   assert.equal(calls.upload.options.upsert, true);
+  assert.equal(calls.upload.options.cacheControl, "0");
+  assert.equal(calls.read.options.cache, "no-store");
+  assert.ok(calls.read.url.searchParams.get("version"));
   assert.deepEqual(JSON.parse(await calls.upload.body.text()), {
     title: "The GFFL Update",
     html: "<p>Updated with a picture.</p><figure><img src=\"https://example.supabase.co/image.png\"></figure>",
   });
   assert.match(elements["story-status"].textContent, /Article updated successfully/);
   assert.equal(elements.story.button.textContent, "Publish story");
+});
+
+test("keeps the draft when the published copy cannot be verified", async () => {
+  const storyName = "story-00000000-0000-4000-8000-000000000001-Update.json";
+  const oldStory = JSON.stringify({ title: "Update", html: "<p>Old article.</p>" });
+  const { elements, authEvent, setReadOverride } = setup("", [
+    { id: "story-id", name: storyName },
+  ], oldStory);
+  await new Promise(setImmediate);
+  authEvent("SIGNED_IN", { user: {} });
+  const editButton = elements.list.children[0].children[0].children[1].children[0].children[2];
+  await editButton.listeners.click();
+  elements["story-editor"].textContent = "New article";
+  elements["story-editor"].innerHTML = "<p>New article</p>";
+  setReadOverride(oldStory);
+
+  await elements.story.listeners.submit({ preventDefault() {} });
+
+  assert.equal(elements.story.wasReset, undefined);
+  assert.equal(elements["story-editor"].innerHTML, "<p>New article</p>");
+  assert.equal(elements.story.hidden, false);
+  assert.equal(elements["story-status"].dataset.state, "error");
+  assert.match(elements["story-status"].textContent, /unable to verify.*draft is still here/i);
+});
+
+test("keeps an edited article and reports a storage permission error", async () => {
+  const storyName = "story-00000000-0000-4000-8000-000000000001-Update.json";
+  const { elements, bucket, authEvent } = setup("", [
+    { id: "story-id", name: storyName },
+  ], JSON.stringify({ title: "Update", html: "<p>Original.</p>" }));
+  await new Promise(setImmediate);
+  authEvent("SIGNED_IN", { user: {} });
+  const editButton = elements.list.children[0].children[0].children[1].children[0].children[2];
+  await editButton.listeners.click();
+  elements["story-editor"].textContent = "Changed.";
+  elements["story-editor"].innerHTML = "<p>Changed.</p>";
+  bucket.upload = async () => ({ error: { message: "Permission denied" } });
+
+  await elements.story.listeners.submit({ preventDefault() {} });
+
+  assert.equal(elements["story-editor"].innerHTML, "<p>Changed.</p>");
+  assert.equal(elements.story.hidden, false);
+  assert.match(elements["story-status"].textContent, /Could not update article: Permission denied/);
+});
+
+test("waits for picture uploads before saving an article", async () => {
+  const { elements, bucket, calls } = setup();
+  await new Promise(setImmediate);
+  elements["story-title"].value = "Headline";
+  elements["story-editor"].textContent = "Article";
+  elements["story-editor"].innerHTML = "<p>Article</p>";
+  const image = new Blob(["picture"], { type: "image/png" });
+  image.name = "photo.png";
+  elements["story-image"].files = [image];
+  let finishUpload;
+  const originalUpload = bucket.upload;
+  bucket.upload = async (...args) => {
+    await new Promise((resolve) => { finishUpload = resolve; });
+    return originalUpload(...args);
+  };
+
+  const uploading = elements["story-image"].listeners.change();
+  assert.equal(elements.story.button.disabled, true);
+  await elements.story.listeners.submit({ preventDefault() {} });
+  assert.equal(calls.upload, undefined);
+  assert.match(elements["story-status"].textContent, /wait.*picture upload/i);
+  finishUpload();
+  await uploading;
+  assert.equal(elements.story.button.disabled, false);
+  assert.equal(elements["story-editor"].children[0].children[0].tagName, "img");
 });
 
 test("edits a legacy text story so pictures can be added", async () => {

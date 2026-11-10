@@ -26,7 +26,7 @@
   let statusRevision = 0;
   const updateStatus = (element, message) => {
     element.textContent = message;
-    element.dataset.state = /could not|choose|enter|add article|add a headline|couldn't/i.test(message)
+    element.dataset.state = /could not|choose|enter|add article|add a headline|couldn't|unable to verify/i.test(message)
       ? "error"
       : /successfully|picture added|published/i.test(message)
         ? "success"
@@ -179,6 +179,18 @@
     const client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
     const bucket = client.storage.from(bucketName);
     let savedStorySelection = null;
+    let pictureUploadPending = false;
+    let storySavePending = false;
+
+    const readStory = async (name) => {
+      const url = new URL(bucket.getPublicUrl(name).data.publicUrl);
+      url.searchParams.set("version", crypto.randomUUID());
+      const response = await fetch(url.href, { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error(`The shared story could not be read (HTTP ${response.status}).`);
+      }
+      return response.text();
+    };
 
     const showError = (action, error, report = setStatus) => {
       const details =
@@ -293,16 +305,7 @@
               loading = true;
               storyBody.textContent = "Loading story...";
               try {
-                const { data, error } = await bucket.download(file.name);
-                if (error) {
-                  showError("Could not load shared story", error);
-                  storyBody.textContent = "Could not load this story. Open it again to retry.";
-                  return;
-                }
-                if (!data || typeof data.text !== "function") {
-                  throw new Error("The shared story could not be read.");
-                }
-                const text = await data.text();
+                const text = await readStory(file.name);
                 const article = parseStoryArticle(text, file.name);
                 if (article) {
                   storyTitle.textContent = article.title;
@@ -333,17 +336,9 @@
                 storyEditButton.disabled = true;
                 setStoryStatus("Loading article for editing...");
                 try {
-                  const { data, error } = await bucket.download(file.name);
-                  if (error) {
-                    showError("Could not edit article", error, setStoryStatus);
-                    return;
-                  }
-                  if (!data || typeof data.text !== "function") {
-                    throw new Error("The shared story could not be read.");
-                  }
-                  storyEditor.replaceChildren();
-                  const text = await data.text();
+                  const text = await readStory(file.name);
                   const article = parseStoryArticle(text, file.name);
+                  storyEditor.replaceChildren();
                   if (article) {
                     storyTitleInput.value = article.title;
                     const parsed = new DOMParser().parseFromString(article.html, "text/html");
@@ -535,7 +530,6 @@
         return;
       }
 
-      storyImageButton.disabled = true;
       setStoryStatus("Uploading picture...");
       try {
         const safeName = image.name
@@ -581,8 +575,29 @@
         setStoryStatus("Picture added to your column.");
       } catch (error) {
         showError("Could not upload picture", error, setStoryStatus);
+      }
+    };
+
+    const uploadStoryImages = async (images) => {
+      if (pictureUploadPending || storySavePending) {
+        setStoryStatus("Wait for the current operation to finish.");
+        return;
+      }
+      pictureUploadPending = true;
+      storyImageButton.disabled = true;
+      storySubmitButton.disabled = true;
+      storyAgainButton.disabled = true;
+      for (const button of storyEditButtons) button.disabled = true;
+      try {
+        for (const image of images) {
+          await uploadStoryImage(image);
+        }
       } finally {
+        pictureUploadPending = false;
         storyImageButton.disabled = false;
+        storySubmitButton.disabled = false;
+        storyAgainButton.disabled = false;
+        for (const button of storyEditButtons) button.disabled = false;
       }
     };
 
@@ -598,16 +613,14 @@
         storyEditor.contains(selection.anchorNode)
         ? selection.getRangeAt(0).cloneRange()
         : null;
-      for (const image of images) {
-        await uploadStoryImage(image);
-      }
+      await uploadStoryImages(images);
     });
 
     storyImageInput.addEventListener("change", async () => {
       const image = storyImageInput.files?.[0];
       storyImageInput.value = "";
       if (!image) return;
-      await uploadStoryImage(image);
+      await uploadStoryImages([image]);
     });
 
     storyAgainButton.addEventListener("click", () => {
@@ -626,6 +639,11 @@
 
     storyForm.addEventListener("submit", async (event) => {
       event.preventDefault();
+      if (storySavePending) return;
+      if (pictureUploadPending) {
+        setStoryStatus("Wait for the current picture upload to finish before saving.");
+        return;
+      }
       const storyTitle = storyTitleInput.value.trim();
       const storyHtml = storyEditor.innerHTML.trim();
       if (!storyTitle) {
@@ -649,7 +667,13 @@
       }
 
       const publishButton = storySubmitButton;
+      storySavePending = true;
       publishButton.disabled = true;
+      storyImageButton.disabled = true;
+      storyAgainButton.disabled = true;
+      storyEditor.contentEditable = "false";
+      storyForm.querySelectorAll("[data-command]").forEach((button) => { button.disabled = true; });
+      for (const button of storyEditButtons) button.disabled = true;
       setStoryStatus("Publishing your article...");
 
       try {
@@ -661,7 +685,7 @@
           `story-${crypto.randomUUID()}-${safeTitle || "untitled"}.json`;
         const wasEditing = Boolean(editingStoryName);
         const { error } = await bucket.upload(objectName, storyFile, {
-          cacheControl: "3600",
+          cacheControl: "0",
           contentType: "application/json;charset=utf-8",
           upsert: wasEditing,
         });
@@ -672,6 +696,17 @@
             error,
             setStoryStatus,
           );
+          return;
+        }
+
+        editingStoryName = objectName;
+        storySubmitButton.textContent = "Save changes";
+        try {
+          if (await readStory(objectName) !== await storyFile.text()) {
+            throw new Error("The published copy does not match your changes yet.");
+          }
+        } catch (error) {
+          showError("Changes uploaded, but unable to verify them. Your draft is still here", error, setStoryStatus);
           return;
         }
 
@@ -698,7 +733,13 @@
           setStoryStatus,
         );
       } finally {
+        storySavePending = false;
         publishButton.disabled = false;
+        storyImageButton.disabled = false;
+        storyAgainButton.disabled = false;
+        storyEditor.contentEditable = "true";
+        storyForm.querySelectorAll("[data-command]").forEach((button) => { button.disabled = false; });
+        for (const button of storyEditButtons) button.disabled = false;
       }
     });
 
