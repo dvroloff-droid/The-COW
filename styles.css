@@ -513,7 +513,7 @@ main,
   columns: 2 24rem;
   column-gap: clamp(1.5rem, 4vw, 3.5rem);
   column-rule: 1px solid var(--rule-light);
-  font-size: 12pt;
+  font-size: 10pt;
   line-height: 1.65;
 }
 

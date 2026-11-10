@@ -47,6 +47,37 @@
     .trim()
     .replace(/\s+/g, " ")
     .toLowerCase();
+  const parseStoryArticle = (text, fileName) => {
+    const isJsonStory = fileName.toLowerCase().endsWith(".json");
+    let article;
+    try {
+      article = JSON.parse(text);
+    } catch (error) {
+      if (isJsonStory) throw error;
+      return null;
+    }
+    if (
+      article &&
+      typeof article.title === "string" &&
+      typeof article.html === "string"
+    ) {
+      return article;
+    }
+    if (isJsonStory) {
+      throw new Error("The published column has an invalid format.");
+    }
+    return null;
+  };
+  const parsePlainStory = (text) => {
+    const lines = text.split(/\r?\n/);
+    const titleIndex = lines.findIndex((line) => line.trim());
+    return {
+      title: titleIndex < 0 ? "Untitled story" : lines[titleIndex].trim(),
+      paragraphs: titleIndex < 0
+        ? []
+        : lines.slice(titleIndex + 1).join("\n").trim().split(/\n\s*\n/).filter(Boolean),
+    };
+  };
   const setWorkbookMessage = (message) => {
     const item = document.createElement("li");
     item.textContent = message;
@@ -234,7 +265,7 @@
             storyEyebrow.textContent = "COACH'S NOTEBOOK";
             storyHeader.className = "shared-story-header";
             storyBody.className = "shared-story-body";
-            if (file.name.endsWith(".json")) {
+            if (/\.(json|txt)$/i.test(file.name)) {
               storyEditButton.className = "story-edit-button";
               storyEditButton.type = "button";
               storyEditButton.textContent = "Edit article";
@@ -246,7 +277,7 @@
               .replace(/\.(txt|json)$/i, "")
               .replace(/-/g, " ") || "Read shared story";
             storyHeader.append(storyEyebrow, storyTitle);
-            if (file.name.endsWith(".json")) storyHeader.append(storyEditButton);
+            if (/\.(json|txt)$/i.test(file.name)) storyHeader.append(storyEditButton);
             storyArticle.append(storyHeader, storyBody);
             details.append(summary, storyArticle);
             details.addEventListener("toggle", async () => {
@@ -272,29 +303,16 @@
                   throw new Error("The shared story could not be read.");
                 }
                 const text = await data.text();
-                if (file.name.endsWith(".json")) {
-                  const article = JSON.parse(text);
-                  if (
-                    !article ||
-                    typeof article.title !== "string" ||
-                    typeof article.html !== "string"
-                  ) {
-                    throw new Error("The published column has an invalid format.");
-                  }
+                const article = parseStoryArticle(text, file.name);
+                if (article) {
                   storyTitle.textContent = article.title;
                   summary.textContent = article.title;
                   const parsed = new DOMParser().parseFromString(article.html, "text/html");
                   storyBody.replaceChildren();
                   appendSafeStoryNodes(parsed.body, storyBody, config.supabaseUrl, bucketName);
                 } else {
-                  const lines = text.split(/\r?\n/);
-                  const titleIndex = lines.findIndex((line) => line.trim());
-                  storyTitle.textContent = titleIndex < 0
-                    ? "Untitled story"
-                    : lines[titleIndex].trim();
-                  const paragraphs = titleIndex < 0
-                    ? []
-                    : lines.slice(titleIndex + 1).join("\n").trim().split(/\n\s*\n/).filter(Boolean);
+                  const { title, paragraphs } = parsePlainStory(text);
+                  storyTitle.textContent = title;
                   storyBody.replaceChildren();
                   for (const paragraph of paragraphs) {
                     const paragraphElement = document.createElement("p");
@@ -310,7 +328,7 @@
                 loading = false;
               }
             });
-            if (file.name.endsWith(".json")) {
+            if (/\.(json|txt)$/i.test(file.name)) {
               storyEditButton.addEventListener("click", async () => {
                 storyEditButton.disabled = true;
                 setStoryStatus("Loading article for editing...");
@@ -323,18 +341,22 @@
                   if (!data || typeof data.text !== "function") {
                     throw new Error("The shared story could not be read.");
                   }
-                  const article = JSON.parse(await data.text());
-                  if (
-                    !article ||
-                    typeof article.title !== "string" ||
-                    typeof article.html !== "string"
-                  ) {
-                    throw new Error("The published column has an invalid format.");
-                  }
-                  storyTitleInput.value = article.title;
                   storyEditor.replaceChildren();
-                  const parsed = new DOMParser().parseFromString(article.html, "text/html");
-                  appendSafeStoryNodes(parsed.body, storyEditor, config.supabaseUrl, bucketName);
+                  const text = await data.text();
+                  const article = parseStoryArticle(text, file.name);
+                  if (article) {
+                    storyTitleInput.value = article.title;
+                    const parsed = new DOMParser().parseFromString(article.html, "text/html");
+                    appendSafeStoryNodes(parsed.body, storyEditor, config.supabaseUrl, bucketName);
+                  } else {
+                    const legacyStory = parsePlainStory(text);
+                    storyTitleInput.value = legacyStory.title;
+                    for (const paragraph of legacyStory.paragraphs) {
+                      const paragraphElement = document.createElement("p");
+                      paragraphElement.textContent = paragraph.trim();
+                      storyEditor.append(paragraphElement);
+                    }
+                  }
                   editingStoryName = file.name;
                   storyForm.hidden = false;
                   storyAgainButton.hidden = false;

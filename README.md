@@ -18,7 +18,8 @@ type up to 20 MB.
    email/password accounts for the people authorized to upload.
 4. Copy the project's URL and its public publishable (or legacy `anon`) key
    into `supabase-config.js`. Never put a `service_role` key in this website.
-5. Publish the site. Authorized uploaders can sign in to add files or publish
+5. Publish the site. Authorized uploaders can sign in to add files, edit
+   published stories (including older plain-text stories), and publish
    newspaper columns with formatted text and inline pictures. Each picture may
    be up to 20 MB. Published columns open in a multi-column newspaper layout,
    with more room reserved for the article than either side column; older

@@ -12,9 +12,9 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261109-4/);
+  assert.match(page, /styles\.css\?v=20261110-1/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
-  assert.match(page, /coach-thoughts\.js\?v=20261109-6/);
+  assert.match(page, /coach-thoughts\.js\?v=20261110-1/);
 });
 
 test("styles the spreadsheet uploader consistently with the article editor", () => {
@@ -23,7 +23,8 @@ test("styles the spreadsheet uploader consistently with the article editor", () 
 });
 
 test("uses smaller text for published article bodies and supports pictures", () => {
-  assert.equal((styles.match(/font-size: 10pt;/g) || []).length, 2);
+  assert.equal((styles.match(/font-size: 10pt;/g) || []).length, 3);
+  assert.match(styles, /\.hero-inner\.newspaper-reading \.shared-story-body\s*\{[^}]*font-size:\s*10pt;/);
   assert.match(page, /id="thoughts-story-add-image"[^>]*>Add picture<\/button>/);
 });
 
@@ -394,6 +395,50 @@ test("edits a published article in place and preserves its file name", async () 
   });
   assert.match(elements["story-status"].textContent, /Article updated successfully/);
   assert.equal(elements.story.button.textContent, "Publish story");
+});
+
+test("edits a legacy text story so pictures can be added", async () => {
+  const storyName = "story-00000000-0000-4000-8000-000000000001-Week-5-Update.txt";
+  const { elements, calls, authEvent } = setup("", [
+    { id: "story-id", name: storyName },
+  ], "Week 5 Update\n\nThe first paragraph.\n\nThe second paragraph.");
+  await new Promise(setImmediate);
+  authEvent("SIGNED_IN", { user: {} });
+
+  const editButton = elements.list.children[0].children[0].children[1].children[0].children[2];
+  assert.equal(editButton.textContent, "Edit article");
+  assert.equal(editButton.hidden, false);
+  await editButton.listeners.click();
+
+  assert.equal(elements["story-title"].value, "Week 5 Update");
+  assert.equal(elements["story-editor"].children.length, 2);
+  assert.equal(elements["story-editor"].children[0].textContent, "The first paragraph.");
+
+  elements["story-editor"].textContent = "Updated with a picture.";
+  elements["story-editor"].innerHTML = "<p>Updated with a picture.</p><figure><img src=\"https://example.supabase.co/image.png\"></figure>";
+  await elements.story.listeners.submit({ preventDefault() {} });
+
+  assert.equal(calls.upload.name, storyName);
+  assert.equal(calls.upload.options.upsert, true);
+  assert.deepEqual(JSON.parse(await calls.upload.body.text()), {
+    title: "Week 5 Update",
+    html: "<p>Updated with a picture.</p><figure><img src=\"https://example.supabase.co/image.png\"></figure>",
+  });
+});
+
+test("opens edited legacy stories after their content is saved as JSON", async () => {
+  const { elements, calls } = setup("", [{
+    id: "story-id",
+    name: "story-00000000-0000-4000-8000-000000000001-Week-5-Update.txt",
+  }], JSON.stringify({ title: "Week 5 Update", html: "<p>Updated article.</p>" }));
+  await new Promise(setImmediate);
+
+  const details = elements.list.children[0].children[0];
+  await details.listeners.toggle();
+
+  const storyArticle = details.children[1];
+  assert.equal(storyArticle.children[0].children[1].textContent, "Week 5 Update");
+  assert.equal(calls.download, "story-00000000-0000-4000-8000-000000000001-Week-5-Update.txt");
 });
 
 test("shows clear validation when an article has no headline", async () => {
