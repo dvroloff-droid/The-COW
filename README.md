@@ -2,6 +2,31 @@
 
 The rebuilt Coach's Office website.
 
+## Coaching lessons checkout
+
+The coaching lessons page offers a $50 single 60-minute youth baseball lesson
+and a $175 package of four 60-minute lessons. Film review is included in the
+lessons. Customers are asked to confirm availability before purchasing and
+email the coach after payment to arrange lesson times; the site does not
+automatically schedule or track lessons.
+
+Online checkout is unavailable until both products are set up in Stripe:
+
+1. In the Stripe Dashboard, create one-time USD products for the single lesson
+   ($50) and the four-lesson package ($175), and create a live Payment Link for
+   each. Use the same descriptions and prices shown on the site and keep
+   adjustable quantity disabled. Configure your receipts, refund policy, and
+   any applicable taxes in Stripe.
+2. Put the corresponding public `https://buy.stripe.com/...` links into
+   `coaching-checkout-config.js` as `single` and `package`. Do not add Stripe
+   API keys or other secrets to the website. Each button appears only when its
+   link is configured.
+3. Publish the changed files and check both links, their product names and
+   totals on the live site. Use Stripe's test mode and test links separately to
+   verify checkout before switching to live links; test links do not take real
+   payments. Stripe's payment confirmation and receipt settings are managed in
+   the Stripe Dashboard.
+
 ## Coach's Thoughts file uploads
 
 The Coach's Thoughts library uses Supabase Storage. Shared files and published

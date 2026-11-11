@@ -1,0 +1,72 @@
+.lessons-page {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+.lessons-page section {
+  margin-top: 2rem;
+}
+
+.lessons-page section h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.5rem;
+}
+
+.lesson-packages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem;
+}
+
+.lesson-package {
+  padding: 1.25rem;
+  border: 1px solid var(--rule);
+  background: rgb(255 247 218 / 25%);
+}
+
+.lesson-package h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.lesson-price {
+  margin: 0.5rem 0;
+  color: var(--red);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.lesson-checkout {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font: 700 0.8rem/1.2 var(--sans);
+  text-decoration: none;
+}
+
+.lesson-checkout:hover,
+.lesson-checkout:focus-visible {
+  background: var(--red);
+}
+
+.lesson-checkout[hidden] {
+  display: none;
+}
+
+.lesson-unavailable {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.lesson-scheduling {
+  padding-top: 1rem;
+  border-top: 3px double var(--ink);
+}
+
+.lesson-scheduling a {
+  color: var(--red);
+  font-weight: 700;
+}
