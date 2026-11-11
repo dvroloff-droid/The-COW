@@ -661,7 +661,6 @@ main,
   margin-top: 0.65rem;
   padding: 0.7rem 0;
   border-top: 3px double var(--ink);
-  text-align: center;
 }
 
 .shared-story-header {
@@ -686,14 +685,14 @@ main,
   margin: 0.45rem 0 0;
   white-space: pre-wrap;
   overflow-wrap: break-word;
-  text-align: center;
-  text-align-last: center;
+  text-align: justify;
+  text-align-last: start;
   hyphens: auto;
 }
 
 .shared-story-body p:first-child::first-letter {
-  float: none;
-  padding: 0;
+  float: left;
+  padding: 0.03rem 0.22rem 0 0;
   color: var(--red);
   font-size: 2.35rem;
   font-weight: 700;
