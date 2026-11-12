@@ -759,7 +759,7 @@ main,
   white-space: pre-wrap;
   overflow-wrap: break-word;
   text-align: justify;
-  text-align-last: start;
+  text-align-last: justify;
   hyphens: auto;
 }
 
