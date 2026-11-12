@@ -12,7 +12,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261112-4/);
+  assert.match(page, /styles\.css\?v=20261112-5/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /coach-thoughts\.js\?v=20261110-2/);
 });
@@ -27,7 +27,7 @@ test("uses smaller text for published article bodies and supports pictures", () 
   assert.match(styles, /\.hero-inner\.newspaper-reading \.shared-story-body\s*\{[^}]*font-size:\s*10pt;/);
   assert.match(styles, /\.shared-story-body\s*\{[^}]*text-align:\s*justify;/);
   assert.doesNotMatch(styles, /\.shared-story-article\s*\{[^}]*text-align:\s*center;/);
-  assert.match(styles, /\.shared-story-body p\s*\{[^}]*text-align:\s*justify;[^}]*text-align-last:\s*justify;[^}]*hyphens:\s*auto;/);
+  assert.match(styles, /\.shared-story-body p\s*\{[^}]*white-space:\s*normal;[^}]*text-align:\s*justify;[^}]*text-align-last:\s*start;[^}]*hyphens:\s*auto;/);
   assert.match(page, /id="thoughts-story-add-image"[^>]*>Add picture<\/button>/);
 });
 
