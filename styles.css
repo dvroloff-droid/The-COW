@@ -1,11 +1,12 @@
 :root {
   color-scheme: light;
-  --paper: #dfcfaa;
-  --paper-dark: #c7b38b;
-  --ink: #332719;
-  --muted: #66553d;
-  --rule: #786143;
-  --rule-light: #b19d77;
+  --paper: #d3bf91;
+  --paper-dark: #b7a074;
+  --paper-light: #e0d0a8;
+  --ink: #302316;
+  --muted: #5e4b33;
+  --rule: #70583a;
+  --rule-light: #a38b62;
   --red: #702b23;
   --serif: Georgia, "Times New Roman", serif;
   --sans: Arial, Helvetica, sans-serif;
@@ -23,10 +24,11 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(ellipse at 8% 12%, #ddcba5 0, transparent 30rem),
-    radial-gradient(ellipse at 90% 78%, #78684f 0, transparent 40rem),
-    repeating-linear-gradient(8deg, transparent 0 5px, rgb(48 36 21 / 3%) 5.2px 5.7px),
-    #93836a;
+    radial-gradient(ellipse at 8% 12%, #cbb58a 0, transparent 32rem),
+    radial-gradient(ellipse at 90% 78%, #594a36 0, transparent 42rem),
+    repeating-linear-gradient(8deg, transparent 0 4px, rgb(36 26 15 / 7%) 4.2px 4.8px),
+    repeating-linear-gradient(103deg, transparent 0 11px, rgb(239 221 178 / 8%) 11.2px 11.7px),
+    #817158;
   color: var(--ink);
   font-family: var(--serif);
   line-height: 1.45;
@@ -57,17 +59,20 @@ main,
   margin-inline: auto;
   background-color: var(--paper);
   background-image:
-    radial-gradient(ellipse at 1% 23%, rgb(91 55 24 / 19%), transparent 24%),
-    radial-gradient(ellipse at 97% 74%, rgb(91 55 24 / 17%), transparent 27%),
-    radial-gradient(ellipse at 52% 2%, rgb(255 247 218 / 31%), transparent 38%),
-    radial-gradient(ellipse at 35% 96%, rgb(91 55 24 / 13%), transparent 34%),
-    radial-gradient(ellipse at 76% 43%, rgb(116 75 34 / 7%) 0 0.7px, transparent 1.8px),
-    repeating-linear-gradient(2deg, transparent 0 3px, rgb(73 54 32 / 5%) 3.2px 3.7px),
-    repeating-linear-gradient(97deg, transparent 0 8px, rgb(73 54 32 / 4%) 8.2px 8.6px);
+    radial-gradient(ellipse at 0% 17%, rgb(73 43 20 / 30%), transparent 28%),
+    radial-gradient(ellipse at 100% 83%, rgb(73 43 20 / 28%), transparent 31%),
+    radial-gradient(ellipse at 52% 1%, rgb(255 241 199 / 24%), transparent 37%),
+    radial-gradient(ellipse at 31% 97%, rgb(73 43 20 / 23%), transparent 36%),
+    radial-gradient(ellipse at 17% 61%, rgb(91 55 24 / 12%) 0 1px, transparent 2px),
+    radial-gradient(ellipse at 74% 39%, rgb(56 39 22 / 12%) 0 0.8px, transparent 2px),
+    repeating-linear-gradient(2deg, transparent 0 2px, rgb(73 54 32 / 7%) 2.2px 2.7px),
+    repeating-linear-gradient(97deg, transparent 0 7px, rgb(73 54 32 / 6%) 7.2px 7.6px),
+    linear-gradient(174deg, transparent 0 48%, rgb(89 63 34 / 5%) 48.2%, transparent 48.8% 100%);
   box-shadow:
-    inset 0 0 1.5rem rgb(75 48 22 / 24%),
-    inset 0 0 5rem rgb(89 66 38 / 18%),
-    0 2px 9px rgb(34 25 14 / 18%);
+    inset 0 0 1.8rem rgb(62 38 18 / 31%),
+    inset 0 0 6rem rgb(75 53 28 / 24%),
+    inset 0 1px 0 rgb(255 240 199 / 25%),
+    0 3px 12px rgb(34 25 14 / 28%);
 }
 
 .site-header {
@@ -466,7 +471,7 @@ main,
   padding: 0.5rem;
   border: 1px solid var(--rule);
   border-radius: 0;
-  background: #fffdf8;
+  background: var(--paper-light);
   color: var(--ink);
   font: 0.8rem var(--sans);
 }
@@ -487,7 +492,7 @@ main,
   min-height: 22rem;
   padding: 0.6rem;
   border: 1px solid var(--rule);
-  background: #fffdf8;
+  background: var(--paper-light);
   font: 12pt/1.5 var(--serif);
 }
 
