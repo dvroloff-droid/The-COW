@@ -4,8 +4,8 @@ The rebuilt Coach's Office website.
 
 ## Coaching lessons checkout
 
-The coaching lessons page offers a $50 single 60-minute youth baseball lesson
-and a $175 package of four 60-minute lessons. Film review is included in the
+The coaching lessons page offers a $60 single 60-minute youth baseball lesson
+and a $200 package of four 60-minute lessons. Film review is included in the
 lessons. Customers are asked to confirm availability before purchasing and
 email the coach after payment to arrange lesson times; the site does not
 automatically schedule or track lessons.
