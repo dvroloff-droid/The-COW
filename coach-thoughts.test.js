@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 
 const script = fs.readFileSync(`${__dirname}/coach-thoughts.js`, "utf8");
+const storyContentScript = fs.readFileSync(`${__dirname}/story-content.js`, "utf8");
 const page = fs.readFileSync(`${__dirname}/index.html`, "utf8");
 const styles = fs.readFileSync(`${__dirname}/styles.css`, "utf8");
 const storagePolicies = fs.readFileSync(`${__dirname}/supabase-setup.sql`, "utf8");
@@ -12,9 +13,11 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261112-5/);
+  assert.match(page, /styles\.css\?v=20261112-6/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
-  assert.match(page, /coach-thoughts\.js\?v=20261110-2/);
+  assert.match(page, /story-content\.js\?v=20261112-1/);
+  assert.match(page, /coach-thoughts\.js\?v=20261112-1/);
+  assert.match(page, /id="thoughts-story-sport"/);
 });
 
 test("styles the spreadsheet uploader consistently with the article editor", () => {
@@ -45,7 +48,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     "status", "login", "reset-request", "reset", "uploader", "upload", "file",
     "spreadsheet", "spreadsheet-file", "spreadsheet-status", "gffl-workbooks",
     "story", "story-title", "story-editor", "story-add-image", "story-image",
-    "story-again", "story-status",
+    "story-sport", "story-again", "story-status",
     "signout", "list",
   ]) {
     elements[id] = {
@@ -170,6 +173,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
       get(name) { return this.values[name]; }
     },
   };
+  vm.runInNewContext(storyContentScript, context);
   vm.runInNewContext(script, context);
   return {
     elements,
@@ -363,6 +367,7 @@ test("publishes a full article as a formatted shared file", async () => {
   assert.deepEqual(JSON.parse(await calls.upload.body.text()), {
     title: "A complete story",
     html: "<p>with a second paragraph.</p>",
+    sport: "",
   });
   assert.equal(elements.story.wasReset, true);
   assert.equal(elements.story.hidden, true);
@@ -382,7 +387,7 @@ test("edits a published article in place and preserves its file name", async () 
   const storyName = "story-00000000-0000-4000-8000-000000000001-GFFL-Update.json";
   const { elements, calls, authEvent } = setup("", [
     { id: "story-id", name: storyName },
-  ], JSON.stringify({ title: "The GFFL Update", html: "<p>Existing article.</p>" }));
+  ], JSON.stringify({ title: "The GFFL Update", html: "<p>Existing article.</p>", sport: "basketball" }));
   await new Promise(setImmediate);
   authEvent("SIGNED_IN", { user: {} });
 
@@ -393,7 +398,9 @@ test("edits a published article in place and preserves its file name", async () 
 
   assert.equal(elements.story.hidden, false);
   assert.equal(elements["story-title"].value, "The GFFL Update");
+  assert.equal(elements["story-sport"].value, "basketball");
   assert.equal(elements.story.button.textContent, "Save changes");
+  elements["story-sport"].value = "baseball";
   elements["story-editor"].textContent = "Updated with a picture.";
   elements["story-editor"].innerHTML = "<p>Updated with a picture.</p><figure><img src=\"https://example.supabase.co/image.png\"></figure>";
   await elements.story.listeners.submit({ preventDefault() {} });
@@ -406,6 +413,7 @@ test("edits a published article in place and preserves its file name", async () 
   assert.deepEqual(JSON.parse(await calls.upload.body.text()), {
     title: "The GFFL Update",
     html: "<p>Updated with a picture.</p><figure><img src=\"https://example.supabase.co/image.png\"></figure>",
+    sport: "baseball",
   });
   assert.match(elements["story-status"].textContent, /Article updated successfully/);
   assert.equal(elements.story.button.textContent, "Publish story");
@@ -507,6 +515,7 @@ test("edits a legacy text story so pictures can be added", async () => {
   assert.deepEqual(JSON.parse(await calls.upload.body.text()), {
     title: "Week 5 Update",
     html: "<p>Updated with a picture.</p><figure><img src=\"https://example.supabase.co/image.png\"></figure>",
+    sport: "",
   });
 });
 

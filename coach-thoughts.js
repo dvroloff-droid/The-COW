@@ -13,6 +13,7 @@
   const storyForm = document.querySelector("#thoughts-story");
   const storySubmitButton = storyForm.querySelector('button[type="submit"]');
   const storyTitleInput = document.querySelector("#thoughts-story-title");
+  const storySportInput = document.querySelector("#thoughts-story-sport");
   const storyEditor = document.querySelector("#thoughts-story-editor");
   const storyImageButton = document.querySelector("#thoughts-story-add-image");
   const storyImageInput = document.querySelector("#thoughts-story-image");
@@ -40,6 +41,8 @@
   const setStoryStatus = (message) => updateStatus(storyStatus, message);
   const storyEditButtons = new Set();
   let editingStoryName = null;
+  const { parseStoryArticle, parsePlainStory, appendSafeStoryNodes } =
+    window.COACH_THOUGHTS_STORIES;
   let activeSession = null;
   const workbookKey = (name) => name
     .replace(/^[0-9a-f-]{36}-/i, "")
@@ -47,101 +50,10 @@
     .trim()
     .replace(/\s+/g, " ")
     .toLowerCase();
-  const parseStoryArticle = (text, fileName) => {
-    const isJsonStory = fileName.toLowerCase().endsWith(".json");
-    let article;
-    try {
-      article = JSON.parse(text);
-    } catch (error) {
-      if (isJsonStory) throw error;
-      return null;
-    }
-    if (
-      article &&
-      typeof article.title === "string" &&
-      typeof article.html === "string"
-    ) {
-      return article;
-    }
-    if (isJsonStory) {
-      throw new Error("The published column has an invalid format.");
-    }
-    return null;
-  };
-  const parsePlainStory = (text) => {
-    const lines = text.split(/\r?\n/);
-    const titleIndex = lines.findIndex((line) => line.trim());
-    return {
-      title: titleIndex < 0 ? "Untitled story" : lines[titleIndex].trim(),
-      paragraphs: titleIndex < 0
-        ? []
-        : lines.slice(titleIndex + 1).join("\n").trim().split(/\n\s*\n/).filter(Boolean),
-    };
-  };
   const setWorkbookMessage = (message) => {
     const item = document.createElement("li");
     item.textContent = message;
     gfflWorkbooks.replaceChildren(item);
-  };
-
-  const appendSafeStoryNodes = (source, target, supabaseUrl, bucketName) => {
-    const allowedTags = new Set([
-      "A", "B", "BLOCKQUOTE", "BR", "DIV", "EM", "FIGCAPTION", "FIGURE",
-      "H2", "H3", "I", "IMG", "LI", "OL", "P", "S", "STRONG", "U", "UL",
-    ]);
-    const blockedTags = new Set(["IFRAME", "OBJECT", "SCRIPT", "STYLE", "SVG"]);
-    for (const child of source.childNodes) {
-      if (child.nodeType === 3) {
-        target.append(document.createTextNode(child.textContent));
-        continue;
-      }
-      if (child.nodeType !== 1 || blockedTags.has(child.tagName)) continue;
-      if (child.tagName === "IMG") {
-        const sourceUrl = child.getAttribute("src");
-        if (!sourceUrl) continue;
-        try {
-          const imageUrl = new URL(sourceUrl, supabaseUrl);
-          const storagePath = `/storage/v1/object/public/${bucketName}/story-images/`;
-          if (
-            imageUrl.origin !== new URL(supabaseUrl).origin ||
-            !imageUrl.pathname.startsWith(storagePath)
-          ) {
-            continue;
-          }
-          const image = document.createElement("img");
-          image.src = imageUrl.href;
-          image.alt = child.getAttribute("alt") || "";
-          target.append(image);
-        } catch {
-          continue;
-        }
-        continue;
-      }
-
-      if (!allowedTags.has(child.tagName)) {
-        appendSafeStoryNodes(child, target, supabaseUrl, bucketName);
-        continue;
-      }
-      const tagName = child.tagName === "DIV" ? "p" : child.tagName.toLowerCase();
-      const element = document.createElement(tagName);
-      if (child.tagName === "A") {
-        const href = child.getAttribute("href");
-        if (href) {
-          try {
-            const linkUrl = new URL(href, window.location.href);
-            if (linkUrl.protocol === "https:" || linkUrl.protocol === "http:") {
-              element.href = linkUrl.href;
-              element.target = "_blank";
-              element.rel = "noopener noreferrer";
-            }
-          } catch {
-            // Render the link label without an unsafe destination.
-          }
-        }
-      }
-      appendSafeStoryNodes(child, element, supabaseUrl, bucketName);
-      target.append(element);
-    }
   };
 
   const showSetupInstructions = () => {
@@ -341,11 +253,13 @@
                   storyEditor.replaceChildren();
                   if (article) {
                     storyTitleInput.value = article.title;
+                    storySportInput.value = article.sport;
                     const parsed = new DOMParser().parseFromString(article.html, "text/html");
                     appendSafeStoryNodes(parsed.body, storyEditor, config.supabaseUrl, bucketName);
                   } else {
                     const legacyStory = parsePlainStory(text);
                     storyTitleInput.value = legacyStory.title;
+                    storySportInput.value = "";
                     for (const paragraph of legacyStory.paragraphs) {
                       const paragraphElement = document.createElement("p");
                       paragraphElement.textContent = paragraph.trim();
@@ -645,6 +559,7 @@
         return;
       }
       const storyTitle = storyTitleInput.value.trim();
+      const storySport = storySportInput.value;
       const storyHtml = storyEditor.innerHTML.trim();
       if (!storyTitle) {
         setStoryStatus("Enter a headline before publishing your article.");
@@ -658,7 +573,7 @@
       }
 
       const storyFile = new Blob(
-        [JSON.stringify({ title: storyTitle, html: storyHtml })],
+        [JSON.stringify({ title: storyTitle, html: storyHtml, sport: storySport })],
         { type: "application/json;charset=utf-8" },
       );
       if (storyFile.size > maxFileSize) {

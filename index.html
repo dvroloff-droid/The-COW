@@ -9,7 +9,7 @@
       content="The Coach's Office: a home for football coaching, resources, fantasy, and community."
     />
     <title>The Coach's Office — Football, well played</title>
-    <link rel="stylesheet" href="styles.css?v=20261112-5" />
+    <link rel="stylesheet" href="styles.css?v=20261112-6" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -228,6 +228,15 @@
                   maxlength="160"
                   placeholder="Give your article a headline"
                 />
+                <label for="thoughts-story-sport">Sports archive</label>
+                <select id="thoughts-story-sport" name="sport">
+                  <option value="">Coach's Thoughts only</option>
+                  <option value="baseball">Baseball</option>
+                  <option value="football">Football</option>
+                  <option value="basketball">Basketball</option>
+                  <option value="hockey">Hockey</option>
+                  <option value="soccer">Soccer</option>
+                </select>
                 <label for="thoughts-story-editor">Write or paste your column</label>
                 <div class="story-toolbar" role="toolbar" aria-label="Story formatting">
                   <button type="button" data-command="bold" aria-label="Bold">Bold</button>
@@ -290,6 +299,7 @@
 
     <script src="app.js"></script>
     <script src="supabase-config.js"></script>
-    <script src="coach-thoughts.js?v=20261110-2"></script>
+    <script src="story-content.js?v=20261112-1"></script>
+    <script src="coach-thoughts.js?v=20261112-1"></script>
   </body>
 </html>

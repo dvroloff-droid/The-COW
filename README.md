@@ -49,8 +49,13 @@ type up to 20 MB.
    be up to 20 MB. Saving waits for picture uploads and confirms that the
    published copy matches the draft; if verification fails, the draft remains
    in the editor. Published columns open in a multi-column newspaper layout,
-   with more room reserved for the article than either side column; older
-   plain-text stories remain readable in the library.
+   with more room reserved for the article than either side column. Select a
+   sport in the article editor to show a story on that sport's archive page;
+   edit an older story and save it with a sport selected to archive it there.
+   Sport-archived stories also remain in the shared library so authorized
+   uploaders can keep editing them. Stories set to "Coach's Thoughts only"
+   appear only in the shared library, and older plain-text stories remain
+   readable there until edited.
    Authorized uploaders can also share `.xlsx`, `.xls`, and `.xlsm`
    workbooks up to 20 MB. Workbooks are stored unchanged, preserving every
    worksheet, and appear as public download links under The GFFL section.

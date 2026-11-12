@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#eee6d4" />
     <meta name="description" content="Browse archived hockey stories from The Coach's Office." />
     <title>Hockey Archive — The Coach's Office</title>
-    <link rel="stylesheet" href="styles.css?v=20261111-2" />
+    <link rel="stylesheet" href="styles.css?v=20261112-1" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -42,9 +42,10 @@
           <h1>Hockey</h1>
           <p>Stories, notes, and columns from the rink.</p>
         </header>
-        <section class="archive-empty" aria-labelledby="archive-status">
-          <h2 id="archive-status">The archive is just getting started</h2>
-          <p>No hockey stories have been archived yet. Check back for future articles and updates.</p>
+        <section class="archive-stories" id="archive-stories" data-sport="hockey" aria-labelledby="archive-title">
+          <h2 id="archive-title">Archived stories</h2>
+          <p id="archive-status" role="status" aria-live="polite">Loading the hockey archive...</p>
+          <ol class="archive-story-list" id="archive-list"></ol>
         </section>
         <a class="archive-back" href="index.html">← Back to the front page</a>
       </article>
@@ -57,5 +58,8 @@
       </div>
     </footer>
     <script src="app.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="story-content.js?v=20261112-1"></script>
+    <script src="sports-archive.js?v=20261112-1"></script>
   </body>
 </html>

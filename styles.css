@@ -288,6 +288,37 @@ main,
   font-size: 0.9rem;
 }
 
+.archive-stories {
+  margin-top: 1.25rem;
+}
+
+.archive-stories > h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.archive-stories > p {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.archive-story-list {
+  display: grid;
+  gap: 1.5rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.archive-story-list > li {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.archive-story-list .shared-story-body {
+  margin-top: 0.6rem;
+}
+
 .archive-back {
   display: inline-block;
   margin-top: 1.4rem;
@@ -532,7 +563,8 @@ main,
 .thoughts-login input,
 .thoughts-reset input,
 .thoughts-uploader input,
-.thoughts-story-form input:not([type="file"]) {
+.thoughts-story-form input:not([type="file"]),
+.thoughts-story-form select {
   width: 100%;
   min-width: 0;
   padding: 0.5rem;
