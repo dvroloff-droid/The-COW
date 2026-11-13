@@ -84,6 +84,11 @@
 .lesson-package {
   min-width: 0;
 }
+.lesson-checkout {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
 
 /* Stack packages on smaller screens */
 @media (max-width: 650px) {
