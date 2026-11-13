@@ -13,7 +13,7 @@ automatically schedule or track lessons.
 Online checkout is unavailable until both products are set up in Stripe:
 
 1. In the Stripe Dashboard, create one-time USD products for the single lesson
-   ($50) and the four-lesson package ($175), and create a live Payment Link for
+   ($60) and the four-lesson package ($200), and create a live Payment Link for
    each. Use the same descriptions and prices shown on the site and keep
    adjustable quantity disabled. Configure your receipts, refund policy, and
    any applicable taxes in Stripe.
