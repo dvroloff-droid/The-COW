@@ -38,18 +38,21 @@
 
 .lesson-checkout {
   display: inline-block;
-  margin-top: 0.5rem;
-  padding: 0.7rem 1rem;
-  border: 1px solid var(--ink);
-  background: var(--ink);
-  color: var(--paper);
-  font: 700 0.8rem/1.2 var(--sans);
+  margin-top: 15px;
+  padding: 14px 24px;
+  border: 2px solid #29251e;
+  background-color: #29251e;
+  color: #fff8e8;
+  font: bold 16px Georgia, serif;
+  text-align: center;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .lesson-checkout:hover,
 .lesson-checkout:focus-visible {
-  background: var(--red);
+  background-color: #66543a;
+  color: #ffffff;
 }
 
 .lesson-checkout[hidden] {
@@ -69,28 +72,4 @@
 .lesson-scheduling a {
   color: var(--red);
   font-weight: 700;
-}
-/* Stripe payment buttons — The Coach's Office */
-
-.lesson-checkout {
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  background-color: #29251e;
-  color: #fff8e8 !important;
-  border: 2px solid #29251e;
-  padding: 14px 24px;
-  margin-top: 15px;
-  font-family: Georgia, serif;
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.lesson-checkout:hover,
-.lesson-checkout:focus-visible {
-  background-color: #66543a;
-  color: #ffffff !important;
 }
