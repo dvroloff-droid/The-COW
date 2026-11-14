@@ -1,13 +1,13 @@
 :root {
   color-scheme: light;
-  --paper: #d3bf91;
-  --paper-dark: #b7a074;
-  --paper-light: #e0d0a8;
-  --ink: #302316;
-  --muted: #5e4b33;
-  --rule: #70583a;
-  --rule-light: #a38b62;
-  --red: #702b23;
+  --paper: #d0cfc8;
+  --paper-dark: #b8b7b0;
+  --paper-light: #ddddd6;
+  --ink: #343431;
+  --muted: #5a5a55;
+  --rule: #6c6b65;
+  --rule-light: #96958d;
+  --red: #625e58;
   --serif: Georgia, "Times New Roman", serif;
   --sans: Arial, Helvetica, sans-serif;
 }
@@ -24,11 +24,11 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(ellipse at 8% 12%, #cbb58a 0, transparent 32rem),
-    radial-gradient(ellipse at 90% 78%, #594a36 0, transparent 42rem),
-    repeating-linear-gradient(8deg, transparent 0 4px, rgb(36 26 15 / 7%) 4.2px 4.8px),
-    repeating-linear-gradient(103deg, transparent 0 11px, rgb(239 221 178 / 8%) 11.2px 11.7px),
-    #817158;
+    radial-gradient(ellipse at 8% 12%, #aaa9a2 0, transparent 32rem),
+    radial-gradient(ellipse at 90% 78%, #41413f 0, transparent 42rem),
+    repeating-linear-gradient(8deg, transparent 0 4px, rgb(28 28 26 / 7%) 4.2px 4.8px),
+    repeating-linear-gradient(103deg, transparent 0 11px, rgb(239 239 234 / 7%) 11.2px 11.7px),
+    #686864;
   color: var(--ink);
   font-family: var(--serif);
   line-height: 1.45;
@@ -59,87 +59,87 @@ main,
   margin-inline: auto;
   background-color: var(--paper);
   clip-path: polygon(
-    0 2px,
+    0 1px,
     7% 0,
-    14% 2px,
+    14% 1px,
     24% 0,
     36% 1px,
     49% 0,
-    63% 2px,
+    63% 1px,
     77% 0,
     89% 1px,
     100% 0,
-    calc(100% - 2px) 2%,
+    calc(100% - 1px) 2%,
     100% 4%,
     calc(100% - 1px) 7%,
     100% 10%,
-    calc(100% - 3px) 13%,
+    calc(100% - 1px) 13%,
     100% 16%,
     calc(100% - 1px) 20%,
     100% 24%,
-    calc(100% - 2px) 28%,
+    calc(100% - 1px) 28%,
     100% 32%,
     calc(100% - 1px) 37%,
     100% 42%,
-    calc(100% - 3px) 47%,
+    calc(100% - 1px) 47%,
     100% 51%,
     calc(100% - 1px) 56%,
     100% 61%,
-    calc(100% - 2px) 66%,
+    calc(100% - 1px) 66%,
     100% 71%,
     calc(100% - 1px) 76%,
     100% 80%,
-    calc(100% - 3px) 85%,
+    calc(100% - 1px) 85%,
     100% 89%,
     calc(100% - 1px) 94%,
     100% 98%,
     92% 100%,
-    80% calc(100% - 1px),
+    80% calc(100% - 0.5px),
     68% 100%,
-    54% calc(100% - 2px),
+    54% calc(100% - 1px),
     41% 100%,
-    28% calc(100% - 1px),
+    28% calc(100% - 0.5px),
     15% 100%,
-    6% calc(100% - 2px),
+    6% calc(100% - 1px),
     0 100%,
-    2px 96%,
+    1px 96%,
     0 93%,
-    3px 89%,
+    1px 89%,
     0 85%,
-    2px 81%,
+    1px 81%,
     0 77%,
-    3px 73%,
+    1px 73%,
     0 69%,
-    2px 64%,
+    1px 64%,
     0 60%,
-    3px 55%,
+    1px 55%,
     0 50%,
-    2px 46%,
+    1px 46%,
     0 41%,
-    3px 36%,
+    1px 36%,
     0 31%,
-    2px 26%,
+    1px 26%,
     0 21%,
-    3px 16%,
+    1px 16%,
     0 12%,
-    2px 8%,
+    1px 8%,
     0 5%
   );
   background-image:
-    radial-gradient(ellipse at 0% 17%, rgb(73 43 20 / 30%), transparent 28%),
-    radial-gradient(ellipse at 100% 83%, rgb(73 43 20 / 28%), transparent 31%),
-    radial-gradient(ellipse at 52% 1%, rgb(255 241 199 / 24%), transparent 37%),
-    radial-gradient(ellipse at 31% 97%, rgb(73 43 20 / 23%), transparent 36%),
-    radial-gradient(ellipse at 17% 61%, rgb(91 55 24 / 12%) 0 1px, transparent 2px),
-    radial-gradient(ellipse at 74% 39%, rgb(56 39 22 / 12%) 0 0.8px, transparent 2px),
-    repeating-linear-gradient(2deg, transparent 0 2px, rgb(73 54 32 / 7%) 2.2px 2.7px),
-    repeating-linear-gradient(97deg, transparent 0 7px, rgb(73 54 32 / 6%) 7.2px 7.6px),
-    linear-gradient(174deg, transparent 0 48%, rgb(89 63 34 / 5%) 48.2%, transparent 48.8% 100%);
+    radial-gradient(ellipse at 0% 17%, rgb(48 48 45 / 22%), transparent 28%),
+    radial-gradient(ellipse at 100% 83%, rgb(48 48 45 / 20%), transparent 31%),
+    radial-gradient(ellipse at 52% 1%, rgb(255 255 255 / 20%), transparent 37%),
+    radial-gradient(ellipse at 31% 97%, rgb(48 48 45 / 17%), transparent 36%),
+    radial-gradient(ellipse at 17% 61%, rgb(48 48 45 / 10%) 0 1px, transparent 2px),
+    radial-gradient(ellipse at 74% 39%, rgb(48 48 45 / 10%) 0 0.8px, transparent 2px),
+    repeating-linear-gradient(2deg, transparent 0 2px, rgb(48 48 45 / 5%) 2.2px 2.7px),
+    repeating-linear-gradient(97deg, transparent 0 7px, rgb(48 48 45 / 4%) 7.2px 7.6px),
+    linear-gradient(174deg, transparent 0 48%, rgb(48 48 45 / 4%) 48.2%, transparent 48.8% 100%);
   box-shadow:
-    inset 0 0 1.8rem rgb(62 38 18 / 31%),
-    inset 0 0 6rem rgb(75 53 28 / 24%),
-    inset 0 1px 0 rgb(255 240 199 / 25%),
-    0 3px 12px rgb(34 25 14 / 28%);
+    inset 0 0 1.8rem rgb(42 42 39 / 26%),
+    inset 0 0 6rem rgb(48 48 45 / 20%),
+    inset 0 1px 0 rgb(255 255 255 / 22%),
+    0 3px 12px rgb(34 34 32 / 24%);
 }
 
 .site-header {
@@ -176,9 +176,9 @@ main,
   line-height: 1.04;
   text-shadow:
     0.75px 0 currentColor,
-    -0.45px 0 rgb(43 36 28 / 42%),
-    0 1px 1px rgb(83 55 27 / 32%),
-    0.4px 0.3px 0 rgb(112 43 35 / 11%);
+    -0.45px 0 rgb(45 45 42 / 38%),
+    0 1px 1px rgb(55 55 52 / 28%),
+    0.4px 0.3px 0 rgb(90 89 84 / 8%);
   text-decoration: none;
 }
 
@@ -364,7 +364,7 @@ main,
   margin-bottom: 0.65rem;
   padding-bottom: 0.6rem;
   border-bottom: 3px double var(--rule);
-  box-shadow: 0 1px 0 rgb(51 39 25 / 20%);
+  box-shadow: 0 1px 0 rgb(48 48 45 / 16%);
 }
 
 .eyebrow {
@@ -509,7 +509,7 @@ main,
 .thoughts-heading {
   padding-bottom: 0.65rem;
   border-bottom: 3px double var(--rule);
-  box-shadow: 0 1px 0 rgb(51 39 25 / 20%);
+  box-shadow: 0 1px 0 rgb(48 48 45 / 16%);
 }
 
 .thoughts-heading h2 {
@@ -772,16 +772,19 @@ main,
     repeating-linear-gradient(96deg, transparent 0 9px, rgb(255 255 255 / 16%) 9.2px 9.7px),
     linear-gradient(155deg, #d8d7d0, #c9c8c1 53%, #d2d1ca);
   clip-path: polygon(
-    0.8% 1.1%, 5% 0.4%, 10% 1%, 16% 0.3%, 23% 0.8%, 30% 0.2%,
-    38% 0.8%, 45% 0.3%, 53% 0.9%, 61% 0.2%, 69% 0.7%, 77% 0.3%,
-    85% 0.9%, 92% 0.2%, 99.2% 0.8%, 99.5% 5%, 99% 10%, 99.7% 16%,
-    99.1% 22%, 99.6% 29%, 99% 36%, 99.8% 43%, 99.2% 50%, 99.6% 57%,
-    99% 64%, 99.7% 71%, 99.1% 78%, 99.5% 85%, 98.9% 92%, 99.3% 98.8%,
-    94% 99.4%, 88% 98.9%, 81% 99.7%, 74% 99%, 66% 99.6%, 58% 98.9%,
-    50% 99.7%, 42% 99.1%, 34% 99.8%, 26% 99%, 18% 99.6%, 10% 98.9%,
-    3% 99.5%, 0.7% 97%, 1.2% 91%, 0.4% 84%, 1% 77%, 0.3% 70%,
-    0.9% 63%, 0.2% 56%, 0.8% 49%, 0.3% 42%, 1% 35%, 0.4% 28%,
-    0.9% 21%, 0.2% 14%, 0.8% 7%
+    0.35% 0.3%, 6% 0.15%, 12% 0.3%, 18% 0.2%, 24% 0.35%, 30% 0.15%,
+    36% 0.3%, 42% 0.2%, 48% 0.35%, 54% 0.15%, 60% 0.3%, 66% 0.2%,
+    72% 0.35%, 78% 0.15%, 84% 0.3%, 90% 0.2%, 96% 0.35%, 99.65% 0.2%,
+    99.8% 6%, 99.65% 13%, 99.8% 20%, 99.65% 27%, 99.8% 34%,
+    99.65% 41%, 99.8% 48%, 99.65% 55%, 99.8% 62%, 99.65% 69%,
+    99.8% 76%, 99.65% 83%, 99.8% 90%, 99.65% 97%, 99.7% 99.7%,
+    94% 99.8%, 88% 99.65%, 82% 99.8%, 76% 99.65%, 70% 99.8%,
+    64% 99.65%, 58% 99.8%, 52% 99.65%, 46% 99.8%, 40% 99.65%,
+    34% 99.8%, 28% 99.65%, 22% 99.8%, 16% 99.65%, 10% 99.8%,
+    4% 99.65%, 0.3% 99.7%, 0.2% 93%, 0.35% 86%, 0.2% 79%,
+    0.35% 72%, 0.2% 65%, 0.35% 58%, 0.2% 51%, 0.35% 44%,
+    0.2% 37%, 0.35% 30%, 0.2% 23%, 0.35% 16%, 0.2% 9%,
+    0.35% 2%
   );
   filter: drop-shadow(0 3px 4px rgb(34 32 29 / 24%));
 }
@@ -918,7 +921,7 @@ main,
 
 .news-item p {
   margin: 0;
-  color: #39332b;
+  color: #3d3c39;
   font-size: 0.83rem;
   line-height: 1.42;
 }
@@ -1160,7 +1163,7 @@ main,
     padding: 0.55rem 1rem 0.8rem;
     border-bottom: 1px solid var(--ink);
     background: var(--paper);
-    box-shadow: 0 5px 8px #211d1820;
+    box-shadow: 0 5px 8px #24242220;
   }
 
   .primary-nav.is-open {
