@@ -23,6 +23,7 @@
   const fileList = document.querySelector("#thoughts-list");
   const gfflWorkbooks = document.querySelector("#gffl-workbooks");
   const heroInner = document.querySelector(".hero-inner");
+  const podcasts = window.createPodcasts();
 
   let statusRevision = 0;
   const updateStatus = (element, message) => {
@@ -57,6 +58,7 @@
   };
 
   const showSetupInstructions = () => {
+    podcasts.unavailable("Connect Supabase to load podcasts.");
     setStatus("Connect a Supabase project to enable file uploads. See the setup instructions.");
     setWorkbookMessage("Connect Supabase to load GFFL workbooks.");
     fileList.replaceChildren();
@@ -80,6 +82,7 @@
 
   const initializeUploader = () => {
     if (!window.supabase?.createClient) {
+      podcasts.unavailable("Could not load podcasts. Check your connection and refresh.");
       setStatus("The Supabase client could not be loaded. Check your connection and refresh.");
       setWorkbookMessage("Could not load GFFL workbooks. Check your connection and refresh.");
       return;
@@ -90,6 +93,7 @@
     const recoveryError = hashParams.get("error_description");
     const client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
     const bucket = client.storage.from(bucketName);
+    podcasts.start(bucket);
     let savedStorySelection = null;
     let pictureUploadPending = false;
     let storySavePending = false;
@@ -117,6 +121,7 @@
       loginForm.hidden = Boolean(session);
       resetForm.hidden = !session || !recoveryMode;
       uploadArea.hidden = !session || recoveryMode;
+      podcasts.setSignedIn(Boolean(session) && !recoveryMode);
       for (const button of storyEditButtons) button.hidden = !session || recoveryMode;
     };
 
@@ -757,6 +762,9 @@
   sdk.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
   sdk.async = true;
   sdk.onload = initializeUploader;
-  sdk.onerror = () => setStatus("Could not load the Supabase client. Check your connection and refresh.");
+  sdk.onerror = () => {
+    setStatus("Could not load the Supabase client. Check your connection and refresh.");
+    podcasts.unavailable("Could not load podcasts. Check your connection and refresh.");
+  };
   document.head.append(sdk);
 })();

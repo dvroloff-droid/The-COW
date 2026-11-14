@@ -13,10 +13,10 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261114-2/);
+  assert.match(page, /styles\.css\?v=20261114-3/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
-  assert.match(page, /coach-thoughts\.js\?v=20261112-1/);
+  assert.match(page, /coach-thoughts\.js\?v=20261114-2/);
   assert.match(page, /id="thoughts-story-sport"/);
 });
 
@@ -97,6 +97,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
   const heroInner = { classList: { add() {}, remove() {} } };
   const emailInput = { value: "coach@example.com", reportValidity: () => true };
   const calls = {};
+  const podcastEvents = [];
   const uploadedStories = new Map();
   let readOverride = null;
   let onAuthStateChange;
@@ -154,6 +155,11 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     window: {
       location: { origin: "https://example.com", pathname: "/The-COW/", hash },
       COACH_THOUGHTS_CONFIG: { supabaseUrl: "https://example.supabase.co", supabaseAnonKey: "public-key" },
+      createPodcasts: () => ({
+        start(bucket) { podcastEvents.push({ type: "start", bucket }); },
+        setSignedIn(value) { podcastEvents.push({ type: "signedIn", value }); },
+        unavailable(message) { podcastEvents.push({ type: "unavailable", message }); },
+      }),
       supabase: { createClient: () => ({ auth, storage: { from: () => bucket } }) },
       getSelection: () => null,
     },
@@ -192,6 +198,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     elements,
     calls,
     bucket,
+    podcastEvents,
     setReadOverride: (text) => { readOverride = text; },
     authEvent: (event, session) => onAuthStateChange(event, session),
   };
@@ -215,6 +222,18 @@ test("existing password sign-in continues to work", async () => {
   authEvent("SIGNED_IN", { user: {} });
   assert.equal(elements.login.hidden, true);
   assert.equal(elements.uploader.hidden, false);
+});
+
+test("connects the podcast form to the existing sign-in and recovery state", async () => {
+  const { authEvent, podcastEvents, bucket } = setup();
+  await new Promise(setImmediate);
+  assert.equal(podcastEvents.find((event) => event.type === "start").bucket, bucket);
+  authEvent("SIGNED_IN", { user: {} });
+  assert.equal(podcastEvents.at(-1).value, true);
+  authEvent("PASSWORD_RECOVERY", { user: {} });
+  assert.equal(podcastEvents.at(-1).value, false);
+  authEvent("SIGNED_OUT", null);
+  assert.equal(podcastEvents.at(-1).value, false);
 });
 
 test("shares Excel workbooks unchanged through public read-only download links", async () => {
