@@ -149,3 +149,15 @@ test("places the podcast section in Around the office and loads its script", () 
   assert.match(page, /id="podcast-form"[^>]*hidden/);
   assert.match(page, /podcasts\.js\?v=20261114-1/);
 });
+
+test("keeps Around the office sections in the requested order", () => {
+  const cards = [...page.matchAll(/<article class="room-card[^"]*"[^>]*>[\s\S]*?<span class="card-number">(\d+)<\/span>[\s\S]*?<h3>([^<]+)<\/h3>/g)];
+  assert.deepEqual(cards.map(([, number, title]) => [number, title]), [
+    ["01", "Coaching lessons"],
+    ["02", "Coaching tips &amp; clips"],
+    ["03", "ESPN Fantasy"],
+    ["04", "Must-listen Podcasts"],
+    ["05", "Milwaukee Angels U-11"],
+    ["06", "Madison College"],
+  ]);
+});
