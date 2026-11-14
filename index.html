@@ -9,7 +9,7 @@
       content="The Coach's Office: a home for football coaching, resources, fantasy, and community."
     />
     <title>The Coach's Office — Football, well played</title>
-    <link rel="stylesheet" href="styles.css?v=20261114-2" />
+    <link rel="stylesheet" href="styles.css?v=20261114-3" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -61,9 +61,18 @@
               <article class="room-card room-card-featured" role="listitem">
                 <div class="card-top"><span class="card-number">01</span><span class="card-tag">THE PLAYBOOK</span></div>
                 <div class="card-content">
-                  <h3>Articles</h3>
-                  <p>Ideas, lessons, and football reading for curious minds.</p>
-                  <span class="availability">Articles coming soon</span>
+                  <h3>Must-listen Podcasts</h3>
+                  <p>Podcasts worth listening to.</p>
+                  <ul id="podcast-list" class="podcast-list" aria-live="polite"></ul>
+                  <p id="podcast-status" class="podcast-status" role="status" aria-live="polite">Loading podcasts...</p>
+                  <p id="podcast-sign-in">To add a podcast, <a href="#thoughts-login">sign in under Coach's Thoughts</a>.</p>
+                  <form id="podcast-form" class="podcast-form" hidden>
+                    <label for="podcast-title">Podcast name</label>
+                    <input id="podcast-title" type="text" maxlength="160" required />
+                    <label for="podcast-url">Podcast link</label>
+                    <input id="podcast-url" type="url" maxlength="2048" placeholder="https://..." required />
+                    <button type="submit">Add podcast</button>
+                  </form>
                 </div>
               </article>
               <article class="room-card room-card-light" role="listitem">
@@ -300,6 +309,7 @@
     <script src="app.js"></script>
     <script src="supabase-config.js"></script>
     <script src="story-content.js?v=20261112-1"></script>
-    <script src="coach-thoughts.js?v=20261112-1"></script>
+    <script src="podcasts.js?v=20261114-1"></script>
+    <script src="coach-thoughts.js?v=20261114-2"></script>
   </body>
 </html>
