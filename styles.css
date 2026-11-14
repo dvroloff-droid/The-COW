@@ -762,9 +762,46 @@ main,
 }
 
 .shared-story-article {
-  margin-top: 0.65rem;
-  padding: 0.7rem 0;
-  border-top: 3px double var(--ink);
+  margin: 0.85rem 0;
+  padding: 1.15rem clamp(0.85rem, 2vw, 1.35rem);
+  color: #3d3c39;
+  background:
+    radial-gradient(ellipse at 9% 12%, rgb(62 60 55 / 13%), transparent 27%),
+    radial-gradient(ellipse at 92% 84%, rgb(62 60 55 / 11%), transparent 31%),
+    repeating-linear-gradient(4deg, transparent 0 4px, rgb(55 53 48 / 3%) 4.2px 4.7px),
+    repeating-linear-gradient(96deg, transparent 0 9px, rgb(255 255 255 / 16%) 9.2px 9.7px),
+    linear-gradient(155deg, #d8d7d0, #c9c8c1 53%, #d2d1ca);
+  clip-path: polygon(
+    0.8% 1.1%, 5% 0.4%, 10% 1%, 16% 0.3%, 23% 0.8%, 30% 0.2%,
+    38% 0.8%, 45% 0.3%, 53% 0.9%, 61% 0.2%, 69% 0.7%, 77% 0.3%,
+    85% 0.9%, 92% 0.2%, 99.2% 0.8%, 99.5% 5%, 99% 10%, 99.7% 16%,
+    99.1% 22%, 99.6% 29%, 99% 36%, 99.8% 43%, 99.2% 50%, 99.6% 57%,
+    99% 64%, 99.7% 71%, 99.1% 78%, 99.5% 85%, 98.9% 92%, 99.3% 98.8%,
+    94% 99.4%, 88% 98.9%, 81% 99.7%, 74% 99%, 66% 99.6%, 58% 98.9%,
+    50% 99.7%, 42% 99.1%, 34% 99.8%, 26% 99%, 18% 99.6%, 10% 98.9%,
+    3% 99.5%, 0.7% 97%, 1.2% 91%, 0.4% 84%, 1% 77%, 0.3% 70%,
+    0.9% 63%, 0.2% 56%, 0.8% 49%, 0.3% 42%, 1% 35%, 0.4% 28%,
+    0.9% 21%, 0.2% 14%, 0.8% 7%
+  );
+  filter: drop-shadow(0 3px 4px rgb(34 32 29 / 24%));
+}
+
+.shared-story-article .eyebrow,
+.shared-story-article .shared-story-body p:first-child::first-letter {
+  color: #595853;
+}
+
+.shared-story-article .shared-story-header {
+  border-bottom-color: #85847d;
+}
+
+.shared-story-article .shared-story-body blockquote {
+  border-left-color: #77766f;
+  color: #55544f;
+}
+
+.shared-story-article a {
+  color: #45443f;
 }
 
 .shared-story-header {

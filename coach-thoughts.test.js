@@ -13,7 +13,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261112-6/);
+  assert.match(page, /styles\.css\?v=20261114-1/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
   assert.match(page, /coach-thoughts\.js\?v=20261112-1/);
@@ -32,6 +32,11 @@ test("uses smaller text for published article bodies and supports pictures", () 
   assert.doesNotMatch(styles, /\.shared-story-article\s*\{[^}]*text-align:\s*center;/);
   assert.match(styles, /\.shared-story-body p\s*\{[^}]*white-space:\s*normal;[^}]*text-align:\s*justify;[^}]*text-align-last:\s*start;[^}]*hyphens:\s*auto;/);
   assert.match(page, /id="thoughts-story-add-image"[^>]*>Add picture<\/button>/);
+});
+
+test("styles published columns as weathered gray newsprint with frayed edges", () => {
+  assert.match(styles, /\.shared-story-article\s*\{[^}]*color:\s*#3d3c39;[^}]*background:[^}]*#d8d7d0[^}]*clip-path:\s*polygon\(/);
+  assert.match(styles, /\.shared-story-article \.shared-story-body blockquote\s*\{[^}]*border-left-color:\s*#77766f;/);
 });
 
 test("keeps shared storage publicly readable and limits authorized updates to stories", () => {
