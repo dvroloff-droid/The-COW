@@ -573,7 +573,6 @@ main,
 .thoughts-heading {
   padding-bottom: 0.65rem;
   border-bottom: 3px double var(--rule);
-  box-shadow: 0 1px 0 rgb(48 48 45 / 16%);
 }
 
 .thoughts-heading h2 {
