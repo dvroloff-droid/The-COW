@@ -776,18 +776,13 @@ main,
   color: var(--red) !important;
 }
 
-.thoughts-library {
-  margin-top: 1rem;
-  padding-top: 0.65rem;
-}
-
 .thoughts-library h3 {
   margin: 0;
   font-size: 1rem;
 }
 
 .thoughts-library ul {
-  margin: 0.35rem 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -807,6 +802,10 @@ main,
   color: var(--red);
   cursor: pointer;
   font-weight: 700;
+}
+
+.thoughts-library summary[hidden] + .shared-story-article {
+  margin-top: 0;
 }
 
 .story-edit-button {
