@@ -13,7 +13,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261115-9/);
+  assert.match(page, /styles\.css\?v=20261115-10/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
   assert.match(page, /coach-thoughts\.js\?v=20261115-1/);
@@ -53,7 +53,8 @@ test("uses a weathered gray newsprint palette and fine torn edges across the sit
   assert.match(styles, /--paper:\s*#d0cfc8;/);
   assert.match(styles, /--paper-dark:\s*#b8b7b0;/);
   assert.match(styles, /body\s*\{[^}]*#686864;/);
-  assert.match(styles, /\.site-header,\s*main,\s*\.site-footer\s*\{[^}]*clip-path:\s*polygon\([\s\S]*?calc\(100% - 1px\)/);
+  assert.match(styles, /\.site-header,\s*main,\s*\.site-footer\s*\{[^}]*clip-path:\s*polygon\([\s\S]*?calc\(100% - 2px\)/);
+  assert.match(styles, /\.site-header,\s*main,\s*\.site-footer\s*\{[^}]*radial-gradient\(ellipse at 7% 24%, rgb\(105 81 47 \/ 9%\)/);
   assert.match(page, /theme-color" content="#d0cfc8"/);
 });
 
