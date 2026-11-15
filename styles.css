@@ -699,7 +699,7 @@ main,
 .hero-inner.newspaper-reading .shared-story-body figcaption {
   margin-top: 0.3rem;
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: 0.60rem;
   font-style: italic;
 }
 
@@ -1089,7 +1089,7 @@ main,
 .blueprint figcaption {
   margin-top: 0.5rem;
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.60rem;
   font-style: italic;
 }
 
