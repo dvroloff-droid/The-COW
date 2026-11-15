@@ -13,11 +13,21 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261115-8/);
+  assert.match(page, /styles\.css\?v=20261115-9/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
   assert.match(page, /coach-thoughts\.js\?v=20261115-1/);
   assert.match(page, /id="thoughts-story-sport"/);
+});
+
+test("uses a shared font size for the three column headings", () => {
+  const sizes = [
+    styles.match(/\.section-heading h2\s*\{[^}]*font-size:\s*([^;]+);/)[1],
+    styles.match(/\.thoughts-heading h2\s*\{[^}]*font-size:\s*([^;]+);/)[1],
+    styles.match(/\.news-heading h2\s*\{[^}]*font-size:\s*([^;]+);/)[1],
+  ];
+  assert.deepEqual(sizes, [sizes[0], sizes[0], sizes[0]]);
+  assert.equal((styles.match(/\.news-heading h2/g) || []).length, 1);
 });
 
 test("styles the spreadsheet uploader consistently with the article editor", () => {
