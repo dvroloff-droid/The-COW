@@ -378,11 +378,13 @@ main,
   line-height: 1.05;
 }
 
-.section-heading h3 {
+.section-heading h3,
+.thoughts-heading > p:last-child {
   margin: 0.4rem 0 0;
   color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.2;
+  font-size: 0.82rem;
+  font-style: italic;
+  font-weight: normal;
 }
 
 .room-grid {
@@ -576,13 +578,6 @@ main,
   font-size: clamp(1.55rem, 2.3vw, 2rem);
   letter-spacing: -0.045em;
   line-height: 1.05;
-}
-
-.thoughts-heading > p:last-child {
-  margin: 0.4rem 0 0;
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-style: italic;
 }
 
 .thoughts-status {
