@@ -567,7 +567,7 @@ main,
 
 .thoughts-column {
   padding: 1.15rem 0;
-  border-block: 3px double var(--ink);
+  border-bottom: 3px double var(--ink);
 }
 
 .thoughts-heading {
