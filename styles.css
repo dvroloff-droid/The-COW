@@ -1154,6 +1154,18 @@ main,
   }
 
   .thoughts-column {
+    grid-row: 1;
+  }
+
+  .rooms {
+    grid-row: 2;
+  }
+
+  .today-news {
+    grid-row: 3;
+  }
+
+  .thoughts-column {
     padding-block: 0 1.15rem;
   }
 
