@@ -566,7 +566,7 @@ main,
 }
 
 .thoughts-column {
-  padding: 1.15rem 0;
+  padding: 0 0 1.15rem;
   border-bottom: 3px double var(--ink);
 }
 
@@ -1161,7 +1161,7 @@ main,
   }
 
   .thoughts-column {
-    padding-block: 1.15rem;
+    padding-block: 0 1.15rem;
   }
 
   .today-news {
