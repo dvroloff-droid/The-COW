@@ -244,6 +244,50 @@ main,
   border-inline: 1px solid var(--rule-light);
 }
 
+.section-jump {
+  position: relative;
+  z-index: 5;
+  align-self: flex-start;
+  margin-bottom: 1rem;
+  font-family: var(--sans);
+}
+
+.section-jump summary {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--rule);
+  background: var(--paper-light);
+  cursor: pointer;
+  font: 700 0.7rem/1.2 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.section-jump summary:hover,
+.section-jump summary:focus-visible,
+.section-jump-menu a:hover,
+.section-jump-menu a:focus-visible {
+  color: var(--red);
+}
+
+.section-jump-menu {
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  left: 0;
+  display: grid;
+  min-width: 13rem;
+  padding: 0.3rem;
+  border: 1px solid var(--rule);
+  background: var(--paper-light);
+  box-shadow: 0 3px 8px rgb(34 34 32 / 24%);
+}
+
+.section-jump-menu a {
+  padding: 0.45rem 0.6rem;
+  color: var(--ink);
+  font: 700 0.7rem/1.3 var(--sans);
+  text-decoration: none;
+}
+
 .archive-main {
   min-height: calc(100vh - 260px);
   padding: clamp(2rem, 6vw, 5rem) 8%;
