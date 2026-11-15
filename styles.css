@@ -779,7 +779,6 @@ main,
 .thoughts-library {
   margin-top: 1rem;
   padding-top: 0.65rem;
-  border-top: 3px double var(--ink);
 }
 
 .thoughts-library h3 {
