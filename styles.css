@@ -357,10 +357,6 @@ main,
 }
 
 .section-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 1rem;
   margin-bottom: 0.65rem;
   padding-bottom: 0.6rem;
   border-bottom: 3px double var(--rule);
@@ -382,11 +378,11 @@ main,
   line-height: 1.05;
 }
 
-.section-heading > p {
-  margin: 0 0 0.1rem;
+.section-heading h3 {
+  margin: 0.4rem 0 0;
   color: var(--muted);
-  font-size: 0.8rem;
-  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.2;
 }
 
 .room-grid {
@@ -1242,10 +1238,6 @@ main,
     font-size: clamp(2.25rem, 9vw, 3.2rem);
   }
 
-  .section-heading > p {
-    max-width: 9rem;
-    text-align: right;
-  }
 }
 
 @media (max-width: 460px) {
