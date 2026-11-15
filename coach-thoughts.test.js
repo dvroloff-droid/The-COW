@@ -16,7 +16,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.match(page, /styles\.css\?v=20261115-2/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
-  assert.match(page, /coach-thoughts\.js\?v=20261114-2/);
+  assert.match(page, /coach-thoughts\.js\?v=20261115-1/);
   assert.match(page, /id="thoughts-story-sport"/);
 });
 
@@ -659,6 +659,23 @@ test("opens the newest published article inline instead of leaving it as a link"
 
   assert.equal(calls.download, newestStory.name);
   assert.equal(newestDetails.children[1].children[0].children[1].textContent, "Newest story");
+});
+
+test("keeps the Brewers article expanded without its collapsed summary line", async () => {
+  const { elements } = setup("", [{
+    id: "brewers-story",
+    name: "story-00000000-0000-4000-8000-000000000001-The-Brewers-Will-Be-Even-Better-in-2027.json",
+  }], JSON.stringify({
+    title: "The Brewers Will Be Even Better in 2027",
+    html: "<p>Article body</p>",
+  }));
+  await new Promise(setImmediate);
+
+  const details = elements.list.children[0].children[0];
+  assert.equal(details.open, true);
+  assert.equal(details.children[0].hidden, true);
+  await details.listeners.toggle();
+  assert.equal(details.children[1].children[0].children[1].textContent, "The Brewers Will Be Even Better in 2027");
 });
 
 test("uploads an image for a newspaper column", async () => {

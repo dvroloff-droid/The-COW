@@ -201,10 +201,14 @@
               storyEditButton.hidden = !activeSession || recoveryMode;
               storyEditButtons.add(storyEditButton);
             }
-            summary.textContent = file.name
+            const storySlug = file.name
               .replace(/^story-[0-9a-f-]{36}-/i, "")
               .replace(/\.(txt|json)$/i, "")
-              .replace(/-/g, " ") || "Read shared story";
+              .replace(/-/g, " ");
+            const keepExpanded = storySlug.trim().toLowerCase() ===
+              "the brewers will be even better in 2027";
+            summary.textContent = storySlug || "Read shared story";
+            summary.hidden = keepExpanded;
             storyHeader.append(storyEyebrow, storyTitle);
             if (/\.(json|txt)$/i.test(file.name)) storyHeader.append(storyEditButton);
             storyArticle.append(storyHeader, storyBody);
@@ -284,7 +288,7 @@
                 }
               });
             }
-            details.open = file.name === storyToOpenName;
+            details.open = keepExpanded || file.name === storyToOpenName;
             if (details.open) {
               heroInner.classList.add("newspaper-reading");
               openedStory = details;
