@@ -515,6 +515,11 @@ main,
   text-underline-offset: 2px;
 }
 
+.podcast-list .podcast-description {
+  margin: 0.2rem 0 0.5rem;
+  white-space: pre-wrap;
+}
+
 .card-content .podcast-status {
   font-size: 0.72rem;
 }
@@ -531,7 +536,8 @@ main,
   display: none;
 }
 
-.podcast-form input {
+.podcast-form input,
+.podcast-form textarea {
   width: 100%;
   min-width: 0;
   padding: 0.45rem;
@@ -539,6 +545,10 @@ main,
   background: var(--paper-light);
   color: var(--ink);
   font: inherit;
+}
+
+.podcast-form textarea {
+  resize: vertical;
 }
 
 .podcast-form button {

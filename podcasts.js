@@ -5,6 +5,7 @@ window.createPodcasts = () => {
   const form = document.querySelector("#podcast-form");
   const titleInput = document.querySelector("#podcast-title");
   const urlInput = document.querySelector("#podcast-url");
+  const descriptionInput = document.querySelector("#podcast-description");
   const submitButton = form.querySelector('button[type="submit"]');
   let bucket;
   let signedIn = false;
@@ -59,6 +60,13 @@ window.createPodcasts = () => {
           link.target = "_blank";
           link.rel = "noopener noreferrer";
           item.append(link);
+          const description = typeof entry.description === "string" ? entry.description.trim() : "";
+          if (description) {
+            const descriptionElement = document.createElement("p");
+            descriptionElement.className = "podcast-description";
+            descriptionElement.textContent = description;
+            item.append(descriptionElement);
+          }
           entries.push(item);
         } catch {
           failed++;
@@ -87,6 +95,7 @@ window.createPodcasts = () => {
     }
     const title = titleInput.value.trim();
     const url = validUrl(urlInput.value.trim());
+    const description = descriptionInput.value.trim();
     if (!title) {
       status.textContent = "Enter a podcast name.";
       titleInput.focus();
@@ -101,7 +110,7 @@ window.createPodcasts = () => {
     submitButton.disabled = true;
     status.textContent = "Adding podcast...";
     try {
-      const body = new Blob([JSON.stringify({ title, url })], { type: "application/json" });
+      const body = new Blob([JSON.stringify({ title, url, description })], { type: "application/json" });
       const { error } = await bucket.upload(`podcasts/${crypto.randomUUID()}.json`, body, {
         contentType: "application/json",
         cacheControl: "0",

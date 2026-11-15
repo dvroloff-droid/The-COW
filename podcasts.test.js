@@ -8,7 +8,7 @@ const page = fs.readFileSync(`${__dirname}/index.html`, "utf8");
 
 function setup(initial = []) {
   const elements = {};
-  for (const id of ["podcast-list", "podcast-status", "podcast-sign-in", "podcast-form", "podcast-title", "podcast-url"]) {
+  for (const id of ["podcast-list", "podcast-status", "podcast-sign-in", "podcast-form", "podcast-title", "podcast-url", "podcast-description"]) {
     elements[id] = {
       hidden: false,
       value: "",
@@ -25,6 +25,7 @@ function setup(initial = []) {
   elements["podcast-form"].reset = () => {
     elements["podcast-title"].value = "";
     elements["podcast-url"].value = "";
+    elements["podcast-description"].value = "";
   };
   const objects = new Map(initial.map((entry, index) => [`${index}.json`, JSON.stringify(entry)]));
   const calls = { list: [], uploads: [] };
@@ -75,7 +76,11 @@ const submit = (elements) => elements["podcast-form"].listeners.submit({ prevent
 
 test("shows safe public podcast links and reports invalid stored entries", async () => {
   const { elements, podcasts, bucket } = setup([
-    { title: "Coaching show", url: "https://example.com/podcast" },
+    {
+      title: "Coaching show",
+      url: "https://example.com/podcast",
+      description: "A discussion about coaching.",
+    },
     { title: "Bad link", url: "javascript:alert(1)" },
   ]);
   podcasts.start(bucket);
@@ -85,6 +90,8 @@ test("shows safe public podcast links and reports invalid stored entries", async
   assert.equal(links[0].children[0].textContent, "Coaching show");
   assert.equal(links[0].children[0].href, "https://example.com/podcast");
   assert.equal(links[0].children[0].rel, "noopener noreferrer");
+  assert.equal(links[0].children[1].textContent, "A discussion about coaching.");
+  assert.equal(links[0].children[1].className, "podcast-description");
   assert.match(elements["podcast-status"].textContent, /1 podcast link could not be loaded/);
 });
 
@@ -101,6 +108,7 @@ test("only signed-in users can add validated links and successful uploads appear
   assert.equal(elements["podcast-sign-in"].hidden, true);
   elements["podcast-title"].value = "  Football talk  ";
   elements["podcast-url"].value = "javascript:alert(1)";
+  elements["podcast-description"].value = " League analysis ";
   await submit(elements);
   assert.match(elements["podcast-status"].textContent, /valid HTTP or HTTPS/);
   elements["podcast-url"].value = "https://user:password@example.com/";
@@ -110,9 +118,15 @@ test("only signed-in users can add validated links and successful uploads appear
   await submit(elements);
   assert.equal(calls.uploads.length, 1);
   assert.match(calls.uploads[0].name, /^podcasts\/.*\.json$/);
-  assert.deepEqual(JSON.parse(calls.uploads[0].body), { title: "Football talk", url: "https://example.com/show" });
+  assert.deepEqual(JSON.parse(calls.uploads[0].body), {
+    title: "Football talk",
+    url: "https://example.com/show",
+    description: "League analysis",
+  });
   assert.equal(elements["podcast-list"].children[0].children[0].textContent, "Football talk");
+  assert.equal(elements["podcast-list"].children[0].children[1].textContent, "League analysis");
   assert.equal(elements["podcast-title"].value, "");
+  assert.equal(elements["podcast-description"].value, "");
   podcasts.setSignedIn(false);
   assert.equal(elements["podcast-form"].hidden, true);
 });
@@ -141,13 +155,15 @@ test("loads every page of podcast links", async () => {
   podcasts.start(bucket);
   await tick();
   assert.equal(elements["podcast-list"].children.length, 101);
+  assert.equal(elements["podcast-list"].children[0].children.length, 1);
   assert.deepEqual(calls.list.map((call) => call.offset), [0, 100]);
 });
 
 test("places the podcast section in Around the office and loads its script", () => {
   assert.match(page, /<h3>Must-listen Podcasts<\/h3>/);
   assert.match(page, /id="podcast-form"[^>]*hidden/);
-  assert.match(page, /podcasts\.js\?v=20261114-1/);
+  assert.match(page, /<textarea id="podcast-description" maxlength="500"/);
+  assert.match(page, /podcasts\.js\?v=20261115-1/);
 });
 
 test("keeps Around the office sections in the requested order", () => {

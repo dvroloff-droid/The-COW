@@ -54,10 +54,12 @@ type up to 20 MB.
 
 Visitors can open podcast links from Around the office. To add one, sign in
 under Coach's Thoughts, then enter its name and an HTTP or HTTPS link in the
-Must-listen Podcasts form. Links are stored as individual public JSON files in
-the `podcasts/` folder of the existing `coach-thoughts` bucket, so the existing
-authenticated upload policy applies. The form adds links; it does not edit or
-remove them. Unauthorized visitors cannot add links.
+Must-listen Podcasts form, with an optional description of up to 500 characters.
+Descriptions appear below each podcast link. Links and descriptions are stored
+as individual public JSON files in the `podcasts/` folder of the existing
+`coach-thoughts` bucket, so the existing authenticated upload policy applies.
+The form adds links; it does not edit or remove them. Unauthorized visitors
+cannot add links.
 
 ## Password recovery
 
