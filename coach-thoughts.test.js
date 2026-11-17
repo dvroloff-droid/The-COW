@@ -13,10 +13,10 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261115-10/);
+  assert.match(page, /styles\.css\?v=20261115-11/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
-  assert.match(page, /coach-thoughts\.js\?v=20261115-1/);
+  assert.match(page, /coach-thoughts\.js\?v=20261117-2/);
   assert.match(page, /id="thoughts-story-sport"/);
 });
 
@@ -224,8 +224,9 @@ test("requests a recovery link using the current site URL", async () => {
 });
 
 test("existing password sign-in continues to work", async () => {
-  const { elements, calls, authEvent } = setup();
+  const { elements, calls, authEvent } = setup("#coach-login");
   await new Promise(setImmediate);
+  assert.equal(elements.login.hidden, false);
   elements.login.values = { email: "coach@example.com", password: "password" };
   await elements.login.listeners.submit({ preventDefault() {} });
   assert.equal(calls.signIn.email, "coach@example.com");
@@ -235,8 +236,22 @@ test("existing password sign-in continues to work", async () => {
   assert.equal(elements.uploader.hidden, false);
 });
 
+test("keeps the sign-in form hidden on the public page", async () => {
+  const { elements } = setup();
+  await new Promise(setImmediate);
+  assert.equal(elements.login.hidden, true);
+});
+
+test("keeps authoring controls hidden on the public page for signed-in users", async () => {
+  const { elements, podcastEvents, authEvent } = setup();
+  await new Promise(setImmediate);
+  authEvent("SIGNED_IN", { user: {} });
+  assert.equal(elements.uploader.hidden, true);
+  assert.equal(podcastEvents.at(-1).value, false);
+});
+
 test("connects the podcast form to the existing sign-in and recovery state", async () => {
-  const { authEvent, podcastEvents, bucket } = setup();
+  const { authEvent, podcastEvents, bucket } = setup("#coach-login");
   await new Promise(setImmediate);
   assert.equal(podcastEvents.find((event) => event.type === "start").bucket, bucket);
   authEvent("SIGNED_IN", { user: {} });
@@ -384,7 +399,7 @@ test("recovery requires matching passwords and updates the account", async () =>
   await elements.reset.listeners.submit({ preventDefault() {} });
   assert.equal(calls.update.password, "new-password");
   assert.equal(elements.reset.hidden, true);
-  assert.equal(elements.uploader.hidden, false);
+  assert.equal(elements.uploader.hidden, true);
 });
 
 test("expired recovery links show an actionable error", async () => {
@@ -428,7 +443,7 @@ test("publishes a full article as a formatted shared file", async () => {
 
 test("edits a published article in place and preserves its file name", async () => {
   const storyName = "story-00000000-0000-4000-8000-000000000001-GFFL-Update.json";
-  const { elements, calls, authEvent } = setup("", [
+  const { elements, calls, authEvent } = setup("#coach-login", [
     { id: "story-id", name: storyName },
   ], JSON.stringify({ title: "The GFFL Update", html: "<p>Existing article.</p>", sport: "basketball" }));
   await new Promise(setImmediate);
@@ -534,7 +549,7 @@ test("waits for picture uploads before saving an article", async () => {
 
 test("edits a legacy text story so pictures can be added", async () => {
   const storyName = "story-00000000-0000-4000-8000-000000000001-Week-5-Update.txt";
-  const { elements, calls, authEvent } = setup("", [
+  const { elements, calls, authEvent } = setup("#coach-login", [
     { id: "story-id", name: storyName },
   ], "Week 5 Update\n\nThe first paragraph.\n\nThe second paragraph.");
   await new Promise(setImmediate);
