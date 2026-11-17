@@ -13,10 +13,10 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261115-10/);
+  assert.match(page, /styles\.css\?v=20261115-11/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
-  assert.match(page, /coach-thoughts\.js\?v=20261115-1/);
+  assert.match(page, /coach-thoughts\.js\?v=20261117-1/);
   assert.match(page, /id="thoughts-story-sport"/);
 });
 
@@ -224,8 +224,9 @@ test("requests a recovery link using the current site URL", async () => {
 });
 
 test("existing password sign-in continues to work", async () => {
-  const { elements, calls, authEvent } = setup();
+  const { elements, calls, authEvent } = setup("#coach-login");
   await new Promise(setImmediate);
+  assert.equal(elements.login.hidden, false);
   elements.login.values = { email: "coach@example.com", password: "password" };
   await elements.login.listeners.submit({ preventDefault() {} });
   assert.equal(calls.signIn.email, "coach@example.com");
@@ -233,6 +234,12 @@ test("existing password sign-in continues to work", async () => {
   authEvent("SIGNED_IN", { user: {} });
   assert.equal(elements.login.hidden, true);
   assert.equal(elements.uploader.hidden, false);
+});
+
+test("keeps the sign-in form hidden on the public page", async () => {
+  const { elements } = setup();
+  await new Promise(setImmediate);
+  assert.equal(elements.login.hidden, true);
 });
 
 test("connects the podcast form to the existing sign-in and recovery state", async () => {

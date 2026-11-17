@@ -24,6 +24,7 @@
   const gfflWorkbooks = document.querySelector("#gffl-workbooks");
   const heroInner = document.querySelector(".hero-inner");
   const podcasts = window.createPodcasts();
+  const coachLoginRequested = window.location.hash === "#coach-login";
 
   let statusRevision = 0;
   const updateStatus = (element, message) => {
@@ -118,7 +119,7 @@
 
     const showSession = (session) => {
       activeSession = session;
-      loginForm.hidden = Boolean(session);
+      loginForm.hidden = Boolean(session) || !coachLoginRequested;
       resetForm.hidden = !session || !recoveryMode;
       uploadArea.hidden = !session || recoveryMode;
       podcasts.setSignedIn(Boolean(session) && !recoveryMode);
