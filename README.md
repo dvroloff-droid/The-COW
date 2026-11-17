@@ -74,7 +74,8 @@ reset before redirecting back to the site.
 On the published site, enter the authorized account's email and select
 **Send password reset link** at
 `https://dvroloff-droid.github.io/The-COW/#coach-login`. The sign-in form is
-hidden from the regular public page. This URL only reveals the form; Supabase
-authentication and storage policies continue to control access. Open the
-latest reset link in the email and enter the new password on the site. Links
-expire and can be used only once; request a new one if needed.
+hidden from the regular public page, and upload/editing controls remain hidden
+there even for signed-in users. This URL reveals those controls; Supabase
+authentication and storage policies continue to control access. Open the latest
+reset link in the email and enter the new password on the site. Links expire
+and can be used only once; request a new one if needed.

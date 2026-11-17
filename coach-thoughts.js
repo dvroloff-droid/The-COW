@@ -121,9 +121,11 @@
       activeSession = session;
       loginForm.hidden = Boolean(session) || !coachLoginRequested;
       resetForm.hidden = !session || !recoveryMode;
-      uploadArea.hidden = !session || recoveryMode;
-      podcasts.setSignedIn(Boolean(session) && !recoveryMode);
-      for (const button of storyEditButtons) button.hidden = !session || recoveryMode;
+      uploadArea.hidden = !session || recoveryMode || !coachLoginRequested;
+      podcasts.setSignedIn(Boolean(session) && !recoveryMode && coachLoginRequested);
+      for (const button of storyEditButtons) {
+        button.hidden = !session || recoveryMode || !coachLoginRequested;
+      }
     };
 
     const loadFiles = async (preserveStatus = false, openStoryName = null) => {
