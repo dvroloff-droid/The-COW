@@ -28,7 +28,8 @@ test("orders EPL Fantasy, its link, spreadsheets, and articles in section 04", (
   const section = page.slice(sectionStart, sectionEnd);
 
   assert.ok(section.indexOf("<h3>EPL Fantasy</h3>") < section.indexOf("https://fantasy.premierleague.com/en/"));
-  assert.ok(section.indexOf("https://fantasy.premierleague.com/en/") < section.indexOf('id="epl-workbooks"'));
+  assert.ok(section.indexOf("https://fantasy.premierleague.com/en/") < section.indexOf("The GFFL Spreadsheet"));
+  assert.ok(section.indexOf("The GFFL Spreadsheet") < section.indexOf('id="epl-workbooks"'));
   assert.ok(section.indexOf('id="epl-workbooks"') < section.indexOf('id="fantasy-updates-list"'));
   const thirdSection = page.slice(page.indexOf('<span class="card-number">03</span>'), sectionStart);
   assert.ok(!thirdSection.includes("The GFFL"));
