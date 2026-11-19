@@ -999,6 +999,24 @@ main,
   text-underline-offset: 2px;
 }
 
+.fantasy-updates-list {
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fantasy-updates-list li {
+  padding: 0.35rem 0;
+  border-top: 1px dotted var(--rule-light);
+}
+
+.fantasy-updates-list a {
+  color: var(--red);
+  font: 700 0.76rem/1.35 var(--sans);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
 .download-briefing {
   display: flex;
   align-items: center;
