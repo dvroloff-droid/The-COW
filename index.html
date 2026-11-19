@@ -109,22 +109,13 @@
                 </div>
               </article>
               <article class="room-card room-card-featured" role="listitem">
-                <div class="card-top"><span class="card-number">04</span><span class="card-tag">THE PLAYBOOK</span></div>
+                <div class="card-top"><span class="card-number">04</span><span class="card-tag">FANTASY SPORTS</span></div>
                 <div class="card-content">
-                  <h3>Must-listen Podcasts</h3>
-                  <p>Podcasts worth listening to.</p>
-                  <ul id="podcast-list" class="podcast-list" aria-live="polite"></ul>
-                  <p id="podcast-status" class="podcast-status" role="status" aria-live="polite">Loading podcasts...</p>
-                  <p id="podcast-sign-in">Podcast additions are managed by the site owner.</p>
-                  <form id="podcast-form" class="podcast-form" hidden>
-                    <label for="podcast-title">Podcast name</label>
-                    <input id="podcast-title" type="text" maxlength="160" required />
-                    <label for="podcast-url">Podcast link</label>
-                    <input id="podcast-url" type="url" maxlength="2048" placeholder="https://..." required />
-                    <label for="podcast-description">Description</label>
-                    <textarea id="podcast-description" maxlength="500" rows="3" placeholder="What is this podcast about?"></textarea>
-                    <button type="submit">Add podcast</button>
-                  </form>
+                  <h3>Fantasy Sports Updates</h3>
+                  <p>Articles, insights, and updates from the fantasy leagues you follow.</p>
+                  <ul id="fantasy-updates-list" class="fantasy-updates-list" aria-live="polite">
+                    <li>No fantasy sports updates have been published yet.</li>
+                  </ul>
                 </div>
               </article>
               <article class="room-card room-card-light" id="milwaukee-angels" role="listitem">
@@ -186,12 +177,21 @@
             </article>
 
             <article class="news-item">
-              <div class="news-meta"><span>FANTASY SPORTS</span></div>
-              <h2>Fantasy Sports Updates</h2>
-              <p>Articles, insights, and updates from the fantasy leagues you follow.</p>
-              <ul id="fantasy-updates-list" class="fantasy-updates-list" aria-live="polite">
-                <li>No fantasy sports updates have been published yet.</li>
-              </ul>
+              <div class="news-meta"><span>THE PLAYBOOK</span></div>
+              <h2>Must-listen Podcasts</h2>
+              <p>Podcasts worth listening to.</p>
+              <ul id="podcast-list" class="podcast-list" aria-live="polite"></ul>
+              <p id="podcast-status" class="podcast-status" role="status" aria-live="polite">Loading podcasts...</p>
+              <p id="podcast-sign-in">Podcast additions are managed by the site owner.</p>
+              <form id="podcast-form" class="podcast-form" hidden>
+                <label for="podcast-title">Podcast name</label>
+                <input id="podcast-title" type="text" maxlength="160" required />
+                <label for="podcast-url">Podcast link</label>
+                <input id="podcast-url" type="url" maxlength="2048" placeholder="https://..." required />
+                <label for="podcast-description">Description</label>
+                <textarea id="podcast-description" maxlength="500" rows="3" placeholder="What is this podcast about?"></textarea>
+                <button type="submit">Add podcast</button>
+              </form>
             </article>
           </aside>
 
