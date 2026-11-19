@@ -44,11 +44,11 @@ type up to 20 MB.
    uploaders can keep editing them. Stories set to "Coach's Thoughts only"
    appear only in the shared library, and older plain-text stories remain
    readable there until edited. Choose "Fantasy Sports Updates" in the article
-   editor's Article section menu to add a headline to the homepage's right-column
-   update list; these articles also remain available in the shared library.
+   editor's Article section menu to add a headline to the homepage's EPL Fantasy
+   article list; these articles also remain available in the shared library.
    Authorized uploaders can also share `.xlsx`, `.xls`, and `.xlsm`
    workbooks up to 20 MB. Workbooks are stored unchanged, preserving every
-   worksheet, and appear as public download links under The GFFL section.
+   worksheet, and appear as public download links under EPL Fantasy.
    Visitors can download a copy but cannot modify the shared original; only
    authorized accounts can upload files.
 

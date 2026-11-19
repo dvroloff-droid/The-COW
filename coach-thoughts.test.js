@@ -12,14 +12,27 @@ const storagePolicies = fs.readFileSync(`${__dirname}/supabase-setup.sql`, "utf8
 test("places article and spreadsheet uploads below the published article archive", () => {
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
-  assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261119-1/);
+  assert.match(page, /id="epl-workbooks"/);
+  assert.match(page, /styles\.css\?v=20261119-2/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
   assert.match(page, /coach-thoughts\.js\?v=20261119-1/);
   assert.match(page, /id="thoughts-story-sport"/);
   assert.match(page, /id="thoughts-story-placement"/);
   assert.match(page, /id="fantasy-updates-list"/);
+});
+
+test("orders EPL Fantasy, its link, spreadsheets, and articles in section 04", () => {
+  const sectionStart = page.indexOf('<span class="card-number">04</span>');
+  const sectionEnd = page.indexOf('<span class="card-number">05</span>', sectionStart);
+  const section = page.slice(sectionStart, sectionEnd);
+
+  assert.ok(section.indexOf("<h3>EPL Fantasy</h3>") < section.indexOf("https://fantasy.premierleague.com/en/"));
+  assert.ok(section.indexOf("https://fantasy.premierleague.com/en/") < section.indexOf('id="epl-workbooks"'));
+  assert.ok(section.indexOf('id="epl-workbooks"') < section.indexOf('id="fantasy-updates-list"'));
+  const thirdSection = page.slice(page.indexOf('<span class="card-number">03</span>'), sectionStart);
+  assert.ok(!thirdSection.includes("The GFFL"));
+  assert.ok(!thirdSection.includes("epl-workbooks"));
 });
 
 test("uses a shared font size for the three column headings", () => {
@@ -74,7 +87,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
   const elements = {};
   for (const id of [
     "status", "login", "reset-request", "reset", "uploader", "upload", "file",
-    "spreadsheet", "spreadsheet-file", "spreadsheet-status", "gffl-workbooks",
+    "spreadsheet", "spreadsheet-file", "spreadsheet-status", "epl-workbooks",
     "story", "story-title", "story-editor", "story-add-image", "story-image",
     "story-sport", "story-placement", "story-again", "story-status",
     "signout", "list",
@@ -286,15 +299,15 @@ test("shares Excel workbooks unchanged through public read-only download links",
     assert.equal(calls.upload.options.contentType, contentType);
     assert.equal(calls.upload.options.upsert, false);
     assert.equal(elements.spreadsheet.wasReset, true);
-    assert.match(elements["spreadsheet-status"].textContent, /public download link is under The GFFL/);
-    const sharedWorkbookLink = elements["gffl-workbooks"].children[0].children[0];
+    assert.match(elements["spreadsheet-status"].textContent, /public download link is under EPL Fantasy/);
+    const sharedWorkbookLink = elements["epl-workbooks"].children[0].children[0];
     assert.equal(sharedWorkbookLink.textContent, filename);
     assert.match(sharedWorkbookLink.href, /\?download$/);
     assert.equal(elements.list.children[0].textContent, "No articles or other shared files have been published.");
   }
 });
 
-test("keeps GFFL workbooks under GFFL while articles stay in the published archive", async () => {
+test("keeps EPL Fantasy spreadsheets separate from articles in the published archive", async () => {
   const { elements } = setup("", [
     { id: "workbook-id", name: "00000000-0000-4000-8000-000000000001-League-Standings.xlsx" },
     { id: "story-id", name: "story-00000000-0000-4000-8000-000000000002-League-update.json" },
@@ -302,8 +315,8 @@ test("keeps GFFL workbooks under GFFL while articles stay in the published archi
   ]);
   await new Promise(setImmediate);
 
-  assert.equal(elements["gffl-workbooks"].children.length, 1);
-  assert.equal(elements["gffl-workbooks"].children[0].children[0].textContent, "League-Standings.xlsx");
+  assert.equal(elements["epl-workbooks"].children.length, 1);
+  assert.equal(elements["epl-workbooks"].children[0].children[0].textContent, "League-Standings.xlsx");
   assert.equal(elements.list.children.length, 2);
   assert.equal(elements.list.children[0].children[0].tagName, "details");
   assert.equal(elements.list.children[1].children[0].textContent, "rules.pdf");
@@ -329,13 +342,13 @@ test("lists only the latest upload for each workbook filename", async () => {
   ]);
   await new Promise(setImmediate);
 
-  assert.equal(elements["gffl-workbooks"].children.length, 2);
-  assert.equal(elements["gffl-workbooks"].children[0].children[0].textContent, "league-standings.xlsx");
+  assert.equal(elements["epl-workbooks"].children.length, 2);
+  assert.equal(elements["epl-workbooks"].children[0].children[0].textContent, "league-standings.xlsx");
   assert.match(
-    elements["gffl-workbooks"].children[0].children[0].href,
+    elements["epl-workbooks"].children[0].children[0].href,
     /00000000-0000-4000-8000-000000000002-league-standings\.xlsx\?download$/,
   );
-  assert.equal(elements["gffl-workbooks"].children[1].children[0].textContent, "Playoff-Bracket.xlsx");
+  assert.equal(elements["epl-workbooks"].children[1].children[0].textContent, "Playoff-Bracket.xlsx");
 });
 
 test("rejects unsupported and oversized files before uploading", async () => {
@@ -375,7 +388,7 @@ test("reports spreadsheet upload errors without discarding the selected workbook
   assert.equal(elements.spreadsheet.button.disabled, false);
 });
 
-test("reports a list refresh failure in the GFFL section after an upload", async () => {
+test("reports a spreadsheet list refresh failure after an upload", async () => {
   const { elements, bucket } = setup();
   await new Promise(setImmediate);
   const workbook = new Blob(["complete workbook"]);
@@ -385,8 +398,8 @@ test("reports a list refresh failure in the GFFL section after an upload", async
 
   await elements.spreadsheet.listeners.submit({ preventDefault() {} });
 
-  assert.match(elements["spreadsheet-status"].textContent, /uploaded, but The GFFL list couldn't refresh/);
-  assert.match(elements["gffl-workbooks"].children[0].textContent, /Could not load GFFL workbooks/);
+  assert.match(elements["spreadsheet-status"].textContent, /uploaded, but the EPL Fantasy spreadsheet list couldn't refresh/);
+  assert.match(elements["epl-workbooks"].children[0].textContent, /Could not load EPL Fantasy spreadsheets/);
   assert.match(elements.status.textContent, /List unavailable/);
 });
 
@@ -446,7 +459,7 @@ test("publishes a full article as a formatted shared file", async () => {
   assert.equal(elements["story-title"].focused, true);
 });
 
-test("publishes fantasy articles into the right-column update list", async () => {
+test("publishes fantasy articles into the EPL Fantasy list", async () => {
   const { elements, calls } = setup();
   await new Promise(setImmediate);
   elements["story-title"].value = "Week 4 Waiver Wire";
@@ -464,7 +477,7 @@ test("publishes fantasy articles into the right-column update list", async () =>
   assert.equal(elements["fantasy-updates-list"].children[0].children[0].href, "#thoughts");
 });
 
-test("opens a fantasy update from the right-column list in the shared story archive", async () => {
+test("opens a fantasy update from the EPL Fantasy list in the shared story archive", async () => {
   const storyName = "story-fantasy-00000000-0000-4000-8000-000000000001-Week-4-Waivers.json";
   const { elements } = setup("", [{ id: "story-id", name: storyName }]);
   await new Promise(setImmediate);

@@ -462,7 +462,7 @@ main,
 .card-children {
   grid-column: 2;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.7rem;
   margin: 0.35rem 0 0.15rem;
   padding-top: 0.38rem;
@@ -483,19 +483,19 @@ main,
   font-size: 0.7rem;
 }
 
-.gffl-workbooks {
+.epl-workbooks {
   margin: 0.2rem 0 0;
   padding: 0;
   list-style: none;
 }
 
-.gffl-workbooks li {
+.epl-workbooks li {
   margin-top: 0.15rem;
   font-size: 0.68rem;
   overflow-wrap: anywhere;
 }
 
-.gffl-workbooks a {
+.epl-workbooks a {
   color: var(--red);
   font-weight: 700;
   text-decoration-thickness: 1px;

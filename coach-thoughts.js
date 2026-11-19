@@ -22,7 +22,7 @@
   const storyStatus = document.querySelector("#thoughts-story-status");
   const signOutButton = document.querySelector("#thoughts-signout");
   const fileList = document.querySelector("#thoughts-list");
-  const gfflWorkbooks = document.querySelector("#gffl-workbooks");
+  const eplWorkbooks = document.querySelector("#epl-workbooks");
   const fantasyUpdatesList = document.querySelector("#fantasy-updates-list");
   const heroInner = document.querySelector(".hero-inner");
   const podcasts = window.createPodcasts();
@@ -57,7 +57,7 @@
   const setWorkbookMessage = (message) => {
     const item = document.createElement("li");
     item.textContent = message;
-    gfflWorkbooks.replaceChildren(item);
+    eplWorkbooks.replaceChildren(item);
   };
   const setFantasyUpdateMessage = (message) => {
     const item = document.createElement("li");
@@ -68,7 +68,7 @@
   const showSetupInstructions = () => {
     podcasts.unavailable("Connect Supabase to load podcasts.");
     setStatus("Connect a Supabase project to enable file uploads. See the setup instructions.");
-    setWorkbookMessage("Connect Supabase to load GFFL workbooks.");
+    setWorkbookMessage("Connect Supabase to load EPL Fantasy spreadsheets.");
     setFantasyUpdateMessage("Connect Supabase to load fantasy sports updates.");
     fileList.replaceChildren();
     const item = document.createElement("li");
@@ -93,7 +93,7 @@
     if (!window.supabase?.createClient) {
       podcasts.unavailable("Could not load podcasts. Check your connection and refresh.");
       setStatus("The Supabase client could not be loaded. Check your connection and refresh.");
-      setWorkbookMessage("Could not load GFFL workbooks. Check your connection and refresh.");
+      setWorkbookMessage("Could not load EPL Fantasy spreadsheets. Check your connection and refresh.");
       return;
     }
 
@@ -140,7 +140,7 @@
       const startingRevision = statusRevision;
       heroInner.classList.remove("newspaper-reading");
       fileList.replaceChildren();
-      gfflWorkbooks.replaceChildren();
+      eplWorkbooks.replaceChildren();
       fantasyUpdatesList.replaceChildren();
       try {
         const { data, error } = await bucket.list("", {
@@ -150,7 +150,7 @@
 
         if (error) {
           showError("Could not load shared files", error);
-          setWorkbookMessage("Could not load GFFL workbooks. Refresh the page to retry.");
+          setWorkbookMessage("Could not load EPL Fantasy spreadsheets. Refresh the page to retry.");
           setFantasyUpdateMessage("Could not load fantasy sports updates. Refresh the page to retry.");
           return false;
         }
@@ -181,8 +181,8 @@
           item.textContent = "Your shared files and stories will appear here.";
           fileList.append(item);
           const workbookItem = document.createElement("li");
-          workbookItem.textContent = "GFFL workbooks will appear here.";
-          gfflWorkbooks.append(workbookItem);
+          workbookItem.textContent = "EPL Fantasy spreadsheets will appear here.";
+          eplWorkbooks.append(workbookItem);
           setFantasyUpdateMessage("No fantasy sports updates have been published yet.");
           return !openStoryName;
         }
@@ -337,7 +337,7 @@
           if (/\.(xlsx|xls|xlsm)$/i.test(file.name)) {
             const workbookName = workbookKey(file.name);
             if (latestWorkbooks.get(workbookName) === file) {
-              gfflWorkbooks.append(item);
+              eplWorkbooks.append(item);
               workbookCount++;
             }
           } else {
@@ -352,8 +352,8 @@
         }
         if (workbookCount === 0) {
           const item = document.createElement("li");
-          item.textContent = "GFFL workbooks will appear here.";
-          gfflWorkbooks.append(item);
+          item.textContent = "EPL Fantasy spreadsheets will appear here.";
+          eplWorkbooks.append(item);
         }
         if (fantasyUpdateCount === 0) {
           setFantasyUpdateMessage("No fantasy sports updates have been published yet.");
@@ -368,7 +368,7 @@
         return !openStoryName || Boolean(openedStory);
       } catch (error) {
         showError("Could not load shared files", error);
-        setWorkbookMessage("Could not load GFFL workbooks. Refresh the page to retry.");
+        setWorkbookMessage("Could not load EPL Fantasy spreadsheets. Refresh the page to retry.");
         return false;
       }
     };
@@ -452,8 +452,8 @@
         spreadsheetForm.reset();
         const refreshed = await loadFiles(true);
         setSpreadsheetStatus(refreshed
-          ? "Workbook shared successfully. Its public download link is under The GFFL."
-          : "Workbook uploaded, but The GFFL list couldn't refresh. Reload the page to find it.");
+          ? "Workbook shared successfully. Its public download link is under EPL Fantasy."
+          : "Workbook uploaded, but the EPL Fantasy spreadsheet list couldn't refresh. Reload the page to find it.");
       } catch (error) {
         showError("Could not share workbook", error, setSpreadsheetStatus);
       } finally {

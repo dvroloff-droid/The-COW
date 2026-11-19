@@ -160,7 +160,7 @@ test("loads every page of podcast links", async () => {
 });
 
 test("places the podcast section in Around the office and loads its script", () => {
-  assert.match(page, /<h3>Must-listen Podcasts<\/h3>/);
+  assert.match(page, /<h2>Must-listen Podcasts<\/h2>/);
   assert.match(page, /id="podcast-form"[^>]*hidden/);
   assert.match(page, /<textarea id="podcast-description" maxlength="500"/);
   assert.match(page, /podcasts\.js\?v=20261115-1/);
@@ -172,7 +172,7 @@ test("keeps Around the office sections in the requested order", () => {
     ["01", "Coaching lessons"],
     ["02", "Coaching tips &amp; clips"],
     ["03", "ESPN Fantasy"],
-    ["04", "Must-listen Podcasts"],
+    ["04", "EPL Fantasy"],
     ["05", "Milwaukee Angels U-11"],
     ["06", "Madison College"],
   ]);
