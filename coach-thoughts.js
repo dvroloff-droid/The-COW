@@ -14,6 +14,7 @@
   const storySubmitButton = storyForm.querySelector('button[type="submit"]');
   const storyTitleInput = document.querySelector("#thoughts-story-title");
   const storySportInput = document.querySelector("#thoughts-story-sport");
+  const storyPlacementInput = document.querySelector("#thoughts-story-placement");
   const storyEditor = document.querySelector("#thoughts-story-editor");
   const storyImageButton = document.querySelector("#thoughts-story-add-image");
   const storyImageInput = document.querySelector("#thoughts-story-image");
@@ -22,6 +23,7 @@
   const signOutButton = document.querySelector("#thoughts-signout");
   const fileList = document.querySelector("#thoughts-list");
   const gfflWorkbooks = document.querySelector("#gffl-workbooks");
+  const fantasyUpdatesList = document.querySelector("#fantasy-updates-list");
   const heroInner = document.querySelector(".hero-inner");
   const podcasts = window.createPodcasts();
   const coachLoginRequested = window.location.hash === "#coach-login";
@@ -57,11 +59,17 @@
     item.textContent = message;
     gfflWorkbooks.replaceChildren(item);
   };
+  const setFantasyUpdateMessage = (message) => {
+    const item = document.createElement("li");
+    item.textContent = message;
+    fantasyUpdatesList.replaceChildren(item);
+  };
 
   const showSetupInstructions = () => {
     podcasts.unavailable("Connect Supabase to load podcasts.");
     setStatus("Connect a Supabase project to enable file uploads. See the setup instructions.");
     setWorkbookMessage("Connect Supabase to load GFFL workbooks.");
+    setFantasyUpdateMessage("Connect Supabase to load fantasy sports updates.");
     fileList.replaceChildren();
     const item = document.createElement("li");
     const link = document.createElement("a");
@@ -133,6 +141,7 @@
       heroInner.classList.remove("newspaper-reading");
       fileList.replaceChildren();
       gfflWorkbooks.replaceChildren();
+      fantasyUpdatesList.replaceChildren();
       try {
         const { data, error } = await bucket.list("", {
           limit: 100,
@@ -142,6 +151,7 @@
         if (error) {
           showError("Could not load shared files", error);
           setWorkbookMessage("Could not load GFFL workbooks. Refresh the page to retry.");
+          setFantasyUpdateMessage("Could not load fantasy sports updates. Refresh the page to retry.");
           return false;
         }
 
@@ -173,12 +183,14 @@
           const workbookItem = document.createElement("li");
           workbookItem.textContent = "GFFL workbooks will appear here.";
           gfflWorkbooks.append(workbookItem);
+          setFantasyUpdateMessage("No fantasy sports updates have been published yet.");
           return !openStoryName;
         }
 
         let openedStory = null;
         let archiveItemCount = 0;
         let workbookCount = 0;
+        let fantasyUpdateCount = 0;
         for (const file of files) {
           const item = document.createElement("li");
           if (file.name.startsWith("story-")) {
@@ -205,7 +217,7 @@
               storyEditButtons.add(storyEditButton);
             }
             const storySlug = file.name
-              .replace(/^story-[0-9a-f-]{36}-/i, "")
+              .replace(/^story-(?:fantasy-)?[0-9a-f-]{36}-/i, "")
               .replace(/\.(txt|json)$/i, "")
               .replace(/-/g, " ");
             const keepExpanded = storySlug.trim().toLowerCase() ===
@@ -278,6 +290,10 @@
                       storyEditor.append(paragraphElement);
                     }
                   }
+                  storyPlacementInput.value = file.name.startsWith("story-fantasy-")
+                    ? "fantasy"
+                    : "";
+                  storyPlacementInput.disabled = true;
                   editingStoryName = file.name;
                   storyForm.hidden = false;
                   storyAgainButton.hidden = false;
@@ -297,6 +313,19 @@
               openedStory = details;
             }
             item.append(details);
+            if (file.name.startsWith("story-fantasy-")) {
+              const updateItem = document.createElement("li");
+              const updateLink = document.createElement("a");
+              updateLink.href = "#thoughts";
+              updateLink.textContent = storySlug || "Read fantasy update";
+              updateLink.addEventListener("click", async (event) => {
+                event.preventDefault();
+                await loadFiles(true, file.name);
+              });
+              updateItem.append(updateLink);
+              fantasyUpdatesList.append(updateItem);
+              fantasyUpdateCount++;
+            }
           } else {
             const link = document.createElement("a");
             link.href = bucket.getPublicUrl(file.name, { download: true }).data.publicUrl;
@@ -325,6 +354,9 @@
           const item = document.createElement("li");
           item.textContent = "GFFL workbooks will appear here.";
           gfflWorkbooks.append(item);
+        }
+        if (fantasyUpdateCount === 0) {
+          setFantasyUpdateMessage("No fantasy sports updates have been published yet.");
         }
 
         if (!preserveStatus && statusRevision === startingRevision) {
@@ -554,6 +586,7 @@
         editingStoryName = null;
         storyForm.reset();
         storyEditor.replaceChildren();
+        storyPlacementInput.disabled = false;
         storySubmitButton.textContent = "Publish story";
       }
       storyForm.hidden = false;
@@ -572,6 +605,7 @@
       }
       const storyTitle = storyTitleInput.value.trim();
       const storySport = storySportInput.value;
+      const storyPlacement = storyPlacementInput.value;
       const storyHtml = storyEditor.innerHTML.trim();
       if (!storyTitle) {
         setStoryStatus("Enter a headline before publishing your article.");
@@ -608,8 +642,9 @@
           ?.normalize("NFKC")
           .replace(/[^\w.-]+/g, "-")
           .replace(/^-+|-+$/g, "");
+        const storyPrefix = storyPlacement === "fantasy" ? "story-fantasy-" : "story-";
         const objectName = editingStoryName ||
-          `story-${crypto.randomUUID()}-${safeTitle || "untitled"}.json`;
+          `${storyPrefix}${crypto.randomUUID()}-${safeTitle || "untitled"}.json`;
         const wasEditing = Boolean(editingStoryName);
         const { error } = await bucket.upload(objectName, storyFile, {
           cacheControl: "0",
@@ -641,6 +676,7 @@
         storyEditor.replaceChildren();
         storySubmitButton.textContent = "Publish story";
         editingStoryName = null;
+        storyPlacementInput.disabled = false;
         storyForm.hidden = true;
         storyAgainButton.hidden = false;
         storyAgainButton.textContent = "Write another article";

@@ -13,11 +13,13 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="gffl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261117-1/);
+  assert.match(page, /styles\.css\?v=20261119-1/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
-  assert.match(page, /coach-thoughts\.js\?v=20261117-2/);
+  assert.match(page, /coach-thoughts\.js\?v=20261119-1/);
   assert.match(page, /id="thoughts-story-sport"/);
+  assert.match(page, /id="thoughts-story-placement"/);
+  assert.match(page, /id="fantasy-updates-list"/);
 });
 
 test("uses a shared font size for the three column headings", () => {
@@ -74,8 +76,9 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     "status", "login", "reset-request", "reset", "uploader", "upload", "file",
     "spreadsheet", "spreadsheet-file", "spreadsheet-status", "gffl-workbooks",
     "story", "story-title", "story-editor", "story-add-image", "story-image",
-    "story-sport", "story-again", "story-status",
+    "story-sport", "story-placement", "story-again", "story-status",
     "signout", "list",
+    "fantasy-updates-list",
   ]) {
     elements[id] = {
       hidden: true,
@@ -443,6 +446,38 @@ test("publishes a full article as a formatted shared file", async () => {
   assert.equal(elements["story-title"].focused, true);
 });
 
+test("publishes fantasy articles into the right-column update list", async () => {
+  const { elements, calls } = setup();
+  await new Promise(setImmediate);
+  elements["story-title"].value = "Week 4 Waiver Wire";
+  elements["story-placement"].value = "fantasy";
+  elements["story-editor"].textContent = "Players to watch this week.";
+  elements["story-editor"].innerHTML = "<p>Players to watch this week.</p>";
+
+  await elements.story.listeners.submit({ preventDefault() {} });
+
+  assert.equal(
+    calls.upload.name,
+    "story-fantasy-00000000-0000-4000-8000-000000000001-Week-4-Waiver-Wire.json",
+  );
+  assert.equal(elements["fantasy-updates-list"].children[0].children[0].textContent, "Week 4 Waiver Wire");
+  assert.equal(elements["fantasy-updates-list"].children[0].children[0].href, "#thoughts");
+});
+
+test("opens a fantasy update from the right-column list in the shared story archive", async () => {
+  const storyName = "story-fantasy-00000000-0000-4000-8000-000000000001-Week-4-Waivers.json";
+  const { elements } = setup("", [{ id: "story-id", name: storyName }]);
+  await new Promise(setImmediate);
+
+  const updateLink = elements["fantasy-updates-list"].children[0].children[0];
+  assert.equal(updateLink.textContent, "Week 4 Waivers");
+  await updateLink.listeners.click({ preventDefault() {} });
+
+  const details = elements.list.children[0].children[0];
+  assert.equal(details.open, true);
+  assert.equal(details.scrolledIntoView, true);
+});
+
 test("edits a published article in place and preserves its file name", async () => {
   const storyName = "story-00000000-0000-4000-8000-000000000001-GFFL-Update.json";
   const { elements, calls, authEvent } = setup("#coach-login", [
@@ -457,6 +492,8 @@ test("edits a published article in place and preserves its file name", async () 
   await editButton.listeners.click();
 
   assert.equal(elements.story.hidden, false);
+  assert.equal(elements["story-placement"].value, "");
+  assert.equal(elements["story-placement"].disabled, true);
   assert.equal(elements["story-title"].value, "The GFFL Update");
   assert.equal(elements["story-sport"].value, "basketball");
   assert.equal(elements.story.button.textContent, "Save changes");
