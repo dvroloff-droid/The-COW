@@ -58,6 +58,18 @@
     item.textContent = message;
     fantasyUpdatesList.replaceChildren(item);
   };
+  const trimLeadingBlankLines = (body) => {
+    while (body.firstChild) {
+      const node = body.firstChild;
+      const blankText = !node.textContent.replace(/[\s\u200b\ufeff]/g, "");
+      const tagName = node.nodeType === 1 ? node.tagName.toLowerCase() : "";
+      const blankParagraph = tagName === "p" &&
+        blankText && !node.querySelector("img");
+      if (!(node.nodeType === 3 && blankText) &&
+          tagName !== "br" && !blankParagraph) break;
+      body.removeChild(node);
+    }
+  };
 
   const showSetupInstructions = () => {
     podcasts.unavailable("Connect Supabase to load podcasts.");
@@ -268,6 +280,7 @@
                     storyBody.append(paragraphElement);
                   }
                 }
+                if (isFantasyStory) trimLeadingBlankLines(storyBody);
                 loaded = true;
                 if (isFantasyStory) summary.hidden = true;
               } catch (error) {

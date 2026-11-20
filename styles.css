@@ -1032,6 +1032,14 @@ main,
   line-height: 1.5;
 }
 
+.fantasy-updates-list .shared-story-body {
+  padding-top: 0.2rem;
+}
+
+.fantasy-updates-list .shared-story-body > p:first-child {
+  margin-top: 0;
+}
+
 .download-briefing {
   display: flex;
   align-items: center;

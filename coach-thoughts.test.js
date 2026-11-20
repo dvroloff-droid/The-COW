@@ -13,10 +13,10 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="epl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261120-3/);
+  assert.match(page, /styles\.css\?v=20261120-4/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
-  assert.match(page, /coach-thoughts\.js\?v=20261120-2/);
+  assert.match(page, /coach-thoughts\.js\?v=20261120-3/);
   assert.match(page, /id="thoughts-story-sport"/);
   assert.match(page, /id="thoughts-story-placement"/);
   assert.match(page, /id="fantasy-updates-list"/);
@@ -176,13 +176,23 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     }),
   };
   const createElement = (tagName) => ({
+    nodeType: 1,
     tagName,
     children: [],
     listeners: {},
     attributes: {},
+    get firstChild() { return this.children[0] || null; },
+    get textContent() {
+      return this._textContent ?? this.children.map((child) => child.textContent || "").join("");
+    },
+    set textContent(value) { this._textContent = value; this.children = []; },
     addEventListener(event, callback) { this.listeners[event] = callback; },
-    replaceChildren(...children) { this.children = children; },
+    replaceChildren(...children) { this._textContent = undefined; this.children = children; },
     append(...children) { this.children.push(...children); },
+    removeChild(child) { this.children.splice(this.children.indexOf(child), 1); },
+    querySelector(selector) {
+      return this.children.find((child) => child.tagName === selector || child.querySelector?.(selector)) || null;
+    },
     getAttribute(name) { return this.attributes[name] || null; },
     scrollIntoView() { this.scrolledIntoView = true; },
     open: false,
@@ -555,6 +565,52 @@ test("allows a failed EPL Fantasy article load to be retried", async () => {
   await details.listeners.toggle();
   assert.equal(details.children[0].hidden, true);
   assert.equal(details.children[1].children[0].children[1].textContent, "Pep");
+});
+
+test("removes only leading blank lines from an EPL article", async () => {
+  const paragraph = (children) => ({ nodeType: 1, tagName: "P", childNodes: children });
+  const text = (value) => ({ nodeType: 3, textContent: value });
+  const lineBreak = { nodeType: 1, tagName: "BR", childNodes: [] };
+  const { elements } = setup("", [{
+    id: "fantasy",
+    name: "story-fantasy-00000000-0000-4000-8000-000000000001-Pep.json",
+  }], JSON.stringify({ title: "Pep", html: "<p>Body</p>" }), [
+    text("\n"),
+    paragraph([lineBreak]),
+    paragraph([text("\u00a0")]),
+    paragraph([text("The opening paragraph.")]),
+    paragraph([lineBreak]),
+    paragraph([text("The next paragraph.")]),
+  ]);
+  await new Promise(setImmediate);
+  const details = elements["fantasy-updates-list"].children[0].children[0];
+  await details.listeners.toggle();
+  const body = details.children[1].children[1];
+  assert.equal(body.children.length, 3);
+  assert.equal(body.children[0].textContent, "The opening paragraph.");
+  assert.equal(body.children[1].children[0].tagName, "br");
+  assert.equal(body.children[2].textContent, "The next paragraph.");
+});
+
+test("keeps an image at the start of an EPL article", async () => {
+  const { elements } = setup("", [{
+    id: "fantasy",
+    name: "story-fantasy-00000000-0000-4000-8000-000000000001-Pep.json",
+  }], JSON.stringify({ title: "Pep", html: "<p>Image</p>" }), [{
+    nodeType: 1,
+    tagName: "P",
+    childNodes: [{
+      nodeType: 1,
+      tagName: "IMG",
+      getAttribute: (name) => name === "src"
+        ? "https://example.supabase.co/storage/v1/object/public/coach-thoughts/story-images/photo.png"
+        : "",
+    }],
+  }]);
+  await new Promise(setImmediate);
+  const details = elements["fantasy-updates-list"].children[0].children[0];
+  await details.listeners.toggle();
+  assert.equal(details.children[1].children[1].children[0].children[0].tagName, "img");
 });
 
 test("allows signed-in owners to edit an EPL Fantasy article in place", async () => {
