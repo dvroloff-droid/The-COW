@@ -461,6 +461,7 @@ test("publishes a full article as a formatted shared file", async () => {
 });
 
 test("publishes fantasy articles into the EPL Fantasy list", async () => {
+  assert.match(page, /<option value="fantasy">EPL Fantasy<\/option>/);
   const { elements, calls } = setup();
   await new Promise(setImmediate);
   elements["story-title"].value = "Week 4 Waiver Wire";

@@ -43,7 +43,7 @@ type up to 20 MB.
    Sport-archived stories also remain in the shared library so authorized
    uploaders can keep editing them. Stories set to "Coach's Thoughts only"
    appear only in the shared library, and older plain-text stories remain
-   readable there until edited. Choose "Fantasy Sports Updates" in the article
+   readable there until edited. Choose "EPL Fantasy" in the article
    editor's Article section menu to add a headline to the homepage's EPL Fantasy
    article list; these articles also remain available in the shared library.
    Authorized uploaders can also share `.xlsx`, `.xls`, and `.xlsm`
