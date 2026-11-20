@@ -699,6 +699,14 @@ main,
   height: auto;
 }
 
+.shared-story-body figure:has(img[src*="6eb1534a-1126-435d-9626-d440d9abdb70-Julian-Hall.jpeg"]) {
+  margin-inline: 0;
+}
+
+.shared-story-body img[src*="6eb1534a-1126-435d-9626-d440d9abdb70-Julian-Hall.jpeg"] {
+  width: 100%;
+}
+
 .shared-story-body figcaption {
   margin-top: 0.3rem;
   color: var(--muted);
