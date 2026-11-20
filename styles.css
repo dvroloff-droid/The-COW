@@ -1000,9 +1000,15 @@ main,
 }
 
 .fantasy-updates-list {
+  grid-column: 1 / -1;
+  min-width: 0;
   margin: 0.35rem 0 0;
   padding: 0;
   list-style: none;
+}
+
+.fantasy-updates-list .shared-story-article {
+  padding-inline: 0.6rem;
 }
 
 .fantasy-updates-list > li {

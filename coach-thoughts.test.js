@@ -13,7 +13,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="epl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261120-1/);
+  assert.match(page, /styles\.css\?v=20261120-2/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
   assert.match(page, /coach-thoughts\.js\?v=20261120-1/);
@@ -31,6 +31,8 @@ test("orders EPL Fantasy, its link, spreadsheets, and articles in section 04", (
   assert.ok(section.indexOf("https://fantasy.premierleague.com/en/") < section.indexOf("The GFFL Spreadsheet"));
   assert.ok(section.indexOf("The GFFL Spreadsheet") < section.indexOf('id="epl-workbooks"'));
   assert.ok(section.indexOf('id="epl-workbooks"') < section.indexOf('id="fantasy-updates-list"'));
+  assert.match(section, /Fantasy articles<\/p>\s*<\/div>\s*<ul id="fantasy-updates-list"/);
+  assert.match(styles, /\.fantasy-updates-list\s*\{[^}]*grid-column:\s*1\s*\/\s*-1;/);
   const thirdSection = page.slice(page.indexOf('<span class="card-number">03</span>'), sectionStart);
   assert.ok(!thirdSection.includes("The GFFL"));
   assert.ok(!thirdSection.includes("epl-workbooks"));
