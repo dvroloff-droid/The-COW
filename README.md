@@ -48,7 +48,8 @@ type up to 20 MB.
    EPL Fantasy section. Authorized uploaders can edit it there.
    Authorized uploaders can also share `.xlsx`, `.xls`, and `.xlsm`
    workbooks up to 20 MB. Workbooks are stored unchanged, preserving every
-   worksheet, and appear as public download links under EPL Fantasy.
+   worksheet. Only the most recently uploaded workbook appears as a public
+   download link under EPL Fantasy; older uploads remain in storage.
    Visitors can download a copy but cannot modify the shared original; only
    authorized accounts can upload files.
 

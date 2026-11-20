@@ -48,12 +48,6 @@
   const { parseStoryArticle, parsePlainStory, appendSafeStoryNodes } =
     window.COACH_THOUGHTS_STORIES;
   let activeSession = null;
-  const workbookKey = (name) => name
-    .replace(/^[0-9a-f-]{36}-/i, "")
-    .normalize("NFKC")
-    .trim()
-    .replace(/\s+/g, " ")
-    .toLowerCase();
   const setWorkbookMessage = (message) => {
     const item = document.createElement("li");
     item.textContent = message;
@@ -143,32 +137,39 @@
       eplWorkbooks.replaceChildren();
       fantasyUpdatesList.replaceChildren();
       try {
-        const { data, error } = await bucket.list("", {
-          limit: 100,
-          sortBy: { column: "created_at", order: "desc" },
-        });
+        const files = [];
+        const pageSize = 100;
+        let offset = 0;
+        while (true) {
+          const { data, error } = await bucket.list("", {
+            limit: pageSize,
+            offset,
+            sortBy: { column: "created_at", order: "desc" },
+          });
 
-        if (error) {
-          showError("Could not load shared files", error);
-          setWorkbookMessage("Could not load EPL Fantasy spreadsheets. Refresh the page to retry.");
-          setFantasyUpdateMessage("Could not load fantasy sports updates. Refresh the page to retry.");
-          return false;
+          if (error) {
+            showError("Could not load shared files", error);
+            setWorkbookMessage("Could not load EPL Fantasy spreadsheets. Refresh the page to retry.");
+            setFantasyUpdateMessage("Could not load fantasy sports updates. Refresh the page to retry.");
+            return false;
+          }
+          const page = data || [];
+          files.push(...page.filter((file) => file.id));
+          if (page.length < pageSize) break;
+          offset += pageSize;
         }
 
-        const files = (data || []).filter((file) => file.id);
-        const latestWorkbooks = new Map();
+        let latestWorkbook = null;
         for (const file of files) {
           if (!/\.(xlsx|xls|xlsm)$/i.test(file.name)) continue;
-          const workbookName = workbookKey(file.name);
-          const current = latestWorkbooks.get(workbookName);
           const fileCreatedAt = Date.parse(file.created_at || "");
-          const currentCreatedAt = Date.parse(current?.created_at || "");
+          const currentCreatedAt = Date.parse(latestWorkbook?.created_at || "");
           if (
-            !current ||
-            (Number.isFinite(fileCreatedAt) &&
-              (!Number.isFinite(currentCreatedAt) || fileCreatedAt > currentCreatedAt))
+            !latestWorkbook ||
+            (Number.isFinite(fileCreatedAt) && Number.isFinite(currentCreatedAt) &&
+              fileCreatedAt > currentCreatedAt)
           ) {
-            latestWorkbooks.set(workbookName, file);
+            latestWorkbook = file;
           }
         }
         const regularStories = files.filter((file) =>
@@ -339,8 +340,7 @@
             item.append(link);
           }
           if (/\.(xlsx|xls|xlsm)$/i.test(file.name)) {
-            const workbookName = workbookKey(file.name);
-            if (latestWorkbooks.get(workbookName) === file) {
+            if (latestWorkbook === file) {
               eplWorkbooks.append(item);
               workbookCount++;
             }

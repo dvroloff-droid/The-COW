@@ -16,7 +16,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.match(page, /styles\.css\?v=20261120-3/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
-  assert.match(page, /coach-thoughts\.js\?v=20261120-1/);
+  assert.match(page, /coach-thoughts\.js\?v=20261120-2/);
   assert.match(page, /id="thoughts-story-sport"/);
   assert.match(page, /id="thoughts-story-placement"/);
   assert.match(page, /id="fantasy-updates-list"/);
@@ -151,7 +151,10 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     },
   };
   const bucket = {
-    list: async () => ({ data: sharedFiles, error: null }),
+    list: async (path, { limit, offset = 0 }) => ({
+      data: sharedFiles.slice(offset, offset + limit),
+      error: null,
+    }),
     upload: async (name, body, options) => {
       calls.upload = { name, body, options };
       if (name.startsWith("story-") && !name.startsWith("story-images/")) {
@@ -326,7 +329,7 @@ test("keeps EPL Fantasy spreadsheets separate from articles in the published arc
   assert.equal(elements.list.children[1].children[0].textContent, "rules.pdf");
 });
 
-test("lists only the latest upload for each workbook filename", async () => {
+test("lists only the most recently uploaded workbook, regardless of filename", async () => {
   const { elements } = setup("", [
     {
       id: "older-workbook",
@@ -346,13 +349,38 @@ test("lists only the latest upload for each workbook filename", async () => {
   ]);
   await new Promise(setImmediate);
 
-  assert.equal(elements["epl-workbooks"].children.length, 2);
-  assert.equal(elements["epl-workbooks"].children[0].children[0].textContent, "league-standings.xlsx");
+  assert.equal(elements["epl-workbooks"].children.length, 1);
+  assert.equal(elements["epl-workbooks"].children[0].children[0].textContent, "Playoff-Bracket.xlsx");
   assert.match(
     elements["epl-workbooks"].children[0].children[0].href,
-    /00000000-0000-4000-8000-000000000002-league-standings\.xlsx\?download$/,
+    /00000000-0000-4000-8000-000000000003-Playoff-Bracket\.xlsx\?download$/,
   );
-  assert.equal(elements["epl-workbooks"].children[1].children[0].textContent, "Playoff-Bracket.xlsx");
+});
+
+test("finds the latest workbook when shared files span multiple pages", async () => {
+  const files = Array.from({ length: 100 }, (_, index) => ({
+    id: `file-${index}`,
+    name: `file-${index}.pdf`,
+  }));
+  files.push({
+    id: "latest-workbook",
+    name: "00000000-0000-4000-8000-000000000001-The-GFFL-2026-27-Tables-.xlsx",
+    created_at: "2026-11-20T12:00:00Z",
+  });
+  const { elements } = setup("", files);
+  await new Promise(setImmediate);
+  assert.equal(elements["epl-workbooks"].children.length, 1);
+  assert.equal(elements["epl-workbooks"].children[0].children[0].textContent, "The-GFFL-2026-27-Tables-.xlsx");
+});
+
+test("links to the latest of multiple uploads with the same filename", async () => {
+  const { elements } = setup("", [
+    { id: "older", name: "00000000-0000-4000-8000-000000000001-The-GFFL-2026-27-Tables-.xlsx", created_at: "2026-11-19T12:00:00Z" },
+    { id: "newer", name: "00000000-0000-4000-8000-000000000002-The-GFFL-2026-27-Tables-.xlsx", created_at: "2026-11-20T12:00:00Z" },
+  ]);
+  await new Promise(setImmediate);
+  assert.equal(elements["epl-workbooks"].children.length, 1);
+  assert.match(elements["epl-workbooks"].children[0].children[0].href, /000000000002-The-GFFL-2026-27-Tables-\.xlsx\?download$/);
 });
 
 test("rejects unsupported and oversized files before uploading", async () => {
