@@ -171,8 +171,12 @@
             latestWorkbooks.set(workbookName, file);
           }
         }
-        const storyToOpenName = openStoryName ||
-          files.find((file) => file.name.startsWith("story-"))?.name;
+        const regularStories = files.filter((file) =>
+          file.name.startsWith("story-") && !file.name.startsWith("story-fantasy-"));
+        const brewersStory = regularStories.find((file) =>
+          /^story-[0-9a-f-]{36}-The-Brewers-Will-Be-Even-Better-in-2027\.(json|txt)$/i.test(file.name));
+        const requestedRegularStory = regularStories.find((file) => file.name === openStoryName);
+        const storyToOpenName = (requestedRegularStory || brewersStory || regularStories[0])?.name;
         if (files.length === 0) {
           if (!preserveStatus && statusRevision === startingRevision) {
             setStatus("No files or stories have been shared yet.");
@@ -194,6 +198,7 @@
         for (const file of files) {
           const item = document.createElement("li");
           if (file.name.startsWith("story-")) {
+            const isFantasyStory = file.name.startsWith("story-fantasy-");
             const details = document.createElement("details");
             const summary = document.createElement("summary");
             const storyArticle = document.createElement("article");
@@ -206,14 +211,14 @@
             let loading = false;
             storyArticle.className = "shared-story-article";
             storyEyebrow.className = "eyebrow";
-            storyEyebrow.textContent = "COACH'S NOTEBOOK";
+            storyEyebrow.textContent = isFantasyStory ? "EPL FANTASY" : "COACH'S NOTEBOOK";
             storyHeader.className = "shared-story-header";
             storyBody.className = "shared-story-body";
             if (/\.(json|txt)$/i.test(file.name)) {
               storyEditButton.className = "story-edit-button";
               storyEditButton.type = "button";
               storyEditButton.textContent = "Edit article";
-              storyEditButton.hidden = !activeSession || recoveryMode;
+              storyEditButton.hidden = !activeSession || recoveryMode || !coachLoginRequested;
               storyEditButtons.add(storyEditButton);
             }
             const storySlug = file.name
@@ -223,19 +228,22 @@
             const keepExpanded = storySlug.trim().toLowerCase() ===
               "the brewers will be even better in 2027";
             summary.textContent = storySlug || "Read shared story";
-            summary.hidden = keepExpanded;
+            summary.hidden = keepExpanded && file.name === storyToOpenName;
             storyHeader.append(storyEyebrow, storyTitle);
             if (/\.(json|txt)$/i.test(file.name)) storyHeader.append(storyEditButton);
             storyArticle.append(storyHeader, storyBody);
             details.append(summary, storyArticle);
             details.addEventListener("toggle", async () => {
-              if (details.open) {
-                for (const otherDetails of fileList.querySelectorAll("details[open]")) {
-                  if (otherDetails !== details) otherDetails.open = false;
+              if (!isFantasyStory) {
+                if (keepExpanded) summary.hidden = details.open;
+                if (details.open) {
+                  for (const otherDetails of fileList.querySelectorAll("details[open]")) {
+                    if (otherDetails !== details) otherDetails.open = false;
+                  }
+                  heroInner.classList.add("newspaper-reading");
+                } else if (!fileList.querySelector("details[open]")) {
+                  heroInner.classList.remove("newspaper-reading");
                 }
-                heroInner.classList.add("newspaper-reading");
-              } else if (!fileList.querySelector("details[open]")) {
-                heroInner.classList.remove("newspaper-reading");
               }
               if (!details.open || loaded || loading) return;
               loading = true;
@@ -260,9 +268,11 @@
                   }
                 }
                 loaded = true;
+                if (isFantasyStory) summary.hidden = true;
               } catch (error) {
                 showError("Could not load shared story", error);
                 storyBody.textContent = "Could not load this story. Open it again to retry.";
+                if (isFantasyStory) summary.hidden = false;
               } finally {
                 loading = false;
               }
@@ -300,6 +310,7 @@
                   storyAgainButton.textContent = "Cancel editing";
                   storySubmitButton.textContent = "Save changes";
                   setStoryStatus("Edit the article, add pictures, and save your changes.");
+                  if (isFantasyStory) storyForm.scrollIntoView({ block: "start", behavior: "smooth" });
                 } catch (error) {
                   showError("Could not edit article", error, setStoryStatus);
                 } finally {
@@ -307,24 +318,17 @@
                 }
               });
             }
-            details.open = keepExpanded || file.name === storyToOpenName;
-            if (details.open) {
+            details.open = isFantasyStory || file.name === storyToOpenName;
+            if (isFantasyStory) summary.hidden = true;
+            if (details.open && !isFantasyStory) {
               heroInner.classList.add("newspaper-reading");
-              openedStory = details;
             }
+            if (file.name === openStoryName) openedStory = details;
             item.append(details);
-            if (file.name.startsWith("story-fantasy-")) {
-              const updateItem = document.createElement("li");
-              const updateLink = document.createElement("a");
-              updateLink.href = "#thoughts";
-              updateLink.textContent = storySlug || "Read fantasy update";
-              updateLink.addEventListener("click", async (event) => {
-                event.preventDefault();
-                await loadFiles(true, file.name);
-              });
-              updateItem.append(updateLink);
-              fantasyUpdatesList.append(updateItem);
+            if (isFantasyStory) {
+              fantasyUpdatesList.append(item);
               fantasyUpdateCount++;
+              continue;
             }
           } else {
             const link = document.createElement("a");

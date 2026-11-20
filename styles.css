@@ -676,7 +676,7 @@ main,
   font-size: 0.9rem;
 }
 
-.hero-inner.newspaper-reading .shared-story-body {
+.hero-inner.newspaper-reading .thoughts-library .shared-story-body {
   columns: 2 24rem;
   column-gap: clamp(1.5rem, 4vw, 3.5rem);
   column-rule: 1px solid var(--rule-light);
@@ -684,29 +684,29 @@ main,
   line-height: 1.65;
 }
 
-.hero-inner.newspaper-reading .shared-story-body > * {
+.hero-inner.newspaper-reading .thoughts-library .shared-story-body > * {
   break-inside: avoid;
 }
 
-.hero-inner.newspaper-reading .shared-story-body figure {
+.hero-inner.newspaper-reading .thoughts-library .shared-story-body figure {
   margin: 0.8rem 0;
   break-inside: avoid;
 }
 
-.hero-inner.newspaper-reading .shared-story-body img {
+.shared-story-body img {
   display: block;
   max-width: 100%;
   height: auto;
 }
 
-.hero-inner.newspaper-reading .shared-story-body figcaption {
+.shared-story-body figcaption {
   margin-top: 0.3rem;
   color: var(--muted);
   font-size: 0.60rem;
   font-style: italic;
 }
 
-.hero-inner.newspaper-reading .shared-story-header h3 {
+.hero-inner.newspaper-reading .thoughts-library .shared-story-header h3 {
   font-size: clamp(2rem, 5vw, 3.4rem);
 }
 
@@ -730,7 +730,7 @@ main,
 }
 
 @media (max-width: 700px) {
-  .hero-inner.newspaper-reading .shared-story-body {
+  .hero-inner.newspaper-reading .thoughts-library .shared-story-body {
     columns: 1;
     column-rule: 0;
   }
@@ -1005,16 +1005,17 @@ main,
   list-style: none;
 }
 
-.fantasy-updates-list li {
+.fantasy-updates-list > li {
   padding: 0.35rem 0;
   border-top: 1px dotted var(--rule-light);
+  overflow-wrap: anywhere;
 }
 
-.fantasy-updates-list a {
-  color: var(--red);
-  font: 700 0.76rem/1.35 var(--sans);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+.fantasy-updates-list .shared-story-body p {
+  margin: 0.45rem 0 0;
+  color: inherit;
+  font-size: 10pt;
+  line-height: 1.5;
 }
 
 .download-briefing {

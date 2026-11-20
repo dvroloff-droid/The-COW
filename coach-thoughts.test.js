@@ -13,10 +13,10 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="epl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261119-2/);
+  assert.match(page, /styles\.css\?v=20261120-1/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
-  assert.match(page, /coach-thoughts\.js\?v=20261119-1/);
+  assert.match(page, /coach-thoughts\.js\?v=20261120-1/);
   assert.match(page, /id="thoughts-story-sport"/);
   assert.match(page, /id="thoughts-story-placement"/);
   assert.match(page, /id="fantasy-updates-list"/);
@@ -52,8 +52,8 @@ test("styles the spreadsheet uploader consistently with the article editor", () 
 });
 
 test("uses smaller text for published article bodies and supports pictures", () => {
-  assert.equal((styles.match(/font-size: 10pt;/g) || []).length, 3);
-  assert.match(styles, /\.hero-inner\.newspaper-reading \.shared-story-body\s*\{[^}]*font-size:\s*10pt;/);
+  assert.match(styles, /\.hero-inner\.newspaper-reading \.thoughts-library \.shared-story-body\s*\{[^}]*font-size:\s*10pt;/);
+  assert.match(styles, /\.fantasy-updates-list \.shared-story-body p\s*\{[^}]*font-size:\s*10pt;/);
   assert.match(styles, /\.shared-story-body\s*\{[^}]*text-align:\s*justify;/);
   assert.doesNotMatch(styles, /\.shared-story-article\s*\{[^}]*text-align:\s*center;/);
   assert.match(styles, /\.shared-story-body p\s*\{[^}]*white-space:\s*normal;[^}]*text-align:\s*justify;[^}]*text-align-last:\s*start;[^}]*hyphens:\s*auto;/);
@@ -119,6 +119,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
       append(...children) { this.children.push(...children); },
       contains() { return false; },
       focus() { this.focused = true; },
+      scrollIntoView() { this.scrolledIntoView = true; },
       reset() { this.wasReset = true; },
     };
   }
@@ -475,22 +476,76 @@ test("publishes fantasy articles into the EPL Fantasy list", async () => {
     calls.upload.name,
     "story-fantasy-00000000-0000-4000-8000-000000000001-Week-4-Waiver-Wire.json",
   );
-  assert.equal(elements["fantasy-updates-list"].children[0].children[0].textContent, "Week 4 Waiver Wire");
-  assert.equal(elements["fantasy-updates-list"].children[0].children[0].href, "#thoughts");
+  const details = elements["fantasy-updates-list"].children[0].children[0];
+  assert.equal(details.tagName, "details");
+  assert.equal(details.open, true);
+  assert.equal(details.children[0].hidden, true);
+  await details.listeners.toggle();
+  assert.equal(details.children[1].children[0].children[1].textContent, "Week 4 Waiver Wire");
 });
 
-test("opens a fantasy update from the EPL Fantasy list in the shared story archive", async () => {
-  const storyName = "story-fantasy-00000000-0000-4000-8000-000000000001-Week-4-Waivers.json";
-  const { elements } = setup("", [{ id: "story-id", name: storyName }]);
+test("shows full fantasy articles in EPL Fantasy and keeps Brewers open in the middle", async () => {
+  const fantasy = "story-fantasy-00000000-0000-4000-8000-000000000001-Pep.json";
+  const brewers = "story-00000000-0000-4000-8000-000000000002-The-Brewers-Will-Be-Even-Better-in-2027.json";
+  const newer = "story-00000000-0000-4000-8000-000000000003-Newer-story.json";
+  const { elements, calls } = setup("", [
+    { id: "fantasy", name: fantasy },
+    { id: "newer", name: newer },
+    { id: "brewers", name: brewers },
+  ], JSON.stringify({ title: "Pep", html: "<p>Article body</p>" }), [
+    { nodeType: 3, textContent: "Full Pep article" },
+  ]);
   await new Promise(setImmediate);
 
-  const updateLink = elements["fantasy-updates-list"].children[0].children[0];
-  assert.equal(updateLink.textContent, "Week 4 Waivers");
-  await updateLink.listeners.click({ preventDefault() {} });
+  const fantasyDetails = elements["fantasy-updates-list"].children[0].children[0];
+  assert.equal(fantasyDetails.open, true);
+  assert.equal(fantasyDetails.children[0].hidden, true);
+  await fantasyDetails.listeners.toggle();
+  assert.equal(calls.download, fantasy);
+  assert.equal(fantasyDetails.children[1].children[0].children[1].textContent, "Pep");
+  assert.equal(fantasyDetails.children[1].children[1].children[0].textContent, "Full Pep article");
+  assert.equal(elements.list.children.length, 2);
+  assert.equal(elements.list.children[0].children[0].open, false);
+  const brewersDetails = elements.list.children[1].children[0];
+  assert.equal(brewersDetails.open, true);
+  assert.equal(brewersDetails.children[0].hidden, true);
+});
 
-  const details = elements.list.children[0].children[0];
-  assert.equal(details.open, true);
-  assert.equal(details.scrolledIntoView, true);
+test("allows a failed EPL Fantasy article load to be retried", async () => {
+  const { elements, setReadOverride } = setup("", [{
+    id: "fantasy",
+    name: "story-fantasy-00000000-0000-4000-8000-000000000001-Pep.json",
+  }], "invalid JSON");
+  await new Promise(setImmediate);
+  const details = elements["fantasy-updates-list"].children[0].children[0];
+  await details.listeners.toggle();
+  assert.equal(details.children[0].hidden, false);
+  assert.match(details.children[1].children[1].textContent, /Could not load/);
+  setReadOverride(JSON.stringify({ title: "Pep", html: "<p>Body</p>" }));
+  await details.listeners.toggle();
+  assert.equal(details.children[0].hidden, true);
+  assert.equal(details.children[1].children[0].children[1].textContent, "Pep");
+});
+
+test("allows signed-in owners to edit an EPL Fantasy article in place", async () => {
+  const storyName = "story-fantasy-00000000-0000-4000-8000-000000000001-Pep.json";
+  const { elements, authEvent, calls } = setup("#coach-login", [
+    { id: "fantasy", name: storyName },
+  ], JSON.stringify({ title: "Pep", html: "<p>Body</p>" }));
+  await new Promise(setImmediate);
+  authEvent("SIGNED_IN", { user: {} });
+  const details = elements["fantasy-updates-list"].children[0].children[0];
+  const editButton = details.children[1].children[0].children[2];
+  assert.equal(editButton.hidden, false);
+  await editButton.listeners.click();
+  assert.equal(elements["story-placement"].value, "fantasy");
+  assert.equal(elements.story.scrolledIntoView, true);
+  elements["story-editor"].textContent = "Updated";
+  elements["story-editor"].innerHTML = "<p>Updated</p>";
+  await elements.story.listeners.submit({ preventDefault() {} });
+  assert.equal(calls.upload.name, storyName);
+  assert.equal(calls.upload.options.upsert, true);
+  assert.match(elements["story-status"].textContent, /Article updated successfully/);
 });
 
 test("edits a published article in place and preserves its file name", async () => {
