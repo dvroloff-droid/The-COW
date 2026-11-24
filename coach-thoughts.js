@@ -186,10 +186,8 @@
         }
         const regularStories = files.filter((file) =>
           file.name.startsWith("story-") && !file.name.startsWith("story-fantasy-"));
-        const brewersStory = regularStories.find((file) =>
-          /^story-[0-9a-f-]{36}-The-Brewers-Will-Be-Even-Better-in-2027\.(json|txt)$/i.test(file.name));
         const requestedRegularStory = regularStories.find((file) => file.name === openStoryName);
-        const storyToOpenName = (requestedRegularStory || brewersStory || regularStories[0])?.name;
+        const storyToOpenName = (requestedRegularStory || regularStories[0])?.name;
         if (files.length === 0) {
           if (!preserveStatus && statusRevision === startingRevision) {
             setStatus("No files or stories have been shared yet.");
@@ -238,17 +236,13 @@
               .replace(/^story-(?:fantasy-)?[0-9a-f-]{36}-/i, "")
               .replace(/\.(txt|json)$/i, "")
               .replace(/-/g, " ");
-            const keepExpanded = storySlug.trim().toLowerCase() ===
-              "the brewers will be even better in 2027";
             summary.textContent = storySlug || "Read shared story";
-            summary.hidden = keepExpanded && file.name === storyToOpenName;
             storyHeader.append(storyEyebrow, storyTitle);
             if (/\.(json|txt)$/i.test(file.name)) storyHeader.append(storyEditButton);
             storyArticle.append(storyHeader, storyBody);
             details.append(summary, storyArticle);
             details.addEventListener("toggle", async () => {
               if (!isFantasyStory) {
-                if (keepExpanded) summary.hidden = details.open;
                 if (details.open) {
                   for (const otherDetails of fileList.querySelectorAll("details[open]")) {
                     if (otherDetails !== details) otherDetails.open = false;

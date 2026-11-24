@@ -16,7 +16,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.match(page, /styles\.css\?v=20261120-4/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261112-1/);
-  assert.match(page, /coach-thoughts\.js\?v=20261120-3/);
+  assert.match(page, /coach-thoughts\.js\?v=20261124-1/);
   assert.match(page, /id="thoughts-story-sport"/);
   assert.match(page, /id="thoughts-story-placement"/);
   assert.match(page, /id="fantasy-updates-list"/);
@@ -524,7 +524,7 @@ test("publishes fantasy articles into the EPL Fantasy list", async () => {
   assert.equal(details.children[1].children[0].children[1].textContent, "Week 4 Waiver Wire");
 });
 
-test("shows full fantasy articles in EPL Fantasy and keeps Brewers open in the middle", async () => {
+test("shows full fantasy articles and opens the newest regular story instead of Brewers", async () => {
   const fantasy = "story-fantasy-00000000-0000-4000-8000-000000000001-Pep.json";
   const brewers = "story-00000000-0000-4000-8000-000000000002-The-Brewers-Will-Be-Even-Better-in-2027.json";
   const newer = "story-00000000-0000-4000-8000-000000000003-Newer-story.json";
@@ -545,10 +545,10 @@ test("shows full fantasy articles in EPL Fantasy and keeps Brewers open in the m
   assert.equal(fantasyDetails.children[1].children[0].children[1].textContent, "Pep");
   assert.equal(fantasyDetails.children[1].children[1].children[0].textContent, "Full Pep article");
   assert.equal(elements.list.children.length, 2);
-  assert.equal(elements.list.children[0].children[0].open, false);
+  assert.equal(elements.list.children[0].children[0].open, true);
   const brewersDetails = elements.list.children[1].children[0];
-  assert.equal(brewersDetails.open, true);
-  assert.equal(brewersDetails.children[0].hidden, true);
+  assert.equal(brewersDetails.open, false);
+  assert.notEqual(brewersDetails.children[0].hidden, true);
 });
 
 test("allows a failed EPL Fantasy article load to be retried", async () => {
@@ -882,7 +882,7 @@ test("opens the newest published article inline instead of leaving it as a link"
   assert.equal(newestDetails.children[1].children[0].children[1].textContent, "Newest story");
 });
 
-test("keeps the Brewers article expanded without its collapsed summary line", async () => {
+test("allows the Brewers article to be collapsed when it is the newest story", async () => {
   const { elements } = setup("", [{
     id: "brewers-story",
     name: "story-00000000-0000-4000-8000-000000000001-The-Brewers-Will-Be-Even-Better-in-2027.json",
@@ -894,7 +894,7 @@ test("keeps the Brewers article expanded without its collapsed summary line", as
 
   const details = elements.list.children[0].children[0];
   assert.equal(details.open, true);
-  assert.equal(details.children[0].hidden, true);
+  assert.notEqual(details.children[0].hidden, true);
   await details.listeners.toggle();
   assert.equal(details.children[1].children[0].children[1].textContent, "The Brewers Will Be Even Better in 2027");
 });
