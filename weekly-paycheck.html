@@ -7,7 +7,7 @@
     <meta name="description" content="Spreadsheet updates from The Weekly Paycheck." />
     <title>The Weekly Paycheck — The Coach's Office</title>
     <link rel="stylesheet" href="styles.css?v=20261125-2" />
-    <link rel="stylesheet" href="weekly-paycheck.css" />
+    <link rel="stylesheet" href="weekly-paycheck.css?v=20261125-1" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -44,6 +44,7 @@
           <h1>The Weekly Paycheck</h1>
           <p>Spreadsheet updates from the office.</p>
         </header>
+        <p><a href="weekly-paycheck.html?edit=1#coach-login">Sign in to post spreadsheet data</a></p>
         <form class="paycheck-form" id="paycheck-login" hidden>
           <h2>Owner sign-in</h2>
           <label for="paycheck-email">Authorized email</label>
@@ -57,9 +58,9 @@
             <h2 id="paycheck-form-heading">Post a table</h2>
             <label for="paycheck-title">Headline</label>
             <input id="paycheck-title" type="text" maxlength="160" required />
-            <label for="paycheck-data">Spreadsheet cells</label>
+            <label for="paycheck-data">Paste spreadsheet cells here</label>
             <p>Copy cells from your spreadsheet and paste them below. The first row becomes the table headings.</p>
-            <textarea id="paycheck-data" rows="8" required></textarea>
+            <textarea id="paycheck-data" rows="8" placeholder="Paste copied spreadsheet cells here" required></textarea>
             <div class="paycheck-actions">
               <button type="submit" id="paycheck-submit">Publish table</button>
               <button type="button" id="paycheck-cancel" hidden>Cancel editing</button>

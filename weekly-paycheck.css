@@ -58,7 +58,6 @@
 
 .paycheck-post {
   padding: 1rem;
-  border: 1px solid var(--rule);
 }
 
 .paycheck-post h3 {
@@ -79,11 +78,8 @@
 .paycheck-table th,
 .paycheck-table td {
   padding: 0.5rem;
-  border: 1px solid var(--rule);
+  border: 0;
+  background: transparent;
   text-align: left;
   white-space: pre-wrap;
-}
-
-.paycheck-table th {
-  background: rgb(0 0 0 / 8%);
 }

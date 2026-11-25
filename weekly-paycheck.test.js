@@ -123,6 +123,23 @@ test("owner mode and authentication are required to publish", async () => {
   assert.equal(elements.author.hidden, true);
 });
 
+test("owner sign-in reveals the spreadsheet paste form", async () => {
+  const { elements } = setup({ session: false });
+  await tick();
+  assert.equal(elements.login.hidden, false);
+  assert.equal(elements.author.hidden, true);
+  elements.email.value = "coach@example.com";
+  elements.password.value = "password";
+  await submit(elements.login);
+  assert.equal(elements.login.hidden, true);
+  assert.equal(elements.author.hidden, false);
+  assert.equal(elements.password.value, "");
+
+  const page = fs.readFileSync(`${__dirname}/weekly-paycheck.html`, "utf8");
+  assert.match(page, /href="weekly-paycheck\.html\?edit=1#coach-login">Sign in to post spreadsheet data<\/a>/);
+  assert.match(page, /<label for="paycheck-data">Paste spreadsheet cells here<\/label>/);
+});
+
 test("reports invalid data and upload failures without discarding the draft", async () => {
   const { elements, calls } = setup();
   await tick();
