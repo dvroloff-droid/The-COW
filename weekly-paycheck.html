@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#d0cfc8" />
+    <meta name="description" content="Spreadsheet updates from The Weekly Paycheck." />
+    <title>The Weekly Paycheck — The Coach's Office</title>
+    <link rel="stylesheet" href="styles.css?v=20261125-2" />
+    <link rel="stylesheet" href="weekly-paycheck.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="edition-bar" aria-label="Newspaper edition">
+        <span>VOL. I <b>◆</b> NO. 1</span>
+        <span>THE WEEKLY PAYCHECK</span>
+        <span>THE COACH'S OFFICE</span>
+      </div>
+      <div class="nameplate">
+        <a class="masthead-title" href="index.html" aria-label="The Coach's Office home">The Coach's Office</a>
+        <p>All the sports worth talking about</p>
+      </div>
+      <div class="nav-bar">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+          <span class="sr-only">Toggle navigation</span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <nav class="primary-nav" id="primary-nav" aria-label="Main navigation">
+          <a href="baseball.html">Baseball</a>
+          <a href="football.html">Football</a>
+          <a href="basketball.html">Basketball</a>
+          <a href="hockey.html">Hockey</a>
+          <a href="soccer.html">Soccer</a>
+          <a href="weekly-paycheck.html" aria-current="page">The Weekly Paycheck</a>
+        </nav>
+      </div>
+    </header>
+    <main class="archive-main" id="main">
+      <article class="archive-page paycheck-page">
+        <header class="archive-heading">
+          <p class="eyebrow">THE COACH'S OFFICE</p>
+          <h1>The Weekly Paycheck</h1>
+          <p>Spreadsheet updates from the office.</p>
+        </header>
+        <form class="paycheck-form" id="paycheck-login" hidden>
+          <h2>Owner sign-in</h2>
+          <label for="paycheck-email">Authorized email</label>
+          <input id="paycheck-email" type="email" autocomplete="username" required />
+          <label for="paycheck-password">Password</label>
+          <input id="paycheck-password" type="password" autocomplete="current-password" required />
+          <button type="submit">Sign in</button>
+        </form>
+        <div id="paycheck-author" hidden>
+          <form class="paycheck-form" id="paycheck-form">
+            <h2 id="paycheck-form-heading">Post a table</h2>
+            <label for="paycheck-title">Headline</label>
+            <input id="paycheck-title" type="text" maxlength="160" required />
+            <label for="paycheck-data">Spreadsheet cells</label>
+            <p>Copy cells from your spreadsheet and paste them below. The first row becomes the table headings.</p>
+            <textarea id="paycheck-data" rows="8" required></textarea>
+            <div class="paycheck-actions">
+              <button type="submit" id="paycheck-submit">Publish table</button>
+              <button type="button" id="paycheck-cancel" hidden>Cancel editing</button>
+              <button type="button" id="paycheck-signout">Sign out</button>
+            </div>
+          </form>
+        </div>
+        <p id="paycheck-editor-status" role="status" aria-live="polite"></p>
+        <section aria-labelledby="paycheck-posts-heading">
+          <h2 id="paycheck-posts-heading">Published tables</h2>
+          <p id="paycheck-status" role="status" aria-live="polite">Loading tables...</p>
+          <ol class="paycheck-posts" id="paycheck-list"></ol>
+        </section>
+        <a class="archive-back" href="index.html">← Back to the front page</a>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <a class="footer-wordmark" href="index.html">The Coach's Office</a>
+        <p>For the love of the game.</p>
+        <span class="copyright">© <span id="year"></span> The Coach's Office</span>
+      </div>
+    </footer>
+    <script src="app.js?v=20261125-1"></script>
+    <script src="supabase-config.js"></script>
+    <script src="weekly-paycheck.js"></script>
+  </body>
+</html>

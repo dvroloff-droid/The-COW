@@ -1,0 +1,89 @@
+.paycheck-page {
+  max-width: 100%;
+}
+
+.paycheck-form {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 48rem;
+  margin: 1.5rem 0;
+}
+
+.paycheck-form[hidden] {
+  display: none;
+}
+
+.paycheck-form h2,
+.paycheck-form p {
+  margin: 0;
+}
+
+.paycheck-form input,
+.paycheck-form textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.paycheck-form textarea {
+  resize: vertical;
+  white-space: pre;
+}
+
+.paycheck-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.paycheck-form button,
+.paycheck-edit {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  font: inherit;
+}
+
+.paycheck-posts {
+  display: grid;
+  gap: 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.paycheck-post {
+  padding: 1rem;
+  border: 1px solid var(--rule);
+}
+
+.paycheck-post h3 {
+  margin: 0 0 0.75rem;
+}
+
+.paycheck-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.paycheck-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.75rem 0;
+}
+
+.paycheck-table th,
+.paycheck-table td {
+  padding: 0.5rem;
+  border: 1px solid var(--rule);
+  text-align: left;
+  white-space: pre-wrap;
+}
+
+.paycheck-table th {
+  background: rgb(0 0 0 / 8%);
+}

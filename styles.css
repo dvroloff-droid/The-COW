@@ -159,7 +159,7 @@ main,
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: clamp(1.5rem, 5vw, 4.5rem);
+  gap: clamp(1rem, 3vw, 3rem);
   min-height: 2.55rem;
 }
 
@@ -169,6 +169,7 @@ main,
   letter-spacing: 0.12em;
   text-decoration: none;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .primary-nav a:hover,

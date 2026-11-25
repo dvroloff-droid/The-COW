@@ -15,6 +15,16 @@ The site accepts Stripe Payment Links. Follow
 test-mode guidance, and the remaining link values. Do not add Stripe API keys
 or other secrets to the website.
 
+## The Weekly Paycheck
+
+Visit `weekly-paycheck.html#coach-login` and sign in with the same authorized
+account used for Coach's Thoughts. Give the post a headline, copy cells from
+a spreadsheet, paste them into the form, and publish. The first row becomes
+the table headings. Published tables are public and can be edited from this
+page when signed in. Pasting copies the displayed cell values, not formulas
+or formatting, and does not keep the table linked to the spreadsheet. Wide
+tables can be scrolled horizontally.
+
 ## Coach's Thoughts file uploads
 
 The Coach's Thoughts library uses Supabase Storage. Shared files and published
