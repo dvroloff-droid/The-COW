@@ -3,9 +3,26 @@ document.documentElement.classList.add("has-js");
 const menuButton = document.querySelector(".nav-toggle");
 const primaryNav = document.querySelector("#primary-nav");
 const year = document.querySelector("#year");
+const editionDate = document.querySelector("#edition-date");
 
 if (year) {
   year.textContent = String(new Date().getFullYear());
+}
+
+if (editionDate) {
+  const updateEditionDate = () => {
+    const now = new Date();
+    editionDate.textContent = now.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).toUpperCase();
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    setTimeout(updateEditionDate, nextMidnight - now);
+  };
+
+  updateEditionDate();
 }
 
 if (menuButton && primaryNav) {
