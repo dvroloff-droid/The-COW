@@ -5,7 +5,7 @@ const vm = require("node:vm");
 
 const script = fs.readFileSync(`${__dirname}/weekly-paycheck.js`, "utf8");
 
-function setup({ owner = true, session = true } = {}) {
+function setup({ owner = true, session = true, initialObjects = {} } = {}) {
   const elements = {};
   const createElement = (tag) => ({
     tag,
@@ -31,7 +31,7 @@ function setup({ owner = true, session = true } = {}) {
   ]) elements[id] = createElement("div");
   elements.file.files = [];
   elements.form.reset = () => { elements.title.value = ""; elements.file.files = []; };
-  const objects = new Map();
+  const objects = new Map(Object.entries(initialObjects));
   const calls = { uploads: [], list: [] };
   const bucket = {
     async list(path, options) {
@@ -129,7 +129,7 @@ test("owner mode and authentication are required to publish", async () => {
   assert.equal(elements.author.hidden, true);
 });
 
-test("owner sign-in reveals the PDF upload form", async () => {
+test("owner sign-in reveals the PDF and image snip upload form", async () => {
   const { elements } = setup({ session: false });
   await tick();
   assert.equal(elements.login.hidden, false);
@@ -142,16 +142,53 @@ test("owner sign-in reveals the PDF upload form", async () => {
   assert.equal(elements.password.value, "");
 
   const page = fs.readFileSync(`${__dirname}/weekly-paycheck.html`, "utf8");
-  assert.match(page, /href="weekly-paycheck\.html\?edit=1#coach-login">Sign in to post a PDF<\/a>/);
-  assert.match(page, /<label for="paycheck-file">Spreadsheet PDF<\/label>/);
+  assert.match(page, /href="weekly-paycheck\.html\?edit=1#coach-login">Sign in to post an update<\/a>/);
+  assert.match(page, /<label for="paycheck-file">PDF or image snip<\/label>/);
+  assert.match(page, /accept="[^"]*\.png[^"]*\.jpg[^"]*\.webp/);
 });
 
-test("reports invalid PDFs and upload failures without discarding the draft", async () => {
+test("publishes an image snip and lets the owner replace it", async () => {
+  const { elements, calls } = setup();
+  await tick();
+  elements.title.value = "Week 2";
+  const snip = new Blob(["image data"], { type: "image/png" });
+  snip.name = "week-2.png";
+  elements.file.files = [snip];
+  await submit(elements.form);
+
+  assert.match(elements["editor-status"].textContent, /published successfully/);
+  assert.match(calls.uploads[0].path, /^story-weekly-paycheck\/.+-week-2\.png$/);
+  assert.equal(calls.uploads[0].options.contentType, "image/png");
+  const article = elements.list.children[0].children[0];
+  assert.equal(article.children[1].tag, "img");
+  assert.equal(article.children[1].alt, "Week 2");
+  assert.equal(article.children[2].textContent, "Open or download image");
+
+  article.children[3].listeners.click();
+  assert.equal(elements.file.required, false);
+  const replacement = new Blob(["new image"], { type: "image/jpeg" });
+  replacement.name = "week-2-revised.jpg";
+  elements.file.files = [replacement];
+  elements.title.value = "Week 2 revised";
+  await submit(elements.form);
+  assert.equal(calls.uploads[2].options.contentType, "image/jpeg");
+  assert.equal(calls.uploads[3].path, calls.uploads[1].path);
+  assert.equal(calls.uploads[3].options.upsert, true);
+  assert.equal(elements.list.children[0].children[0].children[0].textContent, "Week 2 revised");
+});
+
+test("reports invalid files and upload failures without discarding the draft", async () => {
   const { elements, calls } = setup();
   await tick();
   elements.title.value = "Title";
   await submit(elements.form);
-  assert.match(elements["editor-status"].textContent, /Choose a PDF/);
+  assert.match(elements["editor-status"].textContent, /Choose a PDF or image snip/);
+  assert.equal(calls.uploads.length, 0);
+  const invalidFile = new Blob(["data"], { type: "image/gif" });
+  invalidFile.name = "snip.gif";
+  elements.file.files = [invalidFile];
+  await submit(elements.form);
+  assert.match(elements["editor-status"].textContent, /Choose a PDF, PNG, JPEG, or WebP/);
   assert.equal(calls.uploads.length, 0);
   const pdf = new Blob(["%PDF"], { type: "application/pdf" });
   pdf.name = "table.pdf";
@@ -160,6 +197,19 @@ test("reports invalid PDFs and upload failures without discarding the draft", as
   await submit(elements.form);
   assert.match(elements["editor-status"].textContent, /upload failed/);
   assert.equal(elements.file.files[0], pdf);
+});
+
+test("keeps previously published pasted tables visible", async () => {
+  const { elements } = setup({
+    initialObjects: {
+      "previous.json": JSON.stringify({ title: "Previous table", data: "Player\tPay\nAlex\t100" }),
+    },
+  });
+  await tick();
+  assert.equal(elements.list.children.length, 1);
+  const article = elements.list.children[0].children[0];
+  assert.equal(article.children[0].textContent, "Previous table");
+  assert.equal(article.children[1].className, "paycheck-table-wrap");
 });
 
 test("verification failure keeps the draft and retry updates the same object", async () => {

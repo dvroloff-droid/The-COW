@@ -44,7 +44,7 @@
           <h1>The Weekly Paycheck</h1>
           <p>Spreadsheet updates from the office.</p>
         </header>
-        <p><a href="weekly-paycheck.html?edit=1#coach-login">Sign in to post a PDF</a></p>
+        <p><a href="weekly-paycheck.html?edit=1#coach-login">Sign in to post an update</a></p>
         <form class="paycheck-form" id="paycheck-login" hidden>
           <h2>Owner sign-in</h2>
           <label for="paycheck-email">Authorized email</label>
@@ -55,14 +55,14 @@
         </form>
         <div id="paycheck-author" hidden>
           <form class="paycheck-form" id="paycheck-form">
-            <h2 id="paycheck-form-heading">Post a PDF</h2>
+            <h2 id="paycheck-form-heading">Post a spreadsheet PDF or snip</h2>
             <label for="paycheck-title">Headline</label>
             <input id="paycheck-title" type="text" maxlength="160" required />
-            <label for="paycheck-file">Spreadsheet PDF</label>
-            <input id="paycheck-file" type="file" accept=".pdf,application/pdf" required />
-            <p>Choose the PDF made from your spreadsheet. Maximum file size: 20 MB.</p>
+            <label for="paycheck-file">PDF or image snip</label>
+            <input id="paycheck-file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp" required />
+            <p>Choose a spreadsheet PDF or a PNG, JPEG, or WebP snip. Maximum file size: 20 MB.</p>
             <div class="paycheck-actions">
-              <button type="submit" id="paycheck-submit">Publish PDF</button>
+              <button type="submit" id="paycheck-submit">Publish update</button>
               <button type="button" id="paycheck-cancel" hidden>Cancel editing</button>
               <button type="button" id="paycheck-signout">Sign out</button>
             </div>

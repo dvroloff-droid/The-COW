@@ -19,12 +19,20 @@
   let signedIn = false;
   let editingName = null;
   let saving = false;
-  let editingPdfName = null;
+  let editingFileName = null;
+  let editingFileType = null;
   let loadRevision = 0;
   let client;
   let bucket;
 
   const errorMessage = (error) => error?.message || "An unexpected error occurred.";
+  const allowedTypes = {
+    pdf: "application/pdf",
+    png: "image/png",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    webp: "image/webp",
+  };
 
   const parseCells = (text) => {
     const rows = [];
@@ -67,10 +75,11 @@
 
   const resetEditor = () => {
     editingName = null;
-    editingPdfName = null;
+    editingFileName = null;
+    editingFileType = null;
     form.reset();
-    heading.textContent = "Post a PDF";
-    submit.textContent = "Publish PDF";
+    heading.textContent = "Post a spreadsheet PDF or snip";
+    submit.textContent = "Publish update";
     file.required = true;
     cancel.hidden = true;
   };
@@ -100,16 +109,25 @@
     article.className = "paycheck-post";
     postTitle.textContent = post.title;
     let content;
-    if (post.type === "pdf" && post.pdfName) {
-      const url = bucket.getPublicUrl(`${folder}/${post.pdfName}`).data.publicUrl;
-      content = document.createElement("iframe");
-      content.className = "paycheck-pdf";
-      content.src = url;
-      content.title = `${post.title} PDF`;
+    const fileName = post.type === "pdf" ? post.pdfName : post.fileName;
+    const fileType = post.type === "pdf" ? "application/pdf" : post.fileType;
+    if (fileName && fileType) {
+      const url = bucket.getPublicUrl(`${folder}/${fileName}`).data.publicUrl;
+      if (fileType === "application/pdf") {
+        content = document.createElement("iframe");
+        content.className = "paycheck-pdf";
+        content.src = url;
+        content.title = `${post.title} PDF`;
+      } else {
+        content = document.createElement("img");
+        content.className = "paycheck-image";
+        content.src = url;
+        content.alt = post.title;
+      }
       const download = document.createElement("a");
       download.className = "paycheck-pdf-link";
       download.href = `${url}?download=1`;
-      download.textContent = "Open or download PDF";
+      download.textContent = fileType === "application/pdf" ? "Open or download PDF" : "Open or download image";
       download.target = "_blank";
       download.rel = "noopener";
       article.append(postTitle, content, download);
@@ -139,21 +157,22 @@
     }
     edit.type = "button";
     edit.className = "paycheck-edit";
-    edit.textContent = "Edit table";
+    edit.textContent = "Edit update";
     edit.hidden = !signedIn;
     edit.addEventListener("click", () => {
       if (!signedIn || saving) return;
       editingName = name;
-      editingPdfName = post.type === "pdf" ? post.pdfName : null;
+      editingFileName = fileName || null;
+      editingFileType = fileType || null;
       title.value = post.title;
-      if (post.type === "pdf") {
+      if (fileName) {
         file.required = false;
-        heading.textContent = "Edit PDF";
-        submit.textContent = "Save PDF";
+        heading.textContent = "Edit update";
+        submit.textContent = "Save update";
       } else {
         file.required = true;
-        heading.textContent = "Replace with PDF";
-        submit.textContent = "Publish PDF";
+        heading.textContent = "Replace with a PDF or snip";
+        submit.textContent = "Publish update";
       }
       cancel.hidden = false;
       editorStatus.textContent = "";
@@ -193,6 +212,11 @@
             if (typeof post.pdfName !== "string" || !post.pdfName.trim()) {
               throw new Error("Invalid PDF data.");
             }
+          } else if (post.type === "file") {
+            if (typeof post.fileName !== "string" || !post.fileName.trim() ||
+                !Object.values(allowedTypes).includes(post.fileType)) {
+              throw new Error("Invalid file data.");
+            }
           } else if (typeof post.data !== "string" || !post.data.trim()) {
             throw new Error("Invalid update data.");
           }
@@ -208,7 +232,7 @@
         : posts.length ? "" : "No updates have been published yet.";
       return failed === 0;
     } catch (error) {
-      if (revision === loadRevision)       status.textContent = `Could not load updates: ${errorMessage(error)}`;
+      if (revision === loadRevision) status.textContent = `Could not load updates: ${errorMessage(error)}`;
       return false;
     }
   };
@@ -274,22 +298,24 @@
       editorStatus.textContent = "Enter a headline before publishing.";
       return;
     }
-    if (!selectedFile && !editingPdfName) {
-      editorStatus.textContent = "Choose a PDF to publish.";
+    if (!selectedFile && !editingFileName) {
+      editorStatus.textContent = "Choose a PDF or image snip to publish.";
       return;
     }
+    let selectedType;
     if (selectedFile) {
-      const extension = selectedFile.name.match(/\.pdf$/i);
-      if (!extension || selectedFile.type && selectedFile.type !== "application/pdf") {
-        editorStatus.textContent = "Choose a PDF file.";
+      const extension = selectedFile.name.match(/\.(pdf|png|jpe?g|webp)$/i)?.[1].toLowerCase();
+      selectedType = extension ? allowedTypes[extension] : null;
+      if (!selectedType || selectedFile.type && selectedFile.type !== selectedType) {
+        editorStatus.textContent = "Choose a PDF, PNG, JPEG, or WebP file.";
         return;
       }
       if (!selectedFile.size) {
-        editorStatus.textContent = "Choose a non-empty PDF.";
+        editorStatus.textContent = "Choose a non-empty file.";
         return;
       }
       if (selectedFile.size > 20 * 1024 * 1024) {
-        editorStatus.textContent = "Choose a PDF no larger than 20 MB.";
+        editorStatus.textContent = "Choose a file no larger than 20 MB.";
         return;
       }
     }
@@ -299,9 +325,10 @@
     signout.disabled = true;
     title.disabled = true;
     file.disabled = true;
-    editorStatus.textContent = "Publishing PDF...";
+    editorStatus.textContent = "Publishing update...";
     const wasEditing = Boolean(editingName);
-    let pdfName = editingPdfName;
+    let publishedFileName = editingFileName;
+    let publishedFileType = editingFileType;
     const metadataName = editingName || `${crypto.randomUUID()}.json`;
     try {
       if (selectedFile) {
@@ -309,15 +336,16 @@
           .normalize("NFKC")
           .replace(/[^\w.-]+/g, "-")
           .replace(/^-+|-+$/g, "");
-        pdfName = `${crypto.randomUUID()}-${safeName || "spreadsheet.pdf"}`;
-        const { error } = await bucket.upload(`${folder}/${pdfName}`, selectedFile, {
+        publishedFileName = `${crypto.randomUUID()}-${safeName || `spreadsheet.${selectedType.split("/")[1]}`}`;
+        publishedFileType = selectedType;
+        const { error } = await bucket.upload(`${folder}/${publishedFileName}`, selectedFile, {
           cacheControl: "3600",
-          contentType: "application/pdf",
+          contentType: selectedType,
           upsert: false,
         });
         if (error) throw error;
       }
-      const post = { type: "pdf", title: headline, pdfName };
+      const post = { type: "file", title: headline, fileName: publishedFileName, fileType: publishedFileType };
       const body = new Blob([JSON.stringify(post)], {
         type: "application/json;charset=utf-8",
       });
@@ -328,13 +356,14 @@
       });
       if (error) throw error;
       editingName = metadataName;
-      editingPdfName = pdfName;
+      editingFileName = publishedFileName;
+      editingFileType = publishedFileType;
       try {
         if (await readPost(metadataName) !== await body.text()) {
           throw new Error("The published copy does not match your changes yet.");
         }
       } catch (error) {
-        editorStatus.textContent = `PDF uploaded, but could not be verified. Your draft is still here: ${errorMessage(error)}`;
+        editorStatus.textContent = `File uploaded, but could not be verified. Your draft is still here: ${errorMessage(error)}`;
         file.value = "";
         file.files = [];
         return;
@@ -342,10 +371,10 @@
       resetEditor();
       const refreshed = await loadPosts();
       editorStatus.textContent = refreshed
-        ? wasEditing ? "PDF updated successfully." : "PDF published successfully."
-        : "PDF saved, but the list could not fully refresh. Reload the page to see it.";
+        ? wasEditing ? "Update saved successfully." : "Update published successfully."
+        : "Update saved, but the list could not fully refresh. Reload the page to see it.";
     } catch (error) {
-      editorStatus.textContent = `Could not save PDF: ${errorMessage(error)}`;
+      editorStatus.textContent = `Could not save update: ${errorMessage(error)}`;
     } finally {
       saving = false;
       submit.disabled = false;
@@ -358,7 +387,7 @@
 
   if (!config?.supabaseUrl || !config?.supabaseAnonKey ||
       config.supabaseUrl.startsWith("YOUR_") || config.supabaseAnonKey.startsWith("YOUR_")) {
-    status.textContent = "Connect Supabase to load PDFs. See the setup instructions.";
+    status.textContent = "Connect Supabase to load updates. See the setup instructions.";
   } else if (window.supabase?.createClient) {
     initialize();
   } else {

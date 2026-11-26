@@ -17,12 +17,12 @@ or other secrets to the website.
 
 ## The Weekly Paycheck
 
-On The Weekly Paycheck page, select **Sign in to post a PDF** and sign in with
-the same authorized account used for Coach's Thoughts. Give the post a
-headline, select the PDF exported from the spreadsheet, and publish. PDFs up
-to 20 MB are stored in Supabase Storage, displayed inline, and publicly
-readable. Signed-in owners can edit a post's headline or replace its PDF.
-Previously published pasted tables remain visible.
+On The Weekly Paycheck page, select **Sign in to post an update** and sign in
+with the same authorized account used for Coach's Thoughts. Give the post a
+headline, select a spreadsheet PDF or PNG, JPEG, or WebP image snip, and
+publish. Files up to 20 MB are stored in Supabase Storage, displayed inline,
+and publicly readable. Signed-in owners can edit a post's headline or replace
+its file. Previously published PDFs and pasted tables remain visible.
 
 ## Coach's Thoughts file uploads
 
