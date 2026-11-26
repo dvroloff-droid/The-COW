@@ -26,10 +26,11 @@ function setup({ owner = true, session = true } = {}) {
     focus() { this.focused = true; },
   });
   for (const id of [
-    "login", "email", "password", "author", "form", "title", "data", "submit",
+    "login", "email", "password", "author", "form", "title", "file", "submit",
     "cancel", "signout", "form-heading", "editor-status", "status", "list",
   ]) elements[id] = createElement("div");
-  elements.form.reset = () => { elements.title.value = ""; elements.data.value = ""; };
+  elements.file.files = [];
+  elements.form.reset = () => { elements.title.value = ""; elements.file.files = []; };
   const objects = new Map();
   const calls = { uploads: [], list: [] };
   const bucket = {
@@ -86,28 +87,31 @@ function setup({ owner = true, session = true } = {}) {
 const tick = () => new Promise(setImmediate);
 const submit = (element) => element.listeners.submit({ preventDefault() {} });
 
-test("publishes pasted cells safely, including quoted multiline cells, and edits the same post", async () => {
+test("publishes a PDF and edits the same post", async () => {
   const { elements, calls, objects } = setup();
   await tick();
   assert.equal(elements.author.hidden, false);
   elements.title.value = " Week 1 ";
-  elements.data.value = 'Player\tPay\r\n"<script>bad</script>"\t"line one\nline ""two"""\r\n';
+  const pdf = new Blob(["%PDF-1.4"], { type: "application/pdf" });
+  pdf.name = "week-one.pdf";
+  elements.file.files = [pdf];
   await submit(elements.form);
   assert.match(elements["editor-status"].textContent, /published successfully/);
-  assert.match(calls.uploads[0].path, /^story-weekly-paycheck\/.+\.json$/);
-  assert.equal(calls.uploads[0].options.upsert, false);
+  assert.match(calls.uploads[0].path, /^story-weekly-paycheck\/.+-week-one\.pdf$/);
+  assert.equal(calls.uploads[0].options.contentType, "application/pdf");
+  assert.match(calls.uploads[1].path, /^story-weekly-paycheck\/.+\.json$/);
+  assert.equal(calls.uploads[1].options.upsert, false);
   const article = elements.list.children[0].children[0];
-  const table = article.children[1].children[0];
-  assert.equal(table.children[0].children[0].children[0].textContent, "Player");
-  assert.equal(table.children[1].children[0].children[0].textContent, "<script>bad</script>");
-  assert.equal(table.children[1].children[0].children[1].textContent, 'line one\nline "two"');
-  article.children[2].listeners.click();
-  assert.equal(elements.data.value, 'Player\tPay\r\n"<script>bad</script>"\t"line one\nline ""two"""\r\n');
+  assert.equal(article.children[0].textContent, "Week 1");
+  assert.equal(article.children[1].tag, "iframe");
+  assert.equal(article.children[2].tag, "a");
+  article.children[3].listeners.click();
+  assert.equal(elements.title.value, "Week 1");
   elements.title.value = "Week 1 updated";
   await submit(elements.form);
-  assert.equal(calls.uploads[1].path, calls.uploads[0].path);
-  assert.equal(calls.uploads[1].options.upsert, true);
-  assert.equal(objects.size, 1);
+  assert.equal(calls.uploads[2].path, calls.uploads[1].path);
+  assert.equal(calls.uploads[2].options.upsert, true);
+  assert.equal(objects.size, 2);
   assert.equal(elements.list.children[0].children[0].children[0].textContent, "Week 1 updated");
 });
 
@@ -116,14 +120,16 @@ test("owner mode and authentication are required to publish", async () => {
   await tick();
   assert.equal(elements.author.hidden, true);
   elements.title.value = "Title";
-  elements.data.value = "one\ttwo";
+  const pdf = new Blob(["%PDF"], { type: "application/pdf" });
+  pdf.name = "table.pdf";
+  elements.file.files = [pdf];
   await submit(elements.form);
   assert.equal(calls.uploads.length, 0);
   auth({});
   assert.equal(elements.author.hidden, true);
 });
 
-test("owner sign-in reveals the spreadsheet paste form", async () => {
+test("owner sign-in reveals the PDF upload form", async () => {
   const { elements } = setup({ session: false });
   await tick();
   assert.equal(elements.login.hidden, false);
@@ -136,39 +142,42 @@ test("owner sign-in reveals the spreadsheet paste form", async () => {
   assert.equal(elements.password.value, "");
 
   const page = fs.readFileSync(`${__dirname}/weekly-paycheck.html`, "utf8");
-  assert.match(page, /href="weekly-paycheck\.html\?edit=1#coach-login">Sign in to post spreadsheet data<\/a>/);
-  assert.match(page, /<label for="paycheck-data">Paste spreadsheet cells here<\/label>/);
+  assert.match(page, /href="weekly-paycheck\.html\?edit=1#coach-login">Sign in to post a PDF<\/a>/);
+  assert.match(page, /<label for="paycheck-file">Spreadsheet PDF<\/label>/);
 });
 
-test("reports invalid data and upload failures without discarding the draft", async () => {
+test("reports invalid PDFs and upload failures without discarding the draft", async () => {
   const { elements, calls } = setup();
   await tick();
   elements.title.value = "Title";
-  elements.data.value = '"unclosed';
   await submit(elements.form);
-  assert.match(elements["editor-status"].textContent, /incomplete/);
+  assert.match(elements["editor-status"].textContent, /Choose a PDF/);
   assert.equal(calls.uploads.length, 0);
-  elements.data.value = "A\tB";
+  const pdf = new Blob(["%PDF"], { type: "application/pdf" });
+  pdf.name = "table.pdf";
+  elements.file.files = [pdf];
   calls.uploadError = true;
   await submit(elements.form);
   assert.match(elements["editor-status"].textContent, /upload failed/);
-  assert.equal(elements.data.value, "A\tB");
+  assert.equal(elements.file.files[0], pdf);
 });
 
 test("verification failure keeps the draft and retry updates the same object", async () => {
   const { elements, calls, objects } = setup();
   await tick();
   elements.title.value = "Title";
-  elements.data.value = "A\tB";
+  const pdf = new Blob(["%PDF"], { type: "application/pdf" });
+  pdf.name = "table.pdf";
+  elements.file.files = [pdf];
   calls.fetchError = true;
   await submit(elements.form);
   assert.match(elements["editor-status"].textContent, /could not be verified/);
   assert.equal(elements.title.value, "Title");
   calls.fetchError = false;
   await submit(elements.form);
-  assert.equal(calls.uploads[1].path, calls.uploads[0].path);
-  assert.equal(calls.uploads[1].options.upsert, true);
-  assert.equal(objects.size, 1);
+  assert.equal(calls.uploads[2].path, calls.uploads[1].path);
+  assert.equal(calls.uploads[2].options.upsert, true);
+  assert.equal(objects.size, 2);
 });
 
 test("navigation includes the centered weekly paycheck link on every page", () => {

@@ -83,3 +83,19 @@
   text-align: left;
   white-space: pre-wrap;
 }
+
+.paycheck-pdf {
+  width: 100%;
+  height: 70vh;
+  min-height: 36rem;
+  margin: 0.75rem 0;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.paycheck-pdf-link {
+  display: inline-block;
+  margin: 0.25rem 0 0.75rem;
+  color: var(--ink);
+  font-weight: 700;
+}

@@ -8,7 +8,7 @@
   const author = document.querySelector("#paycheck-author");
   const form = document.querySelector("#paycheck-form");
   const title = document.querySelector("#paycheck-title");
-  const data = document.querySelector("#paycheck-data");
+  const file = document.querySelector("#paycheck-file");
   const submit = document.querySelector("#paycheck-submit");
   const cancel = document.querySelector("#paycheck-cancel");
   const signout = document.querySelector("#paycheck-signout");
@@ -19,6 +19,7 @@
   let signedIn = false;
   let editingName = null;
   let saving = false;
+  let editingPdfName = null;
   let loadRevision = 0;
   let client;
   let bucket;
@@ -66,9 +67,11 @@
 
   const resetEditor = () => {
     editingName = null;
+    editingPdfName = null;
     form.reset();
-    heading.textContent = "Post a table";
-    submit.textContent = "Publish table";
+    heading.textContent = "Post a PDF";
+    submit.textContent = "Publish PDF";
+    file.required = true;
     cancel.hidden = true;
   };
 
@@ -93,30 +96,47 @@
     const item = document.createElement("li");
     const article = document.createElement("article");
     const postTitle = document.createElement("h3");
-    const wrap = document.createElement("div");
-    const table = document.createElement("table");
-    const thead = document.createElement("thead");
-    const tbody = document.createElement("tbody");
     const edit = document.createElement("button");
     article.className = "paycheck-post";
     postTitle.textContent = post.title;
-    wrap.className = "paycheck-table-wrap";
-    wrap.tabIndex = 0;
-    wrap.setAttribute("role", "region");
-    wrap.setAttribute("aria-label", `${post.title} table`);
-    table.className = "paycheck-table";
-    parseCells(post.data).forEach((cells, rowIndex) => {
-      const row = document.createElement("tr");
-      for (const value of cells) {
-        const cell = document.createElement(rowIndex === 0 ? "th" : "td");
-        if (rowIndex === 0) cell.setAttribute("scope", "col");
-        cell.textContent = value;
-        row.append(cell);
-      }
-      (rowIndex === 0 ? thead : tbody).append(row);
-    });
-    table.append(thead, tbody);
-    wrap.append(table);
+    let content;
+    if (post.type === "pdf" && post.pdfName) {
+      const url = bucket.getPublicUrl(`${folder}/${post.pdfName}`).data.publicUrl;
+      content = document.createElement("iframe");
+      content.className = "paycheck-pdf";
+      content.src = url;
+      content.title = `${post.title} PDF`;
+      const download = document.createElement("a");
+      download.className = "paycheck-pdf-link";
+      download.href = `${url}?download=1`;
+      download.textContent = "Open or download PDF";
+      download.target = "_blank";
+      download.rel = "noopener";
+      article.append(postTitle, content, download);
+    } else {
+      const wrap = document.createElement("div");
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const tbody = document.createElement("tbody");
+      wrap.className = "paycheck-table-wrap";
+      wrap.tabIndex = 0;
+      wrap.setAttribute("role", "region");
+      wrap.setAttribute("aria-label", `${post.title} table`);
+      table.className = "paycheck-table";
+      parseCells(post.data).forEach((cells, rowIndex) => {
+        const row = document.createElement("tr");
+        for (const value of cells) {
+          const cell = document.createElement(rowIndex === 0 ? "th" : "td");
+          if (rowIndex === 0) cell.setAttribute("scope", "col");
+          cell.textContent = value;
+          row.append(cell);
+        }
+        (rowIndex === 0 ? thead : tbody).append(row);
+      });
+      table.append(thead, tbody);
+      wrap.append(table);
+      article.append(postTitle, wrap);
+    }
     edit.type = "button";
     edit.className = "paycheck-edit";
     edit.textContent = "Edit table";
@@ -124,22 +144,29 @@
     edit.addEventListener("click", () => {
       if (!signedIn || saving) return;
       editingName = name;
+      editingPdfName = post.type === "pdf" ? post.pdfName : null;
       title.value = post.title;
-      data.value = post.data;
-      heading.textContent = "Edit table";
-      submit.textContent = "Save changes";
+      if (post.type === "pdf") {
+        file.required = false;
+        heading.textContent = "Edit PDF";
+        submit.textContent = "Save PDF";
+      } else {
+        file.required = true;
+        heading.textContent = "Replace with PDF";
+        submit.textContent = "Publish PDF";
+      }
       cancel.hidden = false;
       editorStatus.textContent = "";
       title.focus();
     });
-    article.append(postTitle, wrap, edit);
+    article.append(edit);
     item.append(article);
     return item;
   };
 
   const loadPosts = async () => {
     const revision = ++loadRevision;
-    status.textContent = "Loading tables...";
+    status.textContent = "Loading updates...";
     try {
       const files = [];
       const pageSize = 100;
@@ -159,9 +186,15 @@
       for (const file of files) {
         try {
           const post = JSON.parse(await readPost(file.name));
-          if (typeof post?.title !== "string" || !post.title.trim() ||
-              typeof post.data !== "string" || !post.data.trim()) {
-            throw new Error("Invalid table data.");
+          if (typeof post?.title !== "string" || !post.title.trim()) {
+            throw new Error("Invalid update data.");
+          }
+          if (post.type === "pdf") {
+            if (typeof post.pdfName !== "string" || !post.pdfName.trim()) {
+              throw new Error("Invalid PDF data.");
+            }
+          } else if (typeof post.data !== "string" || !post.data.trim()) {
+            throw new Error("Invalid update data.");
           }
           posts.push(renderPost(post, file.name));
         } catch {
@@ -171,11 +204,11 @@
       if (revision !== loadRevision) return false;
       list.replaceChildren(...posts);
       status.textContent = failed
-        ? `${failed} table${failed === 1 ? "" : "s"} could not be loaded. Refresh to retry.`
-        : posts.length ? "" : "No tables have been published yet.";
+        ? `${failed} update${failed === 1 ? "" : "s"} could not be loaded. Refresh to retry.`
+        : posts.length ? "" : "No updates have been published yet.";
       return failed === 0;
     } catch (error) {
-      if (revision === loadRevision) status.textContent = `Could not load tables: ${errorMessage(error)}`;
+      if (revision === loadRevision)       status.textContent = `Could not load updates: ${errorMessage(error)}`;
       return false;
     }
   };
@@ -232,71 +265,100 @@
     event.preventDefault();
     if (saving) return;
     if (!signedIn || !bucket) {
-      editorStatus.textContent = "Sign in before publishing a table.";
+      editorStatus.textContent = "Sign in before publishing an update.";
       return;
     }
     const headline = title.value.trim();
-    const pasted = data.value;
-    if (!headline || !pasted.trim()) {
-      editorStatus.textContent = "Enter a headline and paste spreadsheet cells before publishing.";
+    const selectedFile = file.files?.[0];
+    if (!headline) {
+      editorStatus.textContent = "Enter a headline before publishing.";
       return;
     }
-    try {
-      parseCells(pasted);
-    } catch (error) {
-      editorStatus.textContent = errorMessage(error);
+    if (!selectedFile && !editingPdfName) {
+      editorStatus.textContent = "Choose a PDF to publish.";
       return;
     }
-    const body = new Blob([JSON.stringify({ title: headline, data: pasted })], {
-      type: "application/json;charset=utf-8",
-    });
-    if (body.size > 20 * 1024 * 1024) {
-      editorStatus.textContent = "Choose a table no larger than 20 MB.";
-      return;
+    if (selectedFile) {
+      const extension = selectedFile.name.match(/\.pdf$/i);
+      if (!extension || selectedFile.type && selectedFile.type !== "application/pdf") {
+        editorStatus.textContent = "Choose a PDF file.";
+        return;
+      }
+      if (!selectedFile.size) {
+        editorStatus.textContent = "Choose a non-empty PDF.";
+        return;
+      }
+      if (selectedFile.size > 20 * 1024 * 1024) {
+        editorStatus.textContent = "Choose a PDF no larger than 20 MB.";
+        return;
+      }
     }
     saving = true;
     submit.disabled = true;
     cancel.disabled = true;
     signout.disabled = true;
     title.disabled = true;
-    data.disabled = true;
-    editorStatus.textContent = "Publishing table...";
+    file.disabled = true;
+    editorStatus.textContent = "Publishing PDF...";
     const wasEditing = Boolean(editingName);
-    const name = editingName || `${crypto.randomUUID()}.json`;
+    let pdfName = editingPdfName;
+    const metadataName = editingName || `${crypto.randomUUID()}.json`;
     try {
-      const { error } = await bucket.upload(`${folder}/${name}`, body, {
+      if (selectedFile) {
+        const safeName = selectedFile.name
+          .normalize("NFKC")
+          .replace(/[^\w.-]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+        pdfName = `${crypto.randomUUID()}-${safeName || "spreadsheet.pdf"}`;
+        const { error } = await bucket.upload(`${folder}/${pdfName}`, selectedFile, {
+          cacheControl: "3600",
+          contentType: "application/pdf",
+          upsert: false,
+        });
+        if (error) throw error;
+      }
+      const post = { type: "pdf", title: headline, pdfName };
+      const body = new Blob([JSON.stringify(post)], {
+        type: "application/json;charset=utf-8",
+      });
+      const { error } = await bucket.upload(`${folder}/${metadataName}`, body, {
         cacheControl: "0",
         contentType: "application/json;charset=utf-8",
         upsert: wasEditing,
       });
       if (error) throw error;
-      editingName = name;
+      editingName = metadataName;
+      editingPdfName = pdfName;
       try {
-        if (await readPost(name) !== await body.text()) throw new Error("The published copy does not match your changes yet.");
+        if (await readPost(metadataName) !== await body.text()) {
+          throw new Error("The published copy does not match your changes yet.");
+        }
       } catch (error) {
-        editorStatus.textContent = `Table uploaded, but could not be verified. Your draft is still here: ${errorMessage(error)}`;
+        editorStatus.textContent = `PDF uploaded, but could not be verified. Your draft is still here: ${errorMessage(error)}`;
+        file.value = "";
+        file.files = [];
         return;
       }
       resetEditor();
       const refreshed = await loadPosts();
       editorStatus.textContent = refreshed
-        ? wasEditing ? "Table updated successfully." : "Table published successfully."
-        : "Table saved, but the list could not fully refresh. Reload the page to see it.";
+        ? wasEditing ? "PDF updated successfully." : "PDF published successfully."
+        : "PDF saved, but the list could not fully refresh. Reload the page to see it.";
     } catch (error) {
-      editorStatus.textContent = `Could not save table: ${errorMessage(error)}`;
+      editorStatus.textContent = `Could not save PDF: ${errorMessage(error)}`;
     } finally {
       saving = false;
       submit.disabled = false;
       cancel.disabled = false;
       signout.disabled = false;
       title.disabled = false;
-      data.disabled = false;
+      file.disabled = false;
     }
   });
 
   if (!config?.supabaseUrl || !config?.supabaseAnonKey ||
       config.supabaseUrl.startsWith("YOUR_") || config.supabaseAnonKey.startsWith("YOUR_")) {
-    status.textContent = "Connect Supabase to load tables. See the setup instructions.";
+    status.textContent = "Connect Supabase to load PDFs. See the setup instructions.";
   } else if (window.supabase?.createClient) {
     initialize();
   } else {

@@ -17,14 +17,12 @@ or other secrets to the website.
 
 ## The Weekly Paycheck
 
-On The Weekly Paycheck page, select **Sign in to post spreadsheet data** and
-sign in with the same authorized account used for Coach's Thoughts. Give the
-post a headline, copy cells from a spreadsheet, paste them into the form, and
-publish. The first row becomes the table headings. Published tables have no
-gridlines, are public, and can be edited from this
-page when signed in. Pasting copies the displayed cell values, not formulas
-or formatting, and does not keep the table linked to the spreadsheet. Wide
-tables can be scrolled horizontally.
+On The Weekly Paycheck page, select **Sign in to post a PDF** and sign in with
+the same authorized account used for Coach's Thoughts. Give the post a
+headline, select the PDF exported from the spreadsheet, and publish. PDFs up
+to 20 MB are stored in Supabase Storage, displayed inline, and publicly
+readable. Signed-in owners can edit a post's headline or replace its PDF.
+Previously published pasted tables remain visible.
 
 ## Coach's Thoughts file uploads
 
