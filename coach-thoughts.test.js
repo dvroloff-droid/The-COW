@@ -78,12 +78,12 @@ test("uses a weathered gray newsprint palette and fine torn edges across the sit
   assert.match(page, /theme-color" content="#d0cfc8"/);
 });
 
-test("keeps shared storage publicly readable and limits authorized updates to stories", () => {
+test("keeps shared storage public while limiting authorized updates and deletions", () => {
   assert.match(storagePolicies, /'coach-thoughts'\s*,\s*'coach-thoughts'\s*,\s*true\s*,\s*20971520/i);
   assert.match(storagePolicies, /for select\s+to anon, authenticated/i);
   assert.match(storagePolicies, /for insert\s+to authenticated/i);
   assert.match(storagePolicies, /for update\s+to authenticated\s+using\s*\(bucket_id = 'coach-thoughts' and name like 'story-%'\)/i);
-  assert.doesNotMatch(storagePolicies, /for delete/i);
+  assert.match(storagePolicies, /for delete\s+to authenticated\s+using\s*\(bucket_id = 'coach-thoughts' and name like 'story-weekly-paycheck\/%'\)/i);
 });
 
 function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []) {

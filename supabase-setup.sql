@@ -41,3 +41,10 @@ for update
 to authenticated
 using (bucket_id = 'coach-thoughts' and name like 'story-%')
 with check (bucket_id = 'coach-thoughts' and name like 'story-%');
+
+drop policy if exists "Authorized users can delete Weekly Paycheck files" on storage.objects;
+create policy "Authorized users can delete Weekly Paycheck files"
+on storage.objects
+for delete
+to authenticated
+using (bucket_id = 'coach-thoughts' and name like 'story-weekly-paycheck/%');

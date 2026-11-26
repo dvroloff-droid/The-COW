@@ -40,13 +40,20 @@
 }
 
 .paycheck-form button,
-.paycheck-edit {
+.paycheck-edit,
+.paycheck-delete {
   padding: 0.6rem 0.9rem;
   border: 1px solid var(--ink);
   background: var(--ink);
   color: var(--paper);
   cursor: pointer;
   font: inherit;
+}
+
+.paycheck-delete {
+  margin-left: 0.5rem;
+  border-color: #7a2924;
+  background: #7a2924;
 }
 
 .paycheck-posts {

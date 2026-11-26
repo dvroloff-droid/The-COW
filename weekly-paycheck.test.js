@@ -5,7 +5,7 @@ const vm = require("node:vm");
 
 const script = fs.readFileSync(`${__dirname}/weekly-paycheck.js`, "utf8");
 
-function setup({ owner = true, session = true, initialObjects = {} } = {}) {
+function setup({ owner = true, session = true, initialObjects = {}, confirmDelete = true } = {}) {
   const elements = {};
   const createElement = (tag) => ({
     tag,
@@ -21,7 +21,9 @@ function setup({ owner = true, session = true, initialObjects = {} } = {}) {
     setAttribute(name, value) { this.attributes[name] = value; },
     querySelectorAll(selector) {
       const descendants = (node) => node.children.flatMap((child) => [child, ...descendants(child)]);
-      return descendants(this).filter((node) => selector === ".paycheck-edit" && node.className === "paycheck-edit");
+      return descendants(this).filter((node) =>
+        selector === ".paycheck-edit, .paycheck-delete" &&
+        ["paycheck-edit", "paycheck-delete"].includes(node.className));
     },
     focus() { this.focused = true; },
   });
@@ -32,7 +34,7 @@ function setup({ owner = true, session = true, initialObjects = {} } = {}) {
   elements.file.files = [];
   elements.form.reset = () => { elements.title.value = ""; elements.file.files = []; };
   const objects = new Map(Object.entries(initialObjects));
-  const calls = { uploads: [], list: [] };
+  const calls = { uploads: [], list: [], removes: [], confirmations: [] };
   const bucket = {
     async list(path, options) {
       calls.list.push({ path, ...options });
@@ -48,6 +50,12 @@ function setup({ owner = true, session = true, initialObjects = {} } = {}) {
       if (calls.uploadError) return { error: new Error("upload failed") };
       objects.set(path.split("/").pop(), await body.text());
       return { error: null };
+    },
+    async remove(paths) {
+      calls.removes.push(paths);
+      if (calls.removeError) return { error: new Error("delete failed") };
+      for (const path of paths) objects.delete(path.split("/").pop());
+      return { data: paths, error: null };
     },
     getPublicUrl(path) { return { data: { publicUrl: `https://storage.example/${path}` } }; },
   };
@@ -65,6 +73,7 @@ function setup({ owner = true, session = true, initialObjects = {} } = {}) {
   vm.runInNewContext(script, {
     window: {
       location: { hash: owner ? "#coach-login" : "" },
+      confirm: (message) => { calls.confirmations.push(message); return confirmDelete; },
       COACH_THOUGHTS_CONFIG: { supabaseUrl: "https://storage.example", supabaseAnonKey: "public" },
       supabase: { createClient: () => client },
     },
@@ -210,6 +219,56 @@ test("keeps previously published pasted tables visible", async () => {
   const article = elements.list.children[0].children[0];
   assert.equal(article.children[0].textContent, "Previous table");
   assert.equal(article.children[1].className, "paycheck-table-wrap");
+});
+
+test("owner can confirm deleting one update and its uploaded file", async () => {
+  const { elements, objects, calls } = setup({
+    initialObjects: {
+      "top.json": JSON.stringify({ type: "file", title: "Top post", fileName: "top.png", fileType: "image/png" }),
+      "top.png": "top image",
+      "bottom.json": JSON.stringify({
+        type: "file",
+        title: "Everyone should be thankful for Coach's picks",
+        fileName: "bottom.png",
+        fileType: "image/png",
+      }),
+      "bottom.png": "bottom image",
+    },
+  });
+  await tick();
+  assert.equal(elements.list.children.length, 2);
+  const bottomArticle = elements.list.children[1].children[0];
+  const deleteButton = bottomArticle.children[4];
+  assert.equal(deleteButton.textContent, "Delete update");
+  await deleteButton.listeners.click();
+  assert.match(calls.confirmations[0], /Everyone should be thankful for Coach's picks/);
+  assert.equal(calls.removes[0].join("|"),
+    "story-weekly-paycheck/bottom.json|story-weekly-paycheck/bottom.png");
+  assert.equal(objects.has("bottom.json"), false);
+  assert.equal(objects.has("bottom.png"), false);
+  assert.equal(objects.has("top.json"), true);
+  assert.equal(elements.list.children.length, 1);
+  assert.match(elements["editor-status"].textContent, /deleted successfully/);
+});
+
+test("cancelled or failed deletes leave the post visible", async () => {
+  const initialObjects = {
+    "post.json": JSON.stringify({ title: "Keep me", data: "A\tB" }),
+  };
+  const cancelled = setup({ initialObjects, confirmDelete: false });
+  await tick();
+  const deleteButton = cancelled.elements.list.children[0].children[0].children[3];
+  await deleteButton.listeners.click();
+  assert.equal(cancelled.calls.removes.length, 0);
+  assert.equal(cancelled.elements.list.children.length, 1);
+
+  const failed = setup({ initialObjects });
+  await tick();
+  failed.calls.removeError = true;
+  const failedDeleteButton = failed.elements.list.children[0].children[0].children[3];
+  await failedDeleteButton.listeners.click();
+  assert.match(failed.elements["editor-status"].textContent, /Could not delete update: delete failed/);
+  assert.equal(failed.elements.list.children.length, 1);
 });
 
 test("verification failure keeps the draft and retry updates the same object", async () => {

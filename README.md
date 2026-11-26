@@ -23,6 +23,9 @@ headline, select a spreadsheet PDF or PNG, JPEG, or WebP image snip, and
 publish. Files up to 20 MB are stored in Supabase Storage, displayed inline,
 and publicly readable. Signed-in owners can edit a post's headline or replace
 its file. Previously published PDFs and pasted tables remain visible.
+Signed-in owners can delete an update and its uploaded file from the post's
+**Delete update** button. Rerun `supabase-setup.sql` to enable the matching
+storage delete policy.
 
 ## Coach's Thoughts file uploads
 
@@ -34,8 +37,9 @@ type up to 20 MB.
 1. Create a Supabase project.
 2. In the Supabase SQL Editor, run `supabase-setup.sql` to create or update the
    public bucket and its read/upload policies. The script also allows
-   authorized accounts to update published story files, so rerun it to enable
-   the article editor on an existing project.
+   authorized accounts to update published story files and delete files in
+   The Weekly Paycheck folder, so rerun it to enable these controls on an
+   existing project.
 3. In Supabase Authentication settings, disable public sign-ups and create
    email/password accounts for the people authorized to upload.
 4. Copy the project's URL and its public publishable (or legacy `anon`) key

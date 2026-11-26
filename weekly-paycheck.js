@@ -88,7 +88,7 @@
     signedIn = Boolean(session) && ownerMode;
     login.hidden = !ownerMode || signedIn;
     author.hidden = !signedIn;
-    for (const button of list.querySelectorAll(".paycheck-edit")) {
+    for (const button of list.querySelectorAll(".paycheck-edit, .paycheck-delete")) {
       button.hidden = !signedIn;
     }
   };
@@ -106,6 +106,7 @@
     const article = document.createElement("article");
     const postTitle = document.createElement("h3");
     const edit = document.createElement("button");
+    const remove = document.createElement("button");
     article.className = "paycheck-post";
     postTitle.textContent = post.title;
     let content;
@@ -178,7 +179,34 @@
       editorStatus.textContent = "";
       title.focus();
     });
-    article.append(edit);
+    remove.type = "button";
+    remove.className = "paycheck-delete";
+    remove.textContent = "Delete update";
+    remove.hidden = !signedIn;
+    remove.addEventListener("click", async () => {
+      if (!signedIn || saving) return;
+      if (!window.confirm(`Delete "${post.title}" and its uploaded file? This cannot be undone.`)) return;
+      saving = true;
+      remove.disabled = true;
+      editorStatus.textContent = "Deleting update...";
+      try {
+        const paths = [`${folder}/${name}`];
+        if (fileName) paths.push(`${folder}/${fileName}`);
+        const { error } = await bucket.remove(paths);
+        if (error) throw error;
+        if (editingName === name) resetEditor();
+        const refreshed = await loadPosts();
+        editorStatus.textContent = refreshed
+          ? "Update deleted successfully."
+          : "Update deleted, but the list could not fully refresh. Reload the page to confirm.";
+      } catch (error) {
+        editorStatus.textContent = `Could not delete update: ${errorMessage(error)}`;
+      } finally {
+        saving = false;
+        remove.disabled = false;
+      }
+    });
+    article.append(edit, remove);
     item.append(article);
     return item;
   };
