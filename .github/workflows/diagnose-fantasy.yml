@@ -1,0 +1,57 @@
+name: Diagnose fantasy article formatting
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect public article formatting
+        run: |
+          python3 - <<'PY'
+          import html.parser
+          import json
+          import pathlib
+          import re
+          import urllib.parse
+          import urllib.request
+
+          config = pathlib.Path("supabase-config.js").read_text()
+          base = re.search(r'supabaseUrl:\s*"([^"]+)"', config).group(1)
+          key = re.search(r'supabaseAnonKey:\s*"([^"]+)"', config).group(1)
+          request = urllib.request.Request(
+              base + "/storage/v1/object/list/coach-thoughts",
+              data=json.dumps({"prefix": "", "limit": 1000}).encode(),
+              headers={"apikey": key, "Content-Type": "application/json"},
+          )
+          files = json.load(urllib.request.urlopen(request))
+          class Inspect(html.parser.HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.stack = []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  self.stack.append((tag, attrs.get("style", ""), attrs.get("size", "")))
+              def handle_endtag(self, tag):
+                  for i in range(len(self.stack) - 1, -1, -1):
+                      if self.stack[i][0] == tag:
+                          del self.stack[i:]
+                          break
+              def handle_data(self, data):
+                  if any(phrase in data.lower() for phrase in ("few stories", "sampson", "did yoro", "red card")):
+                      print("matching text structure:", self.stack)
+          for file in files:
+              name = file.get("name", "")
+              if not name.startswith("story-fantasy-") or not name.endswith(".json"):
+                  continue
+              url = base + "/storage/v1/object/public/coach-thoughts/" + urllib.parse.quote(name)
+              article = json.load(urllib.request.urlopen(url))
+              content = article.get("html", "")
+              if "red card" in content.lower():
+                  print("Found matching fantasy story")
+                  Inspect().feed(content)
+          site = urllib.request.urlopen("https://dvroloff-droid.github.io/The-COW/?diagnostic=20261127").read().decode()
+          print("Published stylesheet:", re.findall(r"styles\.css\?v=[^\"']+", site))
+          PY
