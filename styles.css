@@ -1034,7 +1034,26 @@ main,
 }
 
 .fantasy-updates-list .shared-story-body {
+  display: flow-root;
   padding-top: 0.2rem;
+}
+
+.fantasy-updates-list .shared-story-body figure:has(img) {
+  float: left;
+  width: 55%;
+  margin: 0 0.7rem 0.4rem 0;
+}
+
+.fantasy-updates-list .shared-story-body figure img {
+  width: 100%;
+}
+
+.fantasy-updates-list .shared-story-body > img,
+.fantasy-updates-list .shared-story-body > p > img,
+.fantasy-updates-list .shared-story-body > p > a > img {
+  float: left;
+  width: 55%;
+  margin: 0 0.7rem 0.4rem 0;
 }
 
 .fantasy-updates-list .shared-story-body > p:first-child {

@@ -59,7 +59,10 @@ type up to 20 MB.
    appear only in the shared library, and older plain-text stories remain
    readable there until edited. Choose "EPL Fantasy" in the article
    editor's Article section menu to display the full article in the homepage's
-   EPL Fantasy section. Authorized uploaders can edit it there.
+   EPL Fantasy section. Pictures in these articles automatically float left at
+   55% of the article width, with text wrapping alongside them. Place a picture
+   where the wrapping should begin using Add picture or paste it into the
+   editor. Authorized uploaders can edit it there.
    Authorized uploaders can also share `.xlsx`, `.xls`, and `.xlsm`
    workbooks up to 20 MB. Workbooks are stored unchanged, preserving every
    worksheet. Only the most recently uploaded workbook appears as a public
