@@ -107,5 +107,42 @@ window.COACH_THOUGHTS_STORIES = (() => {
     }
   };
 
-  return { sports, parseStoryArticle, parsePlainStory, appendSafeStoryNodes };
+  const attachRedCardCaption = (body) => {
+    const caption = Array.from(body.querySelectorAll("p, figcaption, h2, h3, a, span"))
+      .find((element) =>
+        !element.querySelector("img") &&
+        /^["“]?\s*is this worth a red card\?\s*[-–—]\s*threads\s*["”]?$/i.test(
+          element.textContent.trim().replace(/\s+/g, " "),
+        ));
+    if (!caption) return;
+
+    const image = Array.from(body.querySelectorAll("img"))
+      .filter((element) => element.compareDocumentPosition(caption) & Node.DOCUMENT_POSITION_FOLLOWING)
+      .pop();
+    if (!image) return;
+    let figure = image.closest("figure");
+    if (figure?.contains(caption)) return;
+    if (figure?.querySelector("figcaption")) return;
+    if (!figure) {
+      const link = image.closest("a");
+      const imageNode = link && link.textContent.trim() === "" ? link : image;
+      const paragraph = imageNode.closest("p");
+      const position = paragraph || imageNode;
+      figure = document.createElement("figure");
+      position.before(figure);
+      figure.append(imageNode);
+      if (paragraph && !paragraph.textContent.trim() && !paragraph.querySelector("img")) paragraph.remove();
+    }
+
+    const figcaption = document.createElement("figcaption");
+    if (caption.tagName === "A") {
+      figcaption.append(caption);
+    } else {
+      while (caption.firstChild) figcaption.append(caption.firstChild);
+      caption.remove();
+    }
+    figure.append(figcaption);
+  };
+
+  return { sports, parseStoryArticle, parsePlainStory, appendSafeStoryNodes, attachRedCardCaption };
 })();

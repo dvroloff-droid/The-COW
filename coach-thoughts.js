@@ -45,7 +45,7 @@
   const setStoryStatus = (message) => updateStatus(storyStatus, message);
   const storyEditButtons = new Set();
   let editingStoryName = null;
-  const { parseStoryArticle, parsePlainStory, appendSafeStoryNodes } =
+  const { parseStoryArticle, parsePlainStory, appendSafeStoryNodes, attachRedCardCaption } =
     window.COACH_THOUGHTS_STORIES;
   let activeSession = null;
   const setWorkbookMessage = (message) => {
@@ -274,7 +274,10 @@
                     storyBody.append(paragraphElement);
                   }
                 }
-                if (isFantasyStory) trimLeadingBlankLines(storyBody);
+                if (isFantasyStory) {
+                  trimLeadingBlankLines(storyBody);
+                  attachRedCardCaption(storyBody);
+                }
                 loaded = true;
                 if (isFantasyStory) summary.hidden = true;
               } catch (error) {

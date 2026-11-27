@@ -13,10 +13,10 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="epl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261127-1/);
+  assert.match(page, /styles\.css\?v=20261127-2/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
-  assert.match(page, /story-content\.js\?v=20261127-1/);
-  assert.match(page, /coach-thoughts\.js\?v=20261124-1/);
+  assert.match(page, /story-content\.js\?v=20261127-2/);
+  assert.match(page, /coach-thoughts\.js\?v=20261127-1/);
   assert.match(page, /id="thoughts-story-sport"/);
   assert.match(page, /id="thoughts-story-placement"/);
   assert.match(page, /id="fantasy-updates-list"/);
@@ -55,6 +55,47 @@ test("preserves safe pasted font sizes when rendering and editing stories", () =
   assert.equal(target.children[0].children[0].children[0].textContent, "Is this worth a Red Card? - Threads");
   assert.equal(target.children[1].style.fontSize, undefined);
   assert.equal(target.children[2].style.fontSize, undefined);
+});
+
+test("attaches the Red Card caption to its preceding picture without moving story text", () => {
+  const pictureFigure = {
+    children: [],
+    contains: () => false,
+    querySelector: () => null,
+    append(child) { this.children.push(child); },
+  };
+  const image = {
+    compareDocumentPosition: () => 4,
+    closest: (selector) => selector === "figure" ? pictureFigure : null,
+  };
+  const captionLink = { textContent: "Is this worth a Red Card? - Threads" };
+  const caption = {
+    tagName: "P",
+    textContent: captionLink.textContent,
+    children: [captionLink],
+    get firstChild() { return this.children[0]; },
+    querySelector: () => null,
+    remove() { this.removed = true; },
+  };
+  const body = {
+    querySelectorAll: (selector) => selector === "img" ? [image] : [caption],
+  };
+  const context = {
+    window: {},
+    Node: { DOCUMENT_POSITION_FOLLOWING: 4 },
+    document: {
+      createElement: (tagName) => ({
+        tagName,
+        children: [],
+        append(child) { this.children.push(child); caption.children.shift(); },
+      }),
+    },
+  };
+  vm.runInNewContext(storyContentScript, context);
+  context.window.COACH_THOUGHTS_STORIES.attachRedCardCaption(body);
+  assert.equal(caption.removed, true);
+  assert.equal(pictureFigure.children[0].tagName, "figcaption");
+  assert.equal(pictureFigure.children[0].children[0], captionLink);
 });
 
 test("orders EPL Fantasy, its link, spreadsheets, and articles in section 04", () => {
@@ -228,6 +269,7 @@ function setup(hash = "", sharedFiles = [], downloadText = null, storyNodes = []
     querySelector(selector) {
       return this.children.find((child) => child.tagName === selector || child.querySelector?.(selector)) || null;
     },
+    querySelectorAll() { return []; },
     getAttribute(name) { return this.attributes[name] || null; },
     scrollIntoView() { this.scrolledIntoView = true; },
     open: false,

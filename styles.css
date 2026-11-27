@@ -1040,7 +1040,7 @@ main,
 
 .fantasy-updates-list .shared-story-body figure:has(img) {
   float: left;
-  width: 55%;
+  width: 60%;
   margin: 0 0.7rem 0.4rem 0;
 }
 
@@ -1048,11 +1048,22 @@ main,
   width: 100%;
 }
 
+.fantasy-updates-list .shared-story-body figcaption {
+  color: var(--muted);
+  font-size: 0.6rem;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.fantasy-updates-list .shared-story-body figcaption * {
+  font-size: inherit !important;
+}
+
 .fantasy-updates-list .shared-story-body > img,
 .fantasy-updates-list .shared-story-body > p > img,
 .fantasy-updates-list .shared-story-body > p > a > img {
   float: left;
-  width: 55%;
+  width: 60%;
   margin: 0 0.7rem 0.4rem 0;
 }
 
