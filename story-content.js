@@ -40,7 +40,7 @@ window.COACH_THOUGHTS_STORIES = (() => {
   const appendSafeStoryNodes = (source, target, supabaseUrl, bucketName) => {
     const allowedTags = new Set([
       "A", "B", "BLOCKQUOTE", "BR", "DIV", "EM", "FIGCAPTION", "FIGURE",
-      "H2", "H3", "I", "IMG", "LI", "OL", "P", "S", "STRONG", "U", "UL",
+      "FONT", "H2", "H3", "I", "IMG", "LI", "OL", "P", "S", "SPAN", "STRONG", "U", "UL",
     ]);
     const blockedTags = new Set(["IFRAME", "OBJECT", "SCRIPT", "STYLE", "SVG"]);
     for (const child of source.childNodes) {
@@ -75,8 +75,18 @@ window.COACH_THOUGHTS_STORIES = (() => {
         appendSafeStoryNodes(child, target, supabaseUrl, bucketName);
         continue;
       }
-      const tagName = child.tagName === "DIV" ? "p" : child.tagName.toLowerCase();
+      const tagName = child.tagName === "DIV" ? "p"
+        : child.tagName === "FONT" ? "span"
+        : child.tagName.toLowerCase();
       const element = document.createElement(tagName);
+      const fontSize = child.style?.fontSize || "";
+      const sizeMatch = /^(\d+(?:\.\d+)?)(pt|px|em|rem|%)$/.exec(fontSize);
+      if (sizeMatch) {
+        const size = Number(sizeMatch[1]);
+        const limits = { pt: [5, 72], px: [6, 96], em: [0.4, 4], rem: [0.4, 4], "%": [40, 400] };
+        const [min, max] = limits[sizeMatch[2]];
+        if (size >= min && size <= max) element.style.fontSize = fontSize;
+      }
       if (child.tagName === "A") {
         const href = child.getAttribute("href");
         if (href) {

@@ -47,8 +47,9 @@ type up to 20 MB.
 5. Publish the site. Authorized uploaders can sign in to add files, edit
    published stories (including older plain-text stories), and publish
    newspaper columns with formatted text and inline pictures. Each picture may
-   be up to 20 MB. Saving waits for picture uploads and confirms that the
-   published copy matches the draft; if verification fails, the draft remains
+   be up to 20 MB. Pasted font sizes from 5pt (or 6px) upward are preserved
+   within safe limits, including for image captions. Saving waits for picture
+   uploads and confirms that the published copy matches the draft; if verification fails, the draft remains
    in the editor. Published columns open in a multi-column newspaper layout,
    with more room reserved for the article than either side column. Select a
    sport in the article editor to show a story on that sport's archive page;

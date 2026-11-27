@@ -15,11 +15,46 @@ test("places article and spreadsheet uploads below the published article archive
   assert.match(page, /id="epl-workbooks"/);
   assert.match(page, /styles\.css\?v=20261125-2/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
-  assert.match(page, /story-content\.js\?v=20261112-1/);
+  assert.match(page, /story-content\.js\?v=20261127-1/);
   assert.match(page, /coach-thoughts\.js\?v=20261124-1/);
   assert.match(page, /id="thoughts-story-sport"/);
   assert.match(page, /id="thoughts-story-placement"/);
   assert.match(page, /id="fantasy-updates-list"/);
+});
+
+test("preserves safe pasted font sizes when rendering and editing stories", () => {
+  const createElement = (tagName) => ({
+    tagName,
+    style: {},
+    children: [],
+    append(...children) { this.children.push(...children); },
+  });
+  const context = {
+    window: {},
+    document: {
+      createElement,
+      createTextNode: (textContent) => ({ nodeType: 3, textContent }),
+    },
+    URL,
+  };
+  vm.runInNewContext(storyContentScript, context);
+  const text = (value) => ({ nodeType: 3, textContent: value });
+  const source = { childNodes: [
+    { nodeType: 1, tagName: "P", style: { fontSize: "5pt" }, childNodes: [
+      { nodeType: 1, tagName: "SPAN", style: { fontSize: "5pt" }, childNodes: [text("Is this worth a Red Card? - Threads")] },
+    ] },
+    { nodeType: 1, tagName: "SPAN", style: { fontSize: "9999px" }, childNodes: [text("Body")] },
+    { nodeType: 1, tagName: "SPAN", style: { fontSize: "url(https://example.com)" }, childNodes: [text("Unsafe")] },
+  ] };
+  const target = createElement("div");
+  context.window.COACH_THOUGHTS_STORIES.appendSafeStoryNodes(
+    source, target, "https://example.supabase.co", "coach-thoughts",
+  );
+  assert.equal(target.children[0].style.fontSize, "5pt");
+  assert.equal(target.children[0].children[0].style.fontSize, "5pt");
+  assert.equal(target.children[0].children[0].children[0].textContent, "Is this worth a Red Card? - Threads");
+  assert.equal(target.children[1].style.fontSize, undefined);
+  assert.equal(target.children[2].style.fontSize, undefined);
 });
 
 test("orders EPL Fantasy, its link, spreadsheets, and articles in section 04", () => {
