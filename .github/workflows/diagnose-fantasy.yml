@@ -55,3 +55,63 @@ jobs:
           site = urllib.request.urlopen("https://dvroloff-droid.github.io/The-COW/?diagnostic=20261127").read().decode()
           print("Published stylesheet:", re.findall(r"styles\.css\?v=[^\"']+", site))
           PY
+      - name: Inspect rendered article
+        run: |
+          node <<'JS'
+          const { spawn } = require("node:child_process");
+          const fs = require("node:fs");
+          const os = require("node:os");
+          const path = require("node:path");
+          const profile = fs.mkdtempSync(path.join(os.tmpdir(), "story-chrome-"));
+          const chrome = spawn("google-chrome", ["--headless", "--no-sandbox", "--disable-gpu", "--remote-debugging-port=9222", `--user-data-dir=${profile}`, "about:blank"], {stdio: "ignore"});
+          const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+          (async () => {
+            try {
+              let targets;
+              for (let i = 0; i < 30; i++) {
+                try { targets = await (await fetch("http://127.0.0.1:9222/json")).json(); break; }
+                catch { await sleep(500); }
+              }
+              if (!targets) throw new Error("Chrome did not start");
+              const socket = new WebSocket(targets[0].webSocketDebuggerUrl);
+              await new Promise((resolve, reject) => { socket.onopen = resolve; socket.onerror = reject; });
+              let nextId = 0;
+              const pending = new Map();
+              socket.onmessage = event => {
+                const message = JSON.parse(event.data);
+                if (!message.id || !pending.has(message.id)) return;
+                const [resolve, reject] = pending.get(message.id);
+                pending.delete(message.id);
+                message.error ? reject(new Error(message.error.message)) : resolve(message.result);
+              };
+              const send = (method, params = {}) => new Promise((resolve, reject) => {
+                const id = ++nextId;
+                pending.set(id, [resolve, reject]);
+                socket.send(JSON.stringify({id, method, params}));
+              });
+              await send("Page.navigate", {url: "https://dvroloff-droid.github.io/The-COW/?diagnostic=20261127"});
+              await sleep(15000);
+              const result = await send("Runtime.evaluate", {
+                returnByValue: true,
+                expression: `(() => {
+                  const root = document.querySelector("#fantasy-updates-list");
+                  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+                  const out = [];
+                  while (walker.nextNode()) {
+                    const node = walker.currentNode;
+                    if (!/few stories|sampson|did yoro|red card/i.test(node.textContent)) continue;
+                    const parents = [];
+                    for (let e = node.parentElement; e && e !== root; e = e.parentElement) {
+                      const s = getComputedStyle(e);
+                      parents.push({tag:e.tagName, class:e.className, inline:e.getAttribute("style"), font:s.fontSize, adjust:s.webkitTextSizeAdjust});
+                    }
+                    out.push(parents);
+                  }
+                  return {matches:out, storyCount:root.querySelectorAll(".shared-story-body").length, stylesheet:document.querySelector('link[rel="stylesheet"]').href};
+                })()`,
+              });
+              console.log(JSON.stringify(result.result.value));
+              socket.close();
+            } finally { chrome.kill(); }
+          })().catch(error => { console.error(error); process.exitCode = 1; });
+          JS
