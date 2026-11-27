@@ -89,6 +89,7 @@ jobs:
                 pending.set(id, [resolve, reject]);
                 socket.send(JSON.stringify({id, method, params}));
               });
+              await send("Emulation.setDeviceMetricsOverride", {width: 427, height: 900, deviceScaleFactor: 1, mobile: false});
               await send("Page.navigate", {url: "https://dvroloff-droid.github.io/The-COW/?diagnostic=20261127"});
               await sleep(15000);
               const result = await send("Runtime.evaluate", {
@@ -100,12 +101,15 @@ jobs:
                   while (walker.nextNode()) {
                     const node = walker.currentNode;
                     if (!/few stories|sampson|did yoro|red card/i.test(node.textContent)) continue;
+                    const range = document.createRange();
+                    range.selectNodeContents(node);
+                    const rect = range.getClientRects()[0];
                     const parents = [];
                     for (let e = node.parentElement; e && e !== root; e = e.parentElement) {
                       const s = getComputedStyle(e);
                       parents.push({tag:e.tagName, class:e.className, inline:e.getAttribute("style"), font:s.fontSize, adjust:s.webkitTextSizeAdjust});
                     }
-                    out.push(parents);
+                    out.push({label: /sampson/i.test(node.textContent) ? "before" : /did yoro/i.test(node.textContent) ? "after" : /few stories/i.test(node.textContent) ? "wrapped" : "red-card", rectHeight:rect?.height, parents});
                   }
                   return {matches:out, storyCount:root.querySelectorAll(".shared-story-body").length, stylesheet:document.querySelector('link[rel="stylesheet"]').href};
                 })()`,
