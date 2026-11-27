@@ -854,7 +854,7 @@ main,
 }
 
 .shared-story-article .eyebrow,
-.shared-story-article .shared-story-body p:first-child::first-letter {
+.shared-story-article .shared-story-body > p:first-child::first-letter {
   color: #595853;
 }
 
@@ -890,6 +890,27 @@ main,
   text-align: justify;
 }
 
+.shared-story-body table,
+.story-editor table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin: 0.8rem 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  text-align: left;
+  column-span: all;
+}
+
+.shared-story-body th,
+.shared-story-body td,
+.story-editor th,
+.story-editor td {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--rule-light);
+  vertical-align: top;
+}
+
 .shared-story-body p {
   margin: 0.45rem 0 0;
   white-space: normal;
@@ -899,7 +920,7 @@ main,
   hyphens: auto;
 }
 
-.shared-story-body p:first-child::first-letter {
+.shared-story-body > p:first-child::first-letter {
   float: left;
   padding: 0.03rem 0.22rem 0 0;
   color: var(--red);
@@ -1044,7 +1065,7 @@ main,
   font-size: 11pt !important;
 }
 
-.fantasy-updates-list .shared-story-body p:first-child::first-letter {
+.fantasy-updates-list .shared-story-body > p:first-child::first-letter {
   float: none;
   padding: 0;
   color: inherit;

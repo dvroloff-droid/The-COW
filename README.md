@@ -47,7 +47,8 @@ type up to 20 MB.
 5. Publish the site. Authorized uploaders can sign in to add files, edit
    published stories (including older plain-text stories), and publish
    newspaper columns with formatted text and inline pictures. Each picture may
-   be up to 20 MB. Pasted font sizes from 5pt (or 6px) upward are preserved
+   be up to 20 MB. Pasted tables retain their rows and cells and scroll horizontally
+   on narrow screens. Pasted font sizes from 5pt (or 6px) upward are preserved
    within safe limits, except that EPL Fantasy article text uses a uniform
    size with smaller picture captions. Saving waits for picture
    uploads and confirms that the published copy matches the draft; if verification fails, the draft remains
