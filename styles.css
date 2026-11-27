@@ -1029,13 +1029,26 @@ main,
 .fantasy-updates-list .shared-story-body p {
   margin: 0.45rem 0 0;
   color: inherit;
-  font-size: 10pt;
   line-height: 1.5;
 }
 
 .fantasy-updates-list .shared-story-body {
   display: flow-root;
   padding-top: 0.2rem;
+  font-size: 11pt;
+}
+
+.fantasy-updates-list .shared-story-body :not(figcaption):not(figcaption *) {
+  font-size: 11pt !important;
+}
+
+.fantasy-updates-list .shared-story-body p:first-child::first-letter {
+  float: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
 }
 
 .fantasy-updates-list .shared-story-body figure:has(img) {
