@@ -40,7 +40,8 @@ window.COACH_THOUGHTS_STORIES = (() => {
   const appendSafeStoryNodes = (source, target, supabaseUrl, bucketName) => {
     const allowedTags = new Set([
       "A", "B", "BLOCKQUOTE", "BR", "DIV", "EM", "FIGCAPTION", "FIGURE",
-      "FONT", "H2", "H3", "I", "IMG", "LI", "OL", "P", "S", "SPAN", "STRONG", "U", "UL",
+      "CAPTION", "FONT", "H2", "H3", "I", "IMG", "LI", "OL", "P", "S", "SPAN", "STRONG",
+      "TABLE", "TBODY", "TD", "TFOOT", "TH", "THEAD", "TR", "U", "UL",
     ]);
     const blockedTags = new Set(["IFRAME", "OBJECT", "SCRIPT", "STYLE", "SVG"]);
     for (const child of source.childNodes) {
@@ -79,6 +80,18 @@ window.COACH_THOUGHTS_STORIES = (() => {
         : child.tagName === "FONT" ? "span"
         : child.tagName.toLowerCase();
       const element = document.createElement(tagName);
+      if (child.tagName === "TD" || child.tagName === "TH") {
+        for (const attribute of ["colspan", "rowspan"]) {
+          const value = child.getAttribute(attribute);
+          if (/^[1-9]\d{0,2}$/.test(value || "") && Number(value) <= 100) {
+            element.setAttribute(attribute, value);
+          }
+        }
+        const scope = child.getAttribute("scope");
+        if (child.tagName === "TH" && ["row", "col", "rowgroup", "colgroup"].includes(scope)) {
+          element.setAttribute("scope", scope);
+        }
+      }
       const fontSize = child.style?.fontSize || "";
       const sizeMatch = /^(\d+(?:\.\d+)?)(pt|px|em|rem|%)$/.exec(fontSize);
       if (sizeMatch) {

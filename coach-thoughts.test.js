@@ -13,13 +13,53 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="epl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261127-4/);
+  assert.match(page, /styles\.css\?v=20261127-5/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
-  assert.match(page, /story-content\.js\?v=20261127-2/);
+  assert.match(page, /story-content\.js\?v=20261127-3/);
   assert.match(page, /coach-thoughts\.js\?v=20261127-1/);
   assert.match(page, /id="thoughts-story-sport"/);
   assert.match(page, /id="thoughts-story-placement"/);
   assert.match(page, /id="fantasy-updates-list"/);
+});
+
+test("preserves table structure and safe cell spans in stories", () => {
+  const createElement = (tagName) => ({
+    tagName, style: {}, children: [], attributes: {},
+    append(...children) { this.children.push(...children); },
+    setAttribute(name, value) { this.attributes[name] = value; },
+  });
+  const context = {
+    window: {},
+    document: { createElement, createTextNode: (textContent) => ({ nodeType: 3, textContent }) },
+    URL,
+  };
+  vm.runInNewContext(storyContentScript, context);
+  const node = (tagName, attributes = {}, childNodes = []) => ({
+    nodeType: 1, tagName, childNodes,
+    getAttribute: (name) => attributes[name] || null,
+  });
+  const source = { childNodes: [node("TABLE", {}, [
+    node("TBODY", {}, [
+      node("TR", {}, [
+        node("TH", { colspan: "2", scope: "col", onclick: "alert(1)" }, [
+          { nodeType: 3, textContent: "Utah's opponent" },
+        ]),
+        node("TD", { rowspan: "999", colspan: "javascript:alert(1)" }),
+      ]),
+    ]),
+  ])] };
+  const target = createElement("div");
+  context.window.COACH_THOUGHTS_STORIES.appendSafeStoryNodes(
+    source, target, "https://example.supabase.co", "coach-thoughts",
+  );
+  const table = target.children[0];
+  const row = table.children[0].children[0];
+  assert.equal(table.tagName, "table");
+  assert.equal(row.tagName, "tr");
+  assert.equal(row.children[0].tagName, "th");
+  assert.deepEqual(row.children[0].attributes, { colspan: "2", scope: "col" });
+  assert.equal(row.children[0].children[0].textContent, "Utah's opponent");
+  assert.deepEqual(row.children[1].attributes, {});
 });
 
 test("preserves safe pasted font sizes when rendering and editing stories", () => {
