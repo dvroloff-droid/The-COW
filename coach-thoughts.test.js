@@ -13,7 +13,7 @@ test("places article and spreadsheet uploads below the published article archive
   assert.ok(page.indexOf('class="thoughts-library"') < page.indexOf('id="thoughts-uploader"'));
   assert.ok(page.indexOf('id="thoughts-list"') < page.indexOf('id="thoughts-status"'));
   assert.match(page, /id="epl-workbooks"/);
-  assert.match(page, /styles\.css\?v=20261127-3/);
+  assert.match(page, /styles\.css\?v=20261127-4/);
   assert.match(page, /accept="\.xlsx,\.xls,\.xlsm"/);
   assert.match(page, /story-content\.js\?v=20261127-2/);
   assert.match(page, /coach-thoughts\.js\?v=20261127-1/);
@@ -132,8 +132,9 @@ test("styles the spreadsheet uploader consistently with the article editor", () 
 test("uses smaller text for published article bodies and supports pictures", () => {
   assert.match(styles, /\.hero-inner\.newspaper-reading \.thoughts-library \.shared-story-body\s*\{[^}]*font-size:\s*10pt;/);
   assert.match(styles, /\.fantasy-updates-list \.shared-story-body\s*\{[^}]*font-size:\s*11pt;/);
-  assert.match(styles, /\.fantasy-updates-list \.shared-story-body :not\(figcaption\):not\(figcaption \*\)\s*\{[^}]*font-size:\s*11pt !important;/);
-  assert.match(styles, /\.fantasy-updates-list \.shared-story-body figcaption\s*\{[^}]*font-size:\s*0\.6rem;/);
+  assert.match(styles, /\.fantasy-updates-list \.shared-story-body \*\s*\{[^}]*font-size:\s*11pt !important;/);
+  assert.match(styles, /\.fantasy-updates-list \.shared-story-body figcaption\s*,\s*\.fantasy-updates-list \.shared-story-body figcaption \*\s*\{[^}]*font-size:\s*0\.6rem !important;/);
+  assert.match(styles, /\.fantasy-updates-list \.shared-story-body\s*\{[^}]*-webkit-text-size-adjust:\s*100%;/);
   assert.match(styles, /\.shared-story-body\s*\{[^}]*text-align:\s*justify;/);
   assert.doesNotMatch(styles, /\.shared-story-article\s*\{[^}]*text-align:\s*center;/);
   assert.match(styles, /\.shared-story-body p\s*\{[^}]*white-space:\s*normal;[^}]*text-align:\s*justify;[^}]*text-align-last:\s*start;[^}]*hyphens:\s*auto;/);

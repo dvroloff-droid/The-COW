@@ -1036,9 +1036,11 @@ main,
   display: flow-root;
   padding-top: 0.2rem;
   font-size: 11pt;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-.fantasy-updates-list .shared-story-body :not(figcaption):not(figcaption *) {
+.fantasy-updates-list .shared-story-body * {
   font-size: 11pt !important;
 }
 
@@ -1063,13 +1065,13 @@ main,
 
 .fantasy-updates-list .shared-story-body figcaption {
   color: var(--muted);
-  font-size: 0.6rem;
   line-height: 1.25;
   text-align: left;
 }
 
+.fantasy-updates-list .shared-story-body figcaption,
 .fantasy-updates-list .shared-story-body figcaption * {
-  font-size: inherit !important;
+  font-size: 0.6rem !important;
 }
 
 .fantasy-updates-list .shared-story-body > img,
